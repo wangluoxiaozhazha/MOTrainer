@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOTrainer.Core", "src\MOTrainer.Core\MOTrainer.Core.csproj", "{9DA0DF59-C236-41FC-BD14-7EB0872A826A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOTrainer.WinForms", "src\MOTrainer.WinForms\MOTrainer.WinForms.csproj", "{5B92ECF6-5FE8-438E-B439-B926573F66A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOTrainer.Core.SmokeTests", "tests\MOTrainer.Core.SmokeTests\MOTrainer.Core.SmokeTests.csproj", "{B898BD43-F430-44C9-83E1-61BDD8FFB45C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9DA0DF59-C236-41FC-BD14-7EB0872A826A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA0DF59-C236-41FC-BD14-7EB0872A826A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA0DF59-C236-41FC-BD14-7EB0872A826A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA0DF59-C236-41FC-BD14-7EB0872A826A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B92ECF6-5FE8-438E-B439-B926573F66A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B92ECF6-5FE8-438E-B439-B926573F66A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B92ECF6-5FE8-438E-B439-B926573F66A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B92ECF6-5FE8-438E-B439-B926573F66A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B898BD43-F430-44C9-83E1-61BDD8FFB45C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B898BD43-F430-44C9-83E1-61BDD8FFB45C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B898BD43-F430-44C9-83E1-61BDD8FFB45C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B898BD43-F430-44C9-83E1-61BDD8FFB45C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

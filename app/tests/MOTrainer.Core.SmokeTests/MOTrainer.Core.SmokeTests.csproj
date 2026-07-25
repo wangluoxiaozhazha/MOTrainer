@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>MOTrainer.Core.SmokeTests</RootNamespace>
+    <AssemblyName>MOTrainer.Core.SmokeTests</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MOTrainer.Core\MOTrainer.Core.csproj" />
+    <Compile Include="..\..\src\MOTrainer.WinForms\HotkeyGesture.cs"
+             Link="WinForms\HotkeyGesture.cs" />
+    <Compile Include="..\..\src\MOTrainer.WinForms\HotkeyBindings.cs"
+             Link="WinForms\HotkeyBindings.cs" />
+    <Compile Include="..\..\src\MOTrainer.WinForms\TrainerSettings.cs"
+             Link="WinForms\TrainerSettings.cs" />
+    <Compile Include="..\..\src\MOTrainer.WinForms\SuperweaponChoices.cs"
+             Link="WinForms\SuperweaponChoices.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,25 @@
+# Local-only samples, raw captures, archives and backups
+/local/
+
+# Generated release packages
+/dist/
+
+# .NET build output and IDE state
+**/bin/
+**/obj/
+/app/build/
+.vs/
+*.user
+*.suo
+
+# Python cache and local virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Native/debug artifacts and transient files
+*.dmp
+*.tmp
+*.bak
+*.pdb
