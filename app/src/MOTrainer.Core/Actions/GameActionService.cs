@@ -1357,7 +1357,7 @@ public sealed class GameActionService
 
             SelectionSnapshot selection =
                 new SelectionService(memory, profile.Selection)
-                    .Read(SelectionScope.All, currentPlayerOnly: true);
+                    .Read(SelectionScope.All, currentPlayerOnly: false);
 
             if (!selection.IsSuccess)
             {
@@ -1366,19 +1366,15 @@ public sealed class GameActionService
 
             if (selection.Objects.Count == 0)
             {
-                return ActionResult.Fail("没有选中属于当前玩家的单位");
+                return ActionResult.Fail("没有选中单位");
             }
 
             List<UnitEditWrite> writes = [];
             foreach (uint objectAddress in selection.Objects)
             {
-                uint ownerAddress = checked(
-                    objectAddress + profile.Selection.OwnerOffset);
                 uint healthAddress = checked(
                     objectAddress + profile.Selection.HealthOffset);
-                if (!memory.TryRead(ownerAddress, out uint owner) ||
-                    owner != selection.CurrentPlayer ||
-                    !memory.TryRead(healthAddress, out int original))
+                if (!memory.TryRead(healthAddress, out int original))
                 {
                     return ActionResult.Fail(
                         "单位状态在写入前发生变化，已取消本次操作");
@@ -1410,7 +1406,7 @@ public sealed class GameActionService
 
             return new ActionResult(
                 true,
-                $"{successPrefix}：{writes.Count} 个当前玩家单位",
+                $"{successPrefix}：{writes.Count} 个选中单位",
                 writes.Count);
         }
         catch (OverflowException)

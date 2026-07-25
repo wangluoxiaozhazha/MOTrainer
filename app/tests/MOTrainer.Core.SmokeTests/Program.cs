@@ -36,8 +36,8 @@ internal static class Program
             ("Selected-unit editor combines rank and health for friendly units", SelectedUnitEditorCombinesAttributes),
             ("Selected-unit editor reapplies values for automatic mode", SelectedUnitEditorReappliesValues),
             ("Selected-unit editor rolls back a failed combined write", SelectedUnitEditorRollsBack),
-            ("CTRL+S action adds 2000 health to all selected friendly units", AddHealthUsesSelectedUnits),
-            ("CTRL+D action sets all selected friendly health to one", SetHealthUsesSelectedUnits),
+            ("CTRL+S action adds 2000 health to all selected units", AddHealthUsesSelectedUnits),
+            ("CTRL+D action sets all selected health to one", SetHealthUsesSelectedUnits),
             ("CTRL+F action transfers all selected unit ownership", TransferActionUsesSelectedOwnerChain),
             ("CTRL+O action zeros the selected owner's economy", ZeroEconomyUsesSelectedOwnerChain),
             ("CTRL+SPACE action marks the selected owner defeated", DefeatActionUsesSelectedOwnerChain),
@@ -520,22 +520,30 @@ internal static class Program
         const uint items = 0x00100000;
         const uint first = 0x00300000;
         const uint second = 0x00400000;
+        const uint third = 0x00500000;
         const uint currentPlayer = 0x00200000;
+        const uint alliedPlayer = 0x00210000;
+        const uint enemyPlayer = 0x00220000;
         memory.SetUInt32(layout.ItemsAddress, items);
-        memory.SetInt32(layout.CountAddress, 2);
+        memory.SetInt32(layout.CountAddress, 3);
         memory.SetUInt32(
             layout.CurrentPlayerAddress,
             currentPlayer);
         memory.SetUInt32(items, first);
         memory.SetUInt32(items + 4, second);
+        memory.SetUInt32(items + 8, third);
         memory.SetUInt32(
             first + layout.OwnerOffset,
             currentPlayer);
         memory.SetUInt32(
             second + layout.OwnerOffset,
-            currentPlayer);
+            alliedPlayer);
+        memory.SetUInt32(
+            third + layout.OwnerOffset,
+            enemyPlayer);
         memory.SetInt32(first + layout.HealthOffset, 135);
         memory.SetInt32(second + layout.HealthOffset, 250);
+        memory.SetInt32(third + layout.HealthOffset, 375);
 
         GameActionService actions = CreateReadyActions(memory, profile);
         ActionResult result = actions.AddHealthToSelectedUnits(2000);
@@ -543,8 +551,10 @@ internal static class Program
         Assert(result.Success, result.Message);
         Assert(memory.TryRead(first + layout.HealthOffset, out int firstHealth), "First health readback failed.");
         Assert(memory.TryRead(second + layout.HealthOffset, out int secondHealth), "Second health readback failed.");
+        Assert(memory.TryRead(third + layout.HealthOffset, out int thirdHealth), "Third health readback failed.");
         Assert(firstHealth == 2135, "The first selected unit should gain 2000 health.");
-        Assert(secondHealth == 2250, "Every selected friendly unit should gain 2000 health.");
+        Assert(secondHealth == 2250, "The selected allied unit should gain 2000 health.");
+        Assert(thirdHealth == 2375, "The selected enemy unit should gain 2000 health.");
     }
 
     private static void SetHealthUsesSelectedUnits()
@@ -555,24 +565,42 @@ internal static class Program
 
         const uint items = 0x00100000;
         const uint first = 0x00300000;
+        const uint second = 0x00400000;
+        const uint third = 0x00500000;
         const uint currentPlayer = 0x00200000;
+        const uint alliedPlayer = 0x00210000;
+        const uint enemyPlayer = 0x00220000;
         memory.SetUInt32(layout.ItemsAddress, items);
-        memory.SetInt32(layout.CountAddress, 1);
+        memory.SetInt32(layout.CountAddress, 3);
         memory.SetUInt32(
             layout.CurrentPlayerAddress,
             currentPlayer);
         memory.SetUInt32(items, first);
+        memory.SetUInt32(items + 4, second);
+        memory.SetUInt32(items + 8, third);
         memory.SetUInt32(
             first + layout.OwnerOffset,
             currentPlayer);
+        memory.SetUInt32(
+            second + layout.OwnerOffset,
+            alliedPlayer);
+        memory.SetUInt32(
+            third + layout.OwnerOffset,
+            enemyPlayer);
         memory.SetInt32(first + layout.HealthOffset, 900);
+        memory.SetInt32(second + layout.HealthOffset, 800);
+        memory.SetInt32(third + layout.HealthOffset, 700);
 
         GameActionService actions = CreateReadyActions(memory, profile);
         ActionResult result = actions.SetSelectedUnitsHealth(1);
 
         Assert(result.Success, result.Message);
-        Assert(memory.TryRead(first + layout.HealthOffset, out int health), "Health readback failed.");
-        Assert(health == 1, "The first selected unit health should become one.");
+        Assert(memory.TryRead(first + layout.HealthOffset, out int firstHealth), "First health readback failed.");
+        Assert(memory.TryRead(second + layout.HealthOffset, out int secondHealth), "Second health readback failed.");
+        Assert(memory.TryRead(third + layout.HealthOffset, out int thirdHealth), "Third health readback failed.");
+        Assert(firstHealth == 1, "The selected current-player unit health should become one.");
+        Assert(secondHealth == 1, "The selected allied unit health should become one.");
+        Assert(thirdHealth == 1, "The selected enemy unit health should become one.");
     }
 
     private static void TransferActionUsesSelectedOwnerChain()
