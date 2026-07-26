@@ -3,12 +3,16 @@
 MOTrainer 是一个面向《Mental Omega》的非官方离线修改器。项目独立实现，
 用于单机环境中的单位、资源、生产、战场状态和超级武器调整。
 
-项目目前处于首次公开发布前的整理阶段。程序主体已经完成，公开文档、发布包和
-最终版本信息仍在准备中。
+首个公开候选版本 `v0.1.0-rc1` 已发布。当前版本以简体中文和离线使用为主，
+欢迎通过 Issues 反馈兼容性问题与可复现的异常行为。
 
 > 本项目仅供离线游戏使用，不提供反作弊绕过，也不建议在任何联机环境中运行。
 
 当前源码版本：`0.1.0-rc1`
+
+- [下载 v0.1.0-rc1](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc1)
+- [查看全部 Releases](https://github.com/cmdrmo/MOTrainer/releases)
+- [提交 Issue](https://github.com/cmdrmo/MOTrainer/issues)
 
 ## 主要功能
 
@@ -57,8 +61,10 @@ MOTrainer 是一个面向《Mental Omega》的非官方离线修改器。项目�
 
 ## 使用
 
-首次公开发布完成后，请从本项目的 GitHub Releases 页面下载发布包。不要从
-不明来源下载重新打包的版本。
+请从本项目的
+[GitHub Releases](https://github.com/cmdrmo/MOTrainer/releases)
+下载发布包，不要使用不明来源重新打包的版本。`v0.1.0-rc1` 是公开候选版，
+下载后可使用同页提供的 `.sha256` 文件核对 ZIP。
 
 发布包中的以下三个文件必须放在同一目录：
 
