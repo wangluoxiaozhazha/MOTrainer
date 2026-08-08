@@ -473,8 +473,8 @@ public sealed class MainForm : Form
             actions.SetMoney(decimal.ToUInt32(moneyInput.Value)));
         zeroEconomyButton = new Button
         {
-            Location = new Point(18, 84),
-            Size = new Size(176, 29),
+            Location = new Point(18, 82),
+            Size = new Size(368, 28),
             Text = UiStrings.Get("ActionZeroEconomy"),
         };
         zeroEconomyButton.Click += (_, _) => RunAction(
@@ -484,8 +484,8 @@ public sealed class MainForm : Form
             HotkeyActionIds.ZeroEconomy);
         defeatOwnerButton = new Button
         {
-            Location = new Point(210, 84),
-            Size = new Size(176, 29),
+            Location = new Point(18, 114),
+            Size = new Size(368, 28),
             Text = UiStrings.Get("ActionDefeatOwner"),
         };
         defeatOwnerButton.Click += (_, _) => RunAction(
@@ -498,18 +498,18 @@ public sealed class MainForm : Form
         oneTimeGroup.Controls.Add(zeroEconomyButton);
         oneTimeGroup.Controls.Add(defeatOwnerButton);
         oneTimeGroup.Controls.Add(
-            CreateSeparator(new Point(18, 126), 368));
+            CreateSeparator(new Point(18, 151), 368));
         oneTimeGroup.Controls.Add(
             CreateSectionLabel(
                 UiStrings.Get("SuperweaponsSection"),
-                new Point(18, 136)));
+                new Point(18, 159)));
 
         Point[] superweaponLocations =
         [
-            new(18, 160), new(110, 160),
-            new(202, 160), new(294, 160),
-            new(18, 188), new(110, 188),
-            new(202, 188), new(294, 188),
+            new(18, 181), new(110, 181),
+            new(202, 181), new(294, 181),
+            new(18, 207), new(110, 207),
+            new(202, 207), new(294, 207),
         ];
         for (int index = 0; index < SuperweaponChoices.All.Count; index++)
         {
@@ -526,7 +526,7 @@ public sealed class MainForm : Form
         }
         grantSelectedSuperweaponsButton = new Button
         {
-            Location = new Point(18, 246),
+            Location = new Point(18, 235),
             Size = new Size(368, 28),
             Text = UiStrings.Get("ButtonGrantSelectedSuperweapons"),
         };
@@ -540,7 +540,7 @@ public sealed class MainForm : Form
         {
             AutoSize = true,
             ForeColor = Color.DimGray,
-            Location = new Point(18, 282),
+            Location = new Point(18, 271),
         };
         oneTimeGroup.Controls.Add(superweaponHotkeyDescription);
 
