@@ -1,72 +1,91 @@
 # MOTrainer
 
-MOTrainer 是一个面向《Mental Omega》的非官方离线修改器。项目独立实现，
-用于单机环境中的单位、资源、生产、战场状态和超级武器调整。
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-首个公开候选版本 `v0.1.0-rc1` 已发布。当前版本以简体中文和离线使用为主，
-欢迎通过 Issues 反馈兼容性问题与可复现的异常行为。
+MOTrainer is an independent, unofficial, open-source offline trainer for
+[Mental Omega](https://mentalomega.com/). It provides selected-unit editing,
+economy and production controls, battlefield utilities, and superweapon grants
+for a strictly verified game build.
 
-> 本项目仅供离线游戏使用，不提供反作弊绕过，也不建议在任何联机环境中运行。
+> Offline use only. MOTrainer does not provide anti-cheat bypasses and should
+> not be used in multiplayer environments.
 
-当前源码版本：`0.1.0-rc1`
+![MOTrainer English interface](docs/images/motrainer-english.png)
 
-- [下载 v0.1.0-rc1](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc1)
-- [查看全部 Releases](https://github.com/cmdrmo/MOTrainer/releases)
-- [提交 Issue](https://github.com/cmdrmo/MOTrainer/issues)
+## Project status
 
-## 主要功能
+The current source supports `Auto`, English, and Simplified Chinese display
+languages in one executable. The latest public package,
+[`v0.1.0-rc1`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc1),
+predates the bilingual interface and remains the initial Chinese release
+candidate. Build the current source to preview the English interface until a
+new package is published.
 
-### 选中单位
+- [Releases](https://github.com/cmdrmo/MOTrainer/releases)
+- [Compatibility and troubleshooting](docs/COMPATIBILITY.md)
+- [Report an issue](https://github.com/cmdrmo/MOTrainer/issues)
 
-- 修改当前玩家已选中对象的等级和生命
-- 事件模式：选择形成时应用一次，适合常规自动升星
-- 轮询模式：持续应用当前设置，适合锁定生命和兼容特殊选择路径
-- 占有选中对象
-- 为全部选中对象加血或将生命扣至 1，不区分归属
+## Features
 
-### 全局状态
+### Selected-unit editor
 
-- 锁定经济、锁定电量
-- 仅当前玩家快速生产
-- 随处建造、自动维修
-- 解锁建造数量、解锁队列上限
-- 操纵全部、心灵探测、无视隐形、无视黑雾
-- 科技全开：阵营模式与扩展模式
+- Edit veterancy and health for selected units owned by the current player.
+- Apply once when a selection is formed, or continuously in compatibility
+  mode.
+- Transfer selected units to the current player.
+- Heal all selected objects or set their health to 1 regardless of ownership.
 
-`解锁建造数量` 和 `解锁队列上限` 可以在进入战局前预设；程序会在对应结构
-就绪后应用。
+### Persistent match controls
 
-### 一次性功能
+- Lock credits and power.
+- Current-player-only instant production.
+- Build anywhere and automatic repair.
+- Remove build-count and queue limits.
+- Control all units, detect psychic effects, reveal cloaked units, and reveal
+  the map.
+- Safe technology unlock with faction and extended modes.
 
-- 修改当前玩家经济
-- 将首个选中对象所属阵营的经济归零
-- 令首个选中对象所属阵营投降
-- 批量发放已勾选的八种超级武器
+Build-count and queue-limit options may be preset before entering a match. They
+remain pending and apply only after the required game structures are available.
 
-所有热键均可在程序内修改、保存和恢复默认。热键与鼠标操作调用相同的功能路径。
+### One-time actions
 
-## 兼容性
+- Set current-player credits.
+- Zero the faction economy identified by the first selected object.
+- Mark that faction as surrendered.
+- Grant any selected combination of eight faction superweapons.
 
-- Windows
-- 32 位（x86）游戏进程
-- 默认发布包使用 .NET Framework 4.8
-- 当前仅支持一组经过实机验证的 `gamemd.exe` 与 `Ares.dll`
-- 当前界面和公开文档以简体中文为主
+Every hotkey can be changed, saved, or restored from inside the application.
+Hotkeys and mouse controls call the same validated action paths.
 
-程序会校验目标模块的 SHA-256。模块版本未知、战局结构未就绪或读取结果异常时，
-受影响的操作会被拒绝，不会尝试猜测地址。
+## Compatibility
 
-准确的模块指纹、运行状态说明和版本反馈方法见
-[兼容性说明](docs/COMPATIBILITY.md)。
+| Requirement | Supported scope |
+| --- | --- |
+| Operating system | Windows |
+| Game process | 32-bit `gamemd.exe` |
+| Default runtime | .NET Framework 4.8 |
+| Display language | Auto, English, Simplified Chinese |
+| Intended use | Mental Omega offline matches |
 
-## 使用
+MOTrainer validates the SHA-256 fingerprints of `gamemd.exe` and `Ares.dll`.
+Unknown modules, unavailable match structures, inconsistent bytes, or failed
+readback cause the affected operation to be refused. The program does not guess
+addresses for an unknown build.
 
-请从本项目的
-[GitHub Releases](https://github.com/cmdrmo/MOTrainer/releases)
-下载发布包，不要使用不明来源重新打包的版本。`v0.1.0-rc1` 是公开候选版，
-下载后可使用同页提供的 `.sha256` 文件核对 ZIP。
+See [Compatibility and troubleshooting](docs/COMPATIBILITY.md) for the verified
+fingerprints, status meanings, permissions guidance, and issue-reporting
+requirements.
 
-发布包中的以下三个文件必须放在同一目录：
+## Download and use
+
+Download packages only from this repository's
+[GitHub Releases](https://github.com/cmdrmo/MOTrainer/releases). Avoid
+third-party repacks. When a `.sha256` file is provided, verify the ZIP before
+extracting it.
+
+The original `v0.1.0-rc1` package contains three files that must remain in the
+same directory:
 
 ```text
 MOTrainer.exe
@@ -74,31 +93,45 @@ MOTrainer.Core.dll
 MOTrainer.exe.config
 ```
 
-运行步骤：
+Bilingual builds also contain a `zh-Hans` directory with two satellite resource
+DLLs. Keep that directory beside `MOTrainer.exe`; removing it disables the
+Simplified Chinese resources.
 
-1. 启动 Mental Omega。
-2. 启动 `MOTrainer.exe`。
-3. 等待顶部状态栏显示版本已确认；进入战局后使用对应功能。
+1. Start Mental Omega.
+2. Start `MOTrainer.exe` at the same privilege level as the game.
+3. Wait for the top status bar to confirm the game build.
+4. Enter an offline match and use the required controls.
 
-`MOTrainer.exe.config` 同时保存运行时要求和用户设置。更新版本前建议备份该
-文件；需要保留热键和界面选项时，可继续使用原配置。如果新版本提示配置无效，
-请换回随新版本提供的默认配置。
+`MOTrainer.exe.config` stores the language, editor values, selected
+superweapons, feature modes, and custom hotkeys. Back it up before replacing a
+release if you want to preserve those settings. If an older configuration is
+reported as invalid, restore the default configuration included with the new
+package.
 
-如果系统缺少运行环境，请安装
-[Microsoft .NET Framework 4.8 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48)。
+Install the official
+[.NET Framework 4.8 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48)
+if it is not already available.
 
-## 安全边界
+## Safety model
 
-MOTrainer 不复制或修改 Mental Omega 的游戏文件。功能通过读取和写入当前
-游戏进程实现，修改器退出时会尝试恢复由本次运行启用的持续补丁。
+MOTrainer does not copy or modify Mental Omega game files. It reads and writes
+the running game process and attempts to restore persistent patches installed
+by the current trainer instance when the trainer exits.
 
-由于进程内存读写、远程代码页和全局热键等行为，安全软件可能将发布包标记为
-风险程序。请只使用项目正式发布的文件并核对发布页提供的 SHA-256；如果仍有
-疑虑，可以自行审查源码并构建。
+One-time results cannot be undone automatically. Some changes may also be
+retained by the game in the current save. Save your progress before testing a
+release candidate.
 
-## 从源码构建
+Opening another process, writing memory, allocating temporary remote code pages,
+and registering global hotkeys may trigger heuristic antivirus detection. Use
+only official release assets, verify the published SHA-256, and review or build
+the source if you remain uncertain. The project does not ask users to disable
+security software or exclude an entire game directory.
 
-需要安装能够构建 .NET 8 和 .NET Framework 4.8 目标的 .NET SDK。
+## Build from source
+
+Install a .NET SDK capable of building both .NET 8 and .NET Framework 4.8
+targets, then run:
 
 ```powershell
 dotnet build .\app\MOTrainer.sln --configuration Release
@@ -106,10 +139,12 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-当前自动化测试包含 37 项 Core 烟雾测试。它们覆盖核心状态转换和安全拒绝路径，
-但不代替特定 Mental Omega 版本中的实机验证。
+The current suite contains 37 smoke tests covering core state transitions,
+safety refusals, rollback paths, localization resources, and settings
+compatibility. These tests do not replace validation against the exact supported
+Mental Omega build.
 
-默认的紧凑型 .NET Framework 4.8 发布命令：
+Publish the compact x86 .NET Framework build with:
 
 ```powershell
 dotnet publish .\app\src\MOTrainer.WinForms\MOTrainer.WinForms.csproj `
@@ -122,27 +157,32 @@ dotnet publish .\app\src\MOTrainer.WinForms\MOTrainer.WinForms.csproj `
   --output .\dist\win-x86-net48
 ```
 
-## 项目结构
+## Repository layout
 
 ```text
-app/src/MOTrainer.Core/             进程、内存、版本、功能与安全检查
-app/src/MOTrainer.WinForms/         Windows 图形界面
-app/tests/MOTrainer.Core.SmokeTests/无第三方测试框架的 Core 烟雾测试
-docs/                               公开说明
+app/src/MOTrainer.Core/              process, memory, profiles, and safety logic
+app/src/MOTrainer.WinForms/          Windows user interface
+app/tests/MOTrainer.Core.SmokeTests/ lightweight smoke-test harness
+docs/                                compatibility and maintenance notes
 ```
 
-后续代码维护采用随功能改动逐步偿还结构债的方式，详见
-[渐进维护与结构偿债计划](docs/MAINTENANCE_PLAN.md)。
+Future structural work follows an incremental approach: refactor along real
+feature boundaries without weakening version checks, readback, rollback, or
+shutdown restoration. The current internal plan is available in
+[Simplified Chinese](docs/MAINTENANCE_PLAN.md).
 
-## 项目关系与致谢
+## Independence and acknowledgements
 
-MOTrainer 不是 Mental Omega、Electronic Arts 或任何既有修改器的官方项目，
-也不与这些项目存在隶属关系。设计和兼容性研究参考了社区公开资料、既有工具的
-可观察行为和长期游戏经验，具体说明见[致谢](ACKNOWLEDGEMENTS.md)。
+MOTrainer is not affiliated with or endorsed by Mental Omega, Electronic Arts,
+or any existing trainer project. It is independently implemented from public
+documentation, observable behavior, community research, and validation against
+the supported build. See [Acknowledgements and project boundaries](ACKNOWLEDGEMENTS.md).
 
-本仓库不包含或分发游戏本体、Mental Omega 文件、第三方修改器文件或它们的资源。
+This repository does not contain or distribute the game, Mental Omega files,
+third-party trainer files, or their assets.
 
-## 许可证
+## License
 
-MOTrainer 以 [GNU General Public License v3.0 only](LICENSE)
-（`GPL-3.0-only`）发布。
+MOTrainer source code is licensed under the
+[GNU General Public License v3.0 only](LICENSE) (`GPL-3.0-only`). The license does
+not grant rights to any third-party games, mods, names, or assets.
