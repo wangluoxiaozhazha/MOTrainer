@@ -7,6 +7,10 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+        DisplayLanguage language = DisplayCulture.ReadConfiguredLanguage(
+            TrainerSettingsStore.DefaultPath);
+        DisplayCulture.Apply(language);
+
 #if NET48
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);

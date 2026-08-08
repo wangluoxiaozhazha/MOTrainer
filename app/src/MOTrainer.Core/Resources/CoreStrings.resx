@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AccessDenied" xml:space="preserve"><value>Cannot access gamemd.exe (PID {0}): insufficient permission. Run the game and MOTrainer at the same privilege level, then try again.</value></data>
+  <data name="AresUnsupported" xml:space="preserve"><value>Unsupported Ares.dll: {0}</value></data>
+  <data name="GameNotRunning" xml:space="preserve"><value>Game is not running</value></data>
+  <data name="GamePathReadFailed" xml:space="preserve"><value>Cannot read the gamemd.exe path: {0}</value></data>
+  <data name="GamePathUnavailable" xml:space="preserve"><value>Cannot read the gamemd.exe path</value></data>
+  <data name="GameProcessEnumerationFailed" xml:space="preserve"><value>Game process enumeration failed: {0}</value></data>
+  <data name="GameUnsupported" xml:space="preserve"><value>Unsupported gamemd.exe: {0}</value></data>
+  <data name="MatchReady" xml:space="preserve"><value>Match ready: {0} (PID {1})</value></data>
+  <data name="ModuleListReadFailed" xml:space="preserve"><value>Cannot read the gamemd.exe module list: {0}</value></data>
+  <data name="ObservedMentalOmegaProfile" xml:space="preserve"><value>verified Mental Omega build</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>gamemd.exe (PID {0}) probe failed: {1}</value></data>
+  <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>Version verified: {0}; match structures are not ready</value></data>
+  <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>Version verified: {0}; waiting to enter a match</value></data>
+  <data name="WaitingForAres" xml:space="preserve"><value>gamemd.exe identified; waiting for Ares.dll to load</value></data>
+</root>

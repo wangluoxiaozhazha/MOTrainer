@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AccessDenied" xml:space="preserve"><value>无法访问 gamemd.exe（PID {0}）：权限不足。请让游戏与修改器使用相同权限级别后重试</value></data>
+  <data name="AresUnsupported" xml:space="preserve"><value>Ares.dll 版本不受支持：{0}</value></data>
+  <data name="GameNotRunning" xml:space="preserve"><value>游戏未启动</value></data>
+  <data name="GamePathReadFailed" xml:space="preserve"><value>无法读取 gamemd.exe 路径：{0}</value></data>
+  <data name="GamePathUnavailable" xml:space="preserve"><value>无法读取 gamemd.exe 路径</value></data>
+  <data name="GameProcessEnumerationFailed" xml:space="preserve"><value>游戏进程枚举失败：{0}</value></data>
+  <data name="GameUnsupported" xml:space="preserve"><value>不受支持的 gamemd.exe：{0}</value></data>
+  <data name="MatchReady" xml:space="preserve"><value>战局已就绪：{0}（PID {1}）</value></data>
+  <data name="ModuleListReadFailed" xml:space="preserve"><value>无法读取 gamemd.exe 模块列表：{0}</value></data>
+  <data name="ObservedMentalOmegaProfile" xml:space="preserve"><value>Mental Omega 已验证样本</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>gamemd.exe（PID {0}）探测失败：{1}</value></data>
+  <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>版本已确认：{0}；战局结构尚未就绪</value></data>
+  <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>版本已确认：{0}；等待进入战局</value></data>
+  <data name="WaitingForAres" xml:space="preserve"><value>已识别 gamemd.exe，等待 Ares.dll 加载</value></data>
+</root>

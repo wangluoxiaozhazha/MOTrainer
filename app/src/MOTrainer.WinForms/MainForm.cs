@@ -24,6 +24,7 @@ public sealed class MainForm : Form
     private readonly NumericUpDown moneyInput;
     private readonly Button moneyButton;
     private readonly Button hotkeySettingsButton;
+    private readonly ComboBox languageInput;
     private readonly Button addHealthButton;
     private readonly Button oneHealthButton;
     private readonly Button transferButton;
@@ -71,7 +72,7 @@ public sealed class MainForm : Form
         settingsLoadWarning = settingsLoad.Warning;
         hotkeyBindings = initialSettings.Hotkeys;
 
-        Text = "MO 离线修改器";
+        Text = UiStrings.Get("AppTitle");
         ClientSize = new Size(880, 598);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
@@ -83,14 +84,38 @@ public sealed class MainForm : Form
             AutoSize = false,
             BorderStyle = BorderStyle.FixedSingle,
             Location = new Point(16, 16),
-            Size = new Size(712, 46),
+            Size = new Size(552, 46),
             TextAlign = ContentAlignment.MiddleCenter,
+        };
+        languageInput = new ComboBox
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Location = new Point(584, 27),
+            Size = new Size(144, 24),
+        };
+        languageInput.Items.AddRange(
+        [
+            new DisplayLanguageOption(
+                DisplayLanguage.Auto,
+                UiStrings.Get("LanguageAuto")),
+            new DisplayLanguageOption(
+                DisplayLanguage.SimplifiedChinese,
+                UiStrings.Get("LanguageSimplifiedChinese")),
+            new DisplayLanguageOption(
+                DisplayLanguage.English,
+                UiStrings.Get("LanguageEnglish")),
+        ]);
+        languageInput.SelectedIndex = initialSettings.DisplayLanguage switch
+        {
+            DisplayLanguage.SimplifiedChinese => 1,
+            DisplayLanguage.English => 2,
+            _ => 0,
         };
         hotkeySettingsButton = new Button
         {
             Location = new Point(744, 16),
             Size = new Size(120, 46),
-            Text = "热键设置",
+            Text = UiStrings.Get("HotkeySettings"),
         };
         hotkeySettingsButton.Click += (_, _) =>
             OpenHotkeySettings();
@@ -494,16 +519,22 @@ public sealed class MainForm : Form
             BorderStyle = BorderStyle.FixedSingle,
             Location = new Point(16, 536),
             Size = new Size(848, 46),
-            Text = "当前仅支持已验证的 gamemd.exe / Ares.dll 哈希。",
+            Text = UiStrings.Get("CompatibilityNotice"),
             TextAlign = ContentAlignment.MiddleLeft,
         };
 
         Controls.Add(statusLabel);
+        Controls.Add(languageInput);
         Controls.Add(hotkeySettingsButton);
         Controls.Add(unitGroup);
         Controls.Add(globalStateGroup);
         Controls.Add(oneTimeGroup);
         Controls.Add(resultLabel);
+        hotkeyTips.SetToolTip(
+            languageInput,
+            UiStrings.Get("DisplayLanguageTooltip"));
+        languageInput.SelectedIndexChanged += (_, _) =>
+            SaveDisplayLanguage();
 
         refreshTimer = new System.Windows.Forms.Timer
         {
@@ -834,6 +865,7 @@ public sealed class MainForm : Form
                 ? techOption.Mode
                 : TechUnlockMode.Faction;
         return new TrainerSettings(
+            SelectedDisplayLanguage,
             editVeterancyControl.Checked,
             veterancy,
             editHealthControl.Checked,
@@ -846,6 +878,20 @@ public sealed class MainForm : Form
                 .Select(choice => choice.Id)
                 .ToArray(),
             hotkeyBindings);
+    }
+
+    private DisplayLanguage SelectedDisplayLanguage =>
+        languageInput.SelectedItem is DisplayLanguageOption option
+            ? option.Language
+            : DisplayLanguage.Auto;
+
+    private void SaveDisplayLanguage()
+    {
+        string? error = settingsStore.Save(CaptureSettings());
+        resultLabel.Text = error ?? UiStrings.Get("LanguageRestartRequired");
+        resultLabel.ForeColor = error is null
+            ? Color.DarkOrange
+            : Color.DarkRed;
     }
 
     private void AddPatchControl(
@@ -1625,6 +1671,13 @@ public sealed class MainForm : Form
 
     private sealed record VeterancyOption(
         UnitVeterancyLevel Level,
+        string DisplayName)
+    {
+        public override string ToString() => DisplayName;
+    }
+
+    private sealed record DisplayLanguageOption(
+        DisplayLanguage Language,
         string DisplayName)
     {
         public override string ToString() => DisplayName;

@@ -7,8 +7,10 @@ namespace MOTrainer.Core.Profiles;
 
 public static class KnownProfiles
 {
+    public const string ObservedMentalOmegaId = "mo-observed-2026-07-24";
+
     public static VersionProfile ObservedMentalOmega { get; } = new(
-        Id: "mo-observed-2026-07-24",
+        Id: ObservedMentalOmegaId,
         DisplayName: "Mental Omega 已验证样本",
         Game: new ModuleFingerprint(
             "gamemd.exe",
@@ -196,8 +198,8 @@ public static class KnownProfiles
         },
         SelectionHooks:
             new Dictionary<string, SelectionVeterancyHookDefinition>
-        {
-            [KnownPatchIds.AutoPromoteSelection] =
+            {
+                [KnownPatchIds.AutoPromoteSelection] =
                 new SelectionVeterancyHookDefinition(
                     Id: KnownPatchIds.AutoPromoteSelection,
                     ModuleName: "gamemd.exe",
@@ -222,7 +224,7 @@ public static class KnownProfiles
                     OwnerOffset: 0x21C,
                     VeterancyOffset: 0x150,
                     HealthOffset: 0x6C),
-        },
+            },
         TechUnlockHooks: new Dictionary<string, PlayerTechUnlockHookDefinition>
         {
             [KnownPatchIds.SafeTechUnlock] =

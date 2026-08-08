@@ -12,7 +12,80 @@ internal enum AutoEditMode
     Polling,
 }
 
+internal enum DisplayLanguage
+{
+    Auto,
+    SimplifiedChinese,
+    English,
+}
+
+internal static class DisplayCulture
+{
+    public static DisplayLanguage ReadConfiguredLanguage(string path)
+    {
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return DisplayLanguage.Auto;
+            }
+
+            string? value = XDocument.Load(path)
+                .Root?
+                .Element("appSettings")?
+                .Elements("add")
+                .LastOrDefault(element =>
+                    string.Equals(
+                        (string?)element.Attribute("key"),
+                        "ui.language",
+                        StringComparison.Ordinal))?
+                .Attribute("value")?
+                .Value;
+            return Enum.TryParse(value, true, out DisplayLanguage language) &&
+                Enum.IsDefined(typeof(DisplayLanguage), language)
+                    ? language
+                    : DisplayLanguage.Auto;
+        }
+        catch
+        {
+            return DisplayLanguage.Auto;
+        }
+    }
+
+    public static CultureInfo Apply(
+        DisplayLanguage language,
+        CultureInfo? installedUiCulture = null)
+    {
+        CultureInfo culture = Resolve(language, installedUiCulture);
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+        return culture;
+    }
+
+    public static CultureInfo Resolve(
+        DisplayLanguage language,
+        CultureInfo? installedUiCulture = null)
+    {
+        DisplayLanguage resolved = language == DisplayLanguage.Auto
+            ? ResolveAutomatic(installedUiCulture ?? CultureInfo.InstalledUICulture)
+            : language;
+        return CultureInfo.GetCultureInfo(
+            resolved == DisplayLanguage.SimplifiedChinese
+                ? "zh-Hans"
+                : "en");
+    }
+
+    private static DisplayLanguage ResolveAutomatic(CultureInfo culture) =>
+        string.Equals(
+            culture.TwoLetterISOLanguageName,
+            "zh",
+            StringComparison.OrdinalIgnoreCase)
+            ? DisplayLanguage.SimplifiedChinese
+            : DisplayLanguage.English;
+}
+
 internal sealed record TrainerSettings(
+    DisplayLanguage DisplayLanguage,
     bool ModifyVeterancy,
     UnitVeterancyLevel Veterancy,
     bool ModifyHealth,
@@ -25,6 +98,7 @@ internal sealed record TrainerSettings(
 {
     public static TrainerSettings CreateDefaults() =>
         new(
+            DisplayLanguage: DisplayLanguage.Auto,
             ModifyVeterancy: true,
             Veterancy: UnitVeterancyLevel.Elite,
             ModifyHealth: false,
@@ -48,10 +122,12 @@ internal sealed class TrainerSettingsStore
 
     public TrainerSettingsStore(string? path = null)
     {
-        this.path = path ??
-            ((Assembly.GetEntryAssembly()?.Location ??
-                Application.ExecutablePath) + ".config");
+        this.path = path ?? DefaultPath;
     }
+
+    public static string DefaultPath =>
+        (Assembly.GetEntryAssembly()?.Location ??
+            Application.ExecutablePath) + ".config";
 
     public string Path => path;
 
@@ -77,6 +153,11 @@ internal sealed class TrainerSettingsStore
         }
 
         List<string> warnings = [];
+        DisplayLanguage displayLanguage = ReadEnum(
+            values,
+            "ui.language",
+            defaults.DisplayLanguage,
+            warnings);
         bool modifyVeterancy = ReadBoolean(
             values,
             "unit.modifyVeterancy",
@@ -171,6 +252,7 @@ internal sealed class TrainerSettingsStore
         }
 
         TrainerSettings settings = new(
+            displayLanguage,
             modifyVeterancy,
             veterancy,
             modifyHealth,
@@ -226,6 +308,10 @@ internal sealed class TrainerSettingsStore
             }
 
             SetValue(appSettings, SettingsVersionKey, "2");
+            SetValue(
+                appSettings,
+                "ui.language",
+                settings.DisplayLanguage.ToString());
             SetValue(
                 appSettings,
                 "unit.modifyVeterancy",

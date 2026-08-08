@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>MOTrainer — Offline Trainer</value></data>
+  <data name="CompatibilityNotice" xml:space="preserve"><value>Only verified gamemd.exe and Ares.dll hashes are currently supported.</value></data>
+  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>Display language. Restart MOTrainer after changing this setting.</value></data>
+  <data name="HotkeySettings" xml:space="preserve"><value>Hotkeys</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>Automatic</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageRestartRequired" xml:space="preserve"><value>Display language saved. Restart MOTrainer to apply it.</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+</root>

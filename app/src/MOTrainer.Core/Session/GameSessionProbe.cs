@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Memory;
 using MOTrainer.Core.Profiles;
 
@@ -86,7 +87,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
             return new GameSessionSnapshot(
                 SessionState.Error,
                 null,
-                $"游戏进程枚举失败：{exception.Message}");
+                CoreStrings.Format(
+                    "GameProcessEnumerationFailed",
+                    exception.Message));
         }
     }
 
@@ -101,7 +104,7 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.Error,
                     processId,
-                    "无法读取 gamemd.exe 路径");
+                    CoreStrings.Get("GamePathUnavailable"));
             }
         }
         catch (Exception exception) when (IsAccessDenied(exception))
@@ -113,7 +116,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
             return new GameSessionSnapshot(
                 SessionState.Error,
                 processId,
-                $"无法读取 gamemd.exe 路径：{exception.Message}");
+                CoreStrings.Format(
+                    "GamePathReadFailed",
+                    exception.Message));
         }
 
         try
@@ -127,7 +132,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.Unsupported,
                     processId,
-                    $"不受支持的 gamemd.exe：{ShortHash(gameHash)}");
+                    CoreStrings.Format(
+                        "GameUnsupported",
+                        ShortHash(gameHash)));
             }
 
             string? aresPath;
@@ -146,7 +153,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.Error,
                     processId,
-                    $"无法读取 gamemd.exe 模块列表：{exception.Message}",
+                    CoreStrings.Format(
+                        "ModuleListReadFailed",
+                        exception.Message),
                     profile);
             }
 
@@ -155,7 +164,7 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.ProcessFound,
                     processId,
-                    "已识别 gamemd.exe，等待 Ares.dll 加载",
+                    CoreStrings.Get("WaitingForAres"),
                     profile);
             }
 
@@ -165,7 +174,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.Unsupported,
                     processId,
-                    $"Ares.dll 版本不受支持：{ShortHash(aresHash)}",
+                    CoreStrings.Format(
+                        "AresUnsupported",
+                        ShortHash(aresHash)),
                     profile);
             }
 
@@ -180,7 +191,9 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.ModulesReady,
                     processId,
-                    $"版本已确认：{profile.DisplayName}；等待进入战局",
+                    CoreStrings.Format(
+                        "VersionVerifiedWaitingForMatch",
+                        ProfileDisplayName(profile)),
                     profile);
             }
 
@@ -189,14 +202,19 @@ public sealed class GameSessionProbe : IGameSessionProbe
                 return new GameSessionSnapshot(
                     SessionState.ModulesReady,
                     processId,
-                    $"版本已确认：{profile.DisplayName}；战局结构尚未就绪",
+                    CoreStrings.Format(
+                        "VersionVerifiedStructuresNotReady",
+                        ProfileDisplayName(profile)),
                     profile);
             }
 
             return new GameSessionSnapshot(
                 SessionState.MatchReady,
                 processId,
-                $"战局已就绪：{profile.DisplayName}（PID {processId}）",
+                CoreStrings.Format(
+                    "MatchReady",
+                    ProfileDisplayName(profile),
+                    processId),
                 profile);
         }
         catch (Exception exception) when (IsAccessDenied(exception))
@@ -208,7 +226,10 @@ public sealed class GameSessionProbe : IGameSessionProbe
             return new GameSessionSnapshot(
                 SessionState.Error,
                 processId,
-                $"gamemd.exe（PID {processId}）探测失败：{exception.Message}");
+                CoreStrings.Format(
+                    "ProbeFailed",
+                    processId,
+                    exception.Message));
         }
     }
 
@@ -231,8 +252,7 @@ public sealed class GameSessionProbe : IGameSessionProbe
         new(
             SessionState.Error,
             processId,
-            $"无法访问 gamemd.exe（PID {processId}）：权限不足。" +
-            "请让游戏与修改器使用相同权限级别后重试");
+            CoreStrings.Format("AccessDenied", processId));
 
     private string GetSha256(string path)
     {
@@ -306,6 +326,11 @@ public sealed class GameSessionProbe : IGameSessionProbe
     {
         return value.Length <= 12 ? value : value.Substring(0, 12);
     }
+
+    private static string ProfileDisplayName(VersionProfile profile) =>
+        profile.Id == KnownProfiles.ObservedMentalOmegaId
+            ? CoreStrings.Get("ObservedMentalOmegaProfile")
+            : profile.DisplayName;
 
     private readonly record struct FileIdentity(
         string Path,

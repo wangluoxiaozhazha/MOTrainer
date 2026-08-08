@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>MO 离线修改器</value></data>
+  <data name="CompatibilityNotice" xml:space="preserve"><value>当前仅支持已验证的 gamemd.exe / Ares.dll 哈希。</value></data>
+  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>显示语言；更改后请重启 MOTrainer。</value></data>
+  <data name="HotkeySettings" xml:space="preserve"><value>热键设置</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>自动</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageRestartRequired" xml:space="preserve"><value>显示语言已保存；重启 MOTrainer 后生效。</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>简体中文</value></data>
+</root>
