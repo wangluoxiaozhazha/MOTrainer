@@ -208,7 +208,7 @@ public sealed class MainForm : Form
 
         transferButton = new Button
         {
-            Location = new Point(608, 27),
+            Location = new Point(748, 27),
             Size = new Size(214, 29),
             Text = UiStrings.Get("ButtonTakeOwnership"),
         };
@@ -220,7 +220,7 @@ public sealed class MainForm : Form
 
         addHealthButton = new Button
         {
-            Location = new Point(608, 63),
+            Location = new Point(748, 63),
             Size = new Size(106, 29),
             Text = UiStrings.Get("ButtonHeal"),
         };
@@ -232,7 +232,7 @@ public sealed class MainForm : Form
 
         oneHealthButton = new Button
         {
-            Location = new Point(716, 63),
+            Location = new Point(856, 63),
             Size = new Size(106, 29),
             Text = UiStrings.Get("ButtonSetHealthOne"),
         };
@@ -267,7 +267,7 @@ public sealed class MainForm : Form
         {
             AutoSize = false,
             BorderStyle = BorderStyle.Fixed3D,
-            Location = new Point(590, 24),
+            Location = new Point(730, 24),
             Size = new Size(2, 68),
         });
         globalStateGroup = new GroupBox
@@ -390,11 +390,19 @@ public sealed class MainForm : Form
             ChangeTechUnlockModeIfEnabled();
         globalStateGroup.Controls.Add(techUnlockModeInput);
 
+        Label autoEditModeLabel = new()
+        {
+            AutoSize = true,
+            Location = new Point(430, 67),
+            Text = UiStrings.Get("AutoModeLabel"),
+        };
+        unitGroup.Controls.Add(autoEditModeLabel);
+
         autoEditModeInput = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Location = new Point(430, 63),
-            Size = new Size(150, 24),
+            Location = new Point(478, 63),
+            Size = new Size(230, 24),
         };
         autoEditModeInput.Items.Add(
             new AutoEditModeOption(
@@ -411,6 +419,9 @@ public sealed class MainForm : Form
         autoEditModeInput.SelectedIndexChanged += (_, _) =>
             ChangeAutoEditModeIfEnabled();
         unitGroup.Controls.Add(autoEditModeInput);
+        hotkeyTips.SetToolTip(
+            autoEditModeInput,
+            UiStrings.Get("AutoModeTooltip"));
 
         autoEditControl = new CheckBox
         {
@@ -423,7 +434,8 @@ public sealed class MainForm : Form
             RunAction(ToggleAutoEdit);
         SetHotkeyToolTip(
             autoEditControl,
-            HotkeyActionIds.AutoEdit);
+            HotkeyActionIds.AutoEdit,
+            UiStrings.Get("AutoApplyTooltip"));
         unitGroup.Controls.Add(autoEditControl);
 
         oneTimeGroup = new GroupBox
@@ -1026,11 +1038,13 @@ public sealed class MainForm : Form
 
     private void SetHotkeyToolTip(
         Control control,
-        string actionId)
+        string actionId,
+        string? description = null)
     {
         hotkeyDisplayBindings[control] = new(
             actionId,
-            control.Text);
+            control.Text,
+            description);
         RefreshHotkeyDisplay(control);
     }
 
@@ -1069,14 +1083,21 @@ public sealed class MainForm : Form
                 $"{binding.BaseText}  {gesture.DisplayText}";
             hotkeyTips.SetToolTip(
                 control,
-                UiStrings.Format(
-                    "HotkeySystemLabel",
-                    gesture.DisplayText));
+                string.IsNullOrWhiteSpace(binding.Description)
+                    ? UiStrings.Format(
+                        "HotkeySystemLabel",
+                        gesture.DisplayText)
+                    : binding.Description + Environment.NewLine +
+                        UiStrings.Format(
+                            "HotkeySystemLabel",
+                            gesture.DisplayText));
         }
         else
         {
             control.Text = binding.BaseText;
-            hotkeyTips.SetToolTip(control, string.Empty);
+            hotkeyTips.SetToolTip(
+                control,
+                binding.Description ?? string.Empty);
         }
     }
 
@@ -1700,7 +1721,8 @@ public sealed class MainForm : Form
 
     private sealed record HotkeyDisplayBinding(
         string ActionId,
-        string BaseText);
+        string BaseText,
+        string? Description);
 
     private sealed record AutoEditModeOption(
         AutoEditMode Mode,

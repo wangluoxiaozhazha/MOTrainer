@@ -14,7 +14,10 @@
   <data name="LanguageRefreshing" xml:space="preserve"><value>Display language saved; refreshing the interface…</value></data>
   <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
   <data name="ActionAddHealth" xml:space="preserve"><value>Heal selected units</value></data>
-  <data name="ActionAutoEdit" xml:space="preserve"><value>Auto-edit selected units</value></data>
+  <data name="ActionAutoEdit" xml:space="preserve"><value>Auto apply</value></data>
+  <data name="AutoApplyTooltip" xml:space="preserve"><value>Automatically applies the selected rank and health settings.</value></data>
+  <data name="AutoModeLabel" xml:space="preserve"><value>Mode:</value></data>
+  <data name="AutoModeTooltip" xml:space="preserve"><value>On selection applies once when a selection is formed. Continuous reapplies every 100 ms.</value></data>
   <data name="ActionDefeatOwner" xml:space="preserve"><value>Defeat selected owner</value></data>
   <data name="ActionGrantSuperweapons" xml:space="preserve"><value>Grant selected superweapons</value></data>
   <data name="ActionSetOneHealth" xml:space="preserve"><value>Set selected health to 1</value></data>
@@ -72,10 +75,10 @@
   <data name="HotkeySystemLabel" xml:space="preserve"><value>Global shortcut {0}</value></data>
   <data name="HotkeyUnknownAction" xml:space="preserve"><value>unknown action</value></data>
   <data name="HotkeyUnsaved" xml:space="preserve"><value>Current changes have not been saved.</value></data>
-  <data name="ModeEventRecommended" xml:space="preserve"><value>Event mode (recommended)</value></data>
+  <data name="ModeEventRecommended" xml:space="preserve"><value>On selection (recommended)</value></data>
   <data name="ModeExtended" xml:space="preserve"><value>Extended mode</value></data>
   <data name="ModeFactionRecommended" xml:space="preserve"><value>Faction mode (recommended)</value></data>
-  <data name="ModePollingCompatibility" xml:space="preserve"><value>Polling mode (compatibility)</value></data>
+  <data name="ModePollingCompatibility" xml:space="preserve"><value>Continuous (compatibility)</value></data>
   <data name="OneTimeGroup" xml:space="preserve"><value>One-time actions</value></data>
   <data name="PatchRestoreBlocked" xml:space="preserve"><value>{0} patch bytes are unexpected; exit cancelled</value></data>
   <data name="QueueLimitOff" xml:space="preserve"><value>Remove queue limit [Off]</value></data>

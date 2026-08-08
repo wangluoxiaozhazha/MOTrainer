@@ -15,6 +15,9 @@
   <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>简体中文</value></data>
   <data name="ActionAddHealth" xml:space="preserve"><value>选中单位加血</value></data>
   <data name="ActionAutoEdit" xml:space="preserve"><value>自动修改</value></data>
+  <data name="AutoApplyTooltip" xml:space="preserve"><value>自动应用当前勾选的等级和生命设置。</value></data>
+  <data name="AutoModeLabel" xml:space="preserve"><value>模式：</value></data>
+  <data name="AutoModeTooltip" xml:space="preserve"><value>事件模式在形成选择时应用一次；轮询模式每 100 毫秒持续应用。</value></data>
   <data name="ActionDefeatOwner" xml:space="preserve"><value>目标阵营投降</value></data>
   <data name="ActionGrantSuperweapons" xml:space="preserve"><value>发放已勾选超武</value></data>
   <data name="ActionSetOneHealth" xml:space="preserve"><value>选中单位扣血</value></data>
