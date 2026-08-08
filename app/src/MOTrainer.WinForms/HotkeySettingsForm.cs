@@ -10,7 +10,7 @@ internal sealed class HotkeySettingsForm : Form
     {
         draft = current.Clone();
 
-        Text = "热键设置";
+        Text = UiStrings.Get("HotkeySettingsTitle");
         ClientSize = new Size(600, 594);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
@@ -23,9 +23,7 @@ internal sealed class HotkeySettingsForm : Form
             AutoSize = false,
             Location = new Point(16, 14),
             Size = new Size(568, 42),
-            Text =
-                "点击右侧录入框后直接按组合键。至少包含 Ctrl、Alt 或 Shift；" +
-                "修改只在点击“保存”后生效。",
+            Text = UiStrings.Get("HotkeyInstruction"),
         };
         Controls.Add(instruction);
 
@@ -90,7 +88,7 @@ internal sealed class HotkeySettingsForm : Form
             AutoEllipsis = true,
             Location = new Point(16, 516),
             Size = new Size(340, 62),
-            Text = "当前修改尚未保存。",
+            Text = UiStrings.Get("HotkeyUnsaved"),
             TextAlign = ContentAlignment.MiddleLeft,
         };
         Controls.Add(statusLabel);
@@ -99,7 +97,7 @@ internal sealed class HotkeySettingsForm : Form
         {
             Location = new Point(364, 532),
             Size = new Size(100, 32),
-            Text = "恢复默认",
+            Text = UiStrings.Get("ButtonResetDefaults"),
         };
         resetButton.Click += (_, _) => ResetDefaults();
         Controls.Add(resetButton);
@@ -109,7 +107,7 @@ internal sealed class HotkeySettingsForm : Form
             DialogResult = DialogResult.Cancel,
             Location = new Point(472, 532),
             Size = new Size(52, 32),
-            Text = "取消",
+            Text = UiStrings.Get("ButtonCancel"),
         };
         Controls.Add(cancelButton);
 
@@ -118,7 +116,7 @@ internal sealed class HotkeySettingsForm : Form
             DialogResult = DialogResult.OK,
             Location = new Point(532, 532),
             Size = new Size(52, 32),
-            Text = "保存",
+            Text = UiStrings.Get("ButtonSave"),
         };
         saveButton.Click += (_, _) =>
             ResultBindings = draft.Clone();
@@ -142,7 +140,7 @@ internal sealed class HotkeySettingsForm : Form
         if (IsModifierKey(key))
         {
             SetStatus(
-                "请在按住修饰键的同时再按一个主键。",
+                UiStrings.Get("HotkeyPressMainKey"),
                 Color.DarkOrange);
             return;
         }
@@ -166,7 +164,7 @@ internal sealed class HotkeySettingsForm : Form
         if (modifiers == HotkeyModifiers.None)
         {
             SetStatus(
-                "热键至少需要 Ctrl、Alt 或 Shift 中的一个修饰键。",
+                UiStrings.Get("HotkeyModifierRequired"),
                 Color.DarkRed);
             return;
         }
@@ -175,7 +173,7 @@ internal sealed class HotkeySettingsForm : Form
         if (IsReservedSystemGesture(gesture))
         {
             SetStatus(
-                $"{gesture.DisplayText} 是系统保留组合，请使用其他热键。",
+                UiStrings.Format("HotkeyReserved", gesture.DisplayText),
                 Color.DarkRed);
             return;
         }
@@ -186,17 +184,23 @@ internal sealed class HotkeySettingsForm : Form
                 out string? conflictActionId))
         {
             string conflictName = conflictActionId is null
-                ? "未知功能"
+                ? UiStrings.Get("HotkeyUnknownAction")
                 : HotkeyDefinitions.DisplayName(conflictActionId);
             SetStatus(
-                $"{gesture.DisplayText} 已用于“{conflictName}”。",
+                UiStrings.Format(
+                    "HotkeyConflict",
+                    gesture.DisplayText,
+                    conflictName),
                 Color.DarkRed);
             return;
         }
 
         input.Text = gesture.DisplayText;
         SetStatus(
-            $"“{definition.DisplayName}”已改为 {gesture.DisplayText}，等待保存。",
+            UiStrings.Format(
+                "HotkeySetPending",
+                definition.DisplayName,
+                gesture.DisplayText),
             Color.DarkGreen);
     }
 
@@ -211,7 +215,7 @@ internal sealed class HotkeySettingsForm : Form
         }
 
         SetStatus(
-            "已在当前窗口恢复默认值；点击“保存”后生效。",
+            UiStrings.Get("HotkeyResetPending"),
             Color.DarkOrange);
     }
 

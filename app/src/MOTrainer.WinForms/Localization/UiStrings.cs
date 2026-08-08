@@ -11,4 +11,7 @@ internal static class UiStrings
 
     public static string Get(string key) =>
         Resources.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+
+    public static string Format(string key, params object[] arguments) =>
+        string.Format(CultureInfo.CurrentCulture, Get(key), arguments);
 }

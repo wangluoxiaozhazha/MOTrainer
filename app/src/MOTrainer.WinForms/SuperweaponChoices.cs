@@ -8,14 +8,14 @@ internal static class SuperweaponChoices
 {
     public static IReadOnlyList<SuperweaponChoice> All { get; } =
     [
-        new(0, "核弹"),
-        new(2, "闪电"),
-        new(7, "心控"),
-        new(48, "顶点"),
-        new(1, "铁幕"),
-        new(3, "超时空"),
-        new(28, "基因"),
-        new(47, "屏障"),
+        new(0, UiStrings.Get("SuperweaponNuclearMissile")),
+        new(2, UiStrings.Get("SuperweaponLightningStorm")),
+        new(7, UiStrings.Get("SuperweaponPsychicDominator")),
+        new(48, UiStrings.Get("SuperweaponMentalOmega")),
+        new(1, UiStrings.Get("SuperweaponIronCurtain")),
+        new(3, UiStrings.Get("SuperweaponChronosphere")),
+        new(28, UiStrings.Get("SuperweaponGeneticMutator")),
+        new(47, UiStrings.Get("SuperweaponBarrier")),
     ];
 
     public static IReadOnlyCollection<uint> KnownIds { get; } =

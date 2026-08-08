@@ -10,6 +10,7 @@ using MOTrainer.WinForms;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace MOTrainer.Core.SmokeTests;
@@ -32,6 +33,7 @@ internal static class Program
             ("Patch byte classifier is fail-closed", PatchClassifierIsFailClosed),
             ("Module fingerprint matching is normalized", FingerprintMatchingIsNormalized),
             ("Display language resolution is backward compatible", DisplayLanguageResolutionIsBackwardCompatible),
+            ("WinForms English resources cover the visible surface", WinFormsEnglishResourcesCoverSurface),
             ("Session probe localizes startup and access messages", SessionProbeLocalizesMessages),
             ("Session probe skips inaccessible process candidates", SessionProbeSkipsInaccessibleCandidate),
             ("Session probe explains access-level mismatch", SessionProbeExplainsAccessDenied),
@@ -283,6 +285,28 @@ internal static class Program
                     "权限不足",
                     StringComparison.Ordinal),
                 "The access refusal should remain available in Simplified Chinese.");
+        });
+    }
+
+    private static void WinFormsEnglishResourcesCoverSurface()
+    {
+        RunWithUiCulture("en", () =>
+        {
+            string[] visibleText =
+            [
+                UiStrings.Get("AppTitle"),
+                UiStrings.Get("SelectedUnitsGroup"),
+                UiStrings.Get("GlobalStateGroup"),
+                UiStrings.Get("OneTimeGroup"),
+                UiStrings.Get("HotkeySettingsTitle"),
+                UiStrings.Get("SettingsReadFailed"),
+                .. HotkeyDefinitions.All.Select(item => item.DisplayName),
+                .. SuperweaponChoices.All.Select(item => item.DisplayName),
+            ];
+            Assert(
+                visibleText.All(text =>
+                    !Regex.IsMatch(text, @"\p{IsCJKUnifiedIdeographs}")),
+                "The English WinForms surface should not contain Chinese labels.");
         });
     }
 

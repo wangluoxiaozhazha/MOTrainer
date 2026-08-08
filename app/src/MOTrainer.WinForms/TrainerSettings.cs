@@ -149,7 +149,7 @@ internal sealed class TrainerSettingsStore
         {
             return new TrainerSettingsLoadResult(
                 defaults,
-                $"设置文件读取失败，已使用默认值：{exception.Message}");
+                UiStrings.Format("SettingsReadFailed", exception.Message));
         }
 
         List<string> warnings = [];
@@ -235,7 +235,7 @@ internal sealed class TrainerSettingsStore
 
             if (!HotkeyGesture.TryParse(text, out HotkeyGesture gesture))
             {
-                warnings.Add($"{key} 不是有效热键，已使用默认值");
+                warnings.Add(UiStrings.Format("SettingsInvalidHotkey", key));
                 continue;
             }
 
@@ -246,8 +246,13 @@ internal sealed class TrainerSettingsStore
             {
                 warnings.Add(
                     conflictActionId is null
-                        ? $"{key} 对应未知功能，已忽略"
-                        : $"{key} 与 {HotkeyPrefix}{conflictActionId} 冲突，已使用默认值");
+                        ? UiStrings.Format(
+                            "SettingsUnknownHotkeyAction",
+                            key)
+                        : UiStrings.Format(
+                            "SettingsConflictHotkey",
+                            key,
+                            HotkeyPrefix + conflictActionId));
             }
         }
 
@@ -266,7 +271,7 @@ internal sealed class TrainerSettingsStore
             settings,
             warnings.Count == 0
                 ? null
-                : string.Join("；", warnings));
+                : string.Join(UiStrings.Get("WarningSeparator"), warnings));
     }
 
     public string? Save(TrainerSettings settings)
@@ -282,11 +287,11 @@ internal sealed class TrainerSettingsStore
                     new XElement("configuration"));
             XElement root = document.Root ??
                 throw new InvalidOperationException(
-                    "设置文件缺少 configuration 根节点");
+                    UiStrings.Get("SettingsMissingRoot"));
             if (root.Name != "configuration")
             {
                 throw new InvalidOperationException(
-                    "设置文件根节点不是 configuration");
+                    UiStrings.Get("SettingsWrongRoot"));
             }
 
             XElement appSettings =
@@ -410,7 +415,7 @@ internal sealed class TrainerSettingsStore
         catch (Exception exception)
         {
             TryDelete(temporaryPath);
-            return $"设置保存失败：{exception.Message}";
+            return UiStrings.Format("SettingsSaveFailed", exception.Message);
         }
     }
 
@@ -476,7 +481,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效布尔值，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidBoolean", key));
         return fallback;
     }
 
@@ -497,7 +502,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效选项，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidOption", key));
         return fallback;
     }
 
@@ -524,7 +529,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 超出有效范围，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsOutOfRange", key));
         return fallback;
     }
 
@@ -547,7 +552,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效无符号整数，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidUInt", key));
         return fallback;
     }
 
@@ -573,8 +578,9 @@ internal sealed class TrainerSettingsStore
                     out uint id) ||
                 !SuperweaponChoices.KnownIds.Contains(id))
             {
-                warnings.Add(
-                    $"superweapon.selectedIds 包含未知 ID，已忽略 {part.Trim()}");
+                warnings.Add(UiStrings.Format(
+                    "SettingsUnknownSuperweapon",
+                    part.Trim()));
                 continue;
             }
 

@@ -73,7 +73,7 @@ public sealed class MainForm : Form
         hotkeyBindings = initialSettings.Hotkeys;
 
         Text = UiStrings.Get("AppTitle");
-        ClientSize = new Size(880, 598);
+        ClientSize = new Size(1040, 598);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
@@ -84,13 +84,13 @@ public sealed class MainForm : Form
             AutoSize = false,
             BorderStyle = BorderStyle.FixedSingle,
             Location = new Point(16, 16),
-            Size = new Size(552, 46),
+            Size = new Size(680, 46),
             TextAlign = ContentAlignment.MiddleCenter,
         };
         languageInput = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Location = new Point(584, 27),
+            Location = new Point(712, 27),
             Size = new Size(144, 24),
         };
         languageInput.Items.AddRange(
@@ -113,8 +113,8 @@ public sealed class MainForm : Form
         };
         hotkeySettingsButton = new Button
         {
-            Location = new Point(744, 16),
-            Size = new Size(120, 46),
+            Location = new Point(872, 16),
+            Size = new Size(152, 46),
             Text = UiStrings.Get("HotkeySettings"),
         };
         hotkeySettingsButton.Click += (_, _) =>
@@ -123,22 +123,22 @@ public sealed class MainForm : Form
         unitGroup = new GroupBox
         {
             Location = new Point(16, 76),
-            Size = new Size(848, 106),
-            Text = "选中单位修改",
+            Size = new Size(1008, 106),
+            Text = UiStrings.Get("SelectedUnitsGroup"),
         };
 
         unitGroup.Controls.Add(new Label
         {
             AutoSize = true,
             Location = new Point(18, 31),
-            Text = "等级",
+            Text = UiStrings.Get("Rank"),
         });
         editVeterancyControl = new CheckBox
         {
             AutoSize = true,
             Checked = initialSettings.ModifyVeterancy,
             Location = new Point(218, 30),
-            Text = "修改",
+            Text = UiStrings.Get("ButtonEdit"),
         };
         editVeterancyInput = new ComboBox
         {
@@ -149,15 +149,15 @@ public sealed class MainForm : Form
         editVeterancyInput.Items.Add(
             new VeterancyOption(
                 UnitVeterancyLevel.Rookie,
-                "新兵"));
+                UiStrings.Get("RankRookie")));
         editVeterancyInput.Items.Add(
             new VeterancyOption(
                 UnitVeterancyLevel.Veteran,
-                "老兵"));
+                UiStrings.Get("RankVeteran")));
         editVeterancyInput.Items.Add(
             new VeterancyOption(
                 UnitVeterancyLevel.Elite,
-                "精英 / 三星"));
+                UiStrings.Get("RankElite")));
         editVeterancyInput.SelectedIndex =
             (int)initialSettings.Veterancy;
 
@@ -166,7 +166,7 @@ public sealed class MainForm : Form
             AutoSize = true,
             Checked = initialSettings.ModifyHealth,
             Location = new Point(218, 66),
-            Text = "修改",
+            Text = UiStrings.Get("ButtonEdit"),
         };
         editHealthInput = new NumericUpDown
         {
@@ -181,13 +181,13 @@ public sealed class MainForm : Form
         {
             Location = new Point(318, 27),
             Size = new Size(250, 29),
-            Text = "修改选中",
+            Text = UiStrings.Get("ButtonEditSelected"),
         };
         applyUnitEditButton.Click += (_, _) =>
             RunAction(() =>
                 BuildSelectedUnitEditRequest() is { } request
                     ? actions.EditSelectedUnits(request)
-                    : ActionResult.Fail("请至少勾选修改等级或修改生命"));
+                    : ActionResult.Fail(UiStrings.Get("SelectUnitAttribute")));
         editVeterancyControl.CheckedChanged += (_, _) =>
             RefreshUnitEditorInputsAndAutoEdit();
         editHealthControl.CheckedChanged += (_, _) =>
@@ -201,7 +201,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(608, 27),
             Size = new Size(214, 29),
-            Text = "占有单位",
+            Text = UiStrings.Get("ButtonTakeOwnership"),
         };
         transferButton.Click += (_, _) => RunAction(
             actions.TransferSelectedUnitsToCurrentPlayer);
@@ -213,7 +213,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(608, 63),
             Size = new Size(106, 29),
-            Text = "加血",
+            Text = UiStrings.Get("ButtonHeal"),
         };
         addHealthButton.Click += (_, _) => RunAction(() =>
             actions.AddHealthToSelectedUnits(2000));
@@ -225,7 +225,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(716, 63),
             Size = new Size(106, 29),
-            Text = "扣血",
+            Text = UiStrings.Get("ButtonSetHealthOne"),
         };
         oneHealthButton.Click += (_, _) => RunAction(() =>
             actions.SetSelectedUnitsHealth(1));
@@ -245,7 +245,7 @@ public sealed class MainForm : Form
         {
             AutoSize = true,
             Location = new Point(18, 67),
-            Text = "生命",
+            Text = UiStrings.Get("Health"),
         });
         unitGroup.Controls.Add(new Label
         {
@@ -264,43 +264,49 @@ public sealed class MainForm : Form
         globalStateGroup = new GroupBox
         {
             Location = new Point(16, 196),
-            Size = new Size(430, 326),
-            Text = "全局状态",
+            Size = new Size(494, 326),
+            Text = UiStrings.Get("GlobalStateGroup"),
         };
         globalStateGroup.Controls.Add(
-            CreateSectionLabel("资源与生产", new Point(18, 24)));
+            CreateSectionLabel(
+                UiStrings.Get("EconomyProductionSection"),
+                new Point(18, 24)));
         globalStateGroup.Controls.Add(
             CreateSeparator(new Point(18, 160), 394));
         globalStateGroup.Controls.Add(
-            CreateSectionLabel("战场信息与控制", new Point(18, 170)));
+            CreateSectionLabel(
+                UiStrings.Get("BattlefieldSection"),
+                new Point(18, 170)));
         globalStateGroup.Controls.Add(
             CreateSeparator(new Point(18, 250), 394));
         globalStateGroup.Controls.Add(
-            CreateSectionLabel("科技", new Point(18, 260)));
+            CreateSectionLabel(
+                UiStrings.Get("TechnologySection"),
+                new Point(18, 260)));
 
         AddPatchControl(
             KnownPatchIds.EconomyNoDecrease,
-            "锁定经济",
+            UiStrings.Get("FeatureLockEconomy"),
             HotkeyActionIds.Patch(KnownPatchIds.EconomyNoDecrease),
             new Point(18, 48));
         AddPatchControl(
             KnownPatchIds.PowerNoDecrease,
-            "锁定电量",
+            UiStrings.Get("FeatureLockPower"),
             HotkeyActionIds.Patch(KnownPatchIds.PowerNoDecrease),
             new Point(218, 48));
         AddPatchControl(
             KnownPatchIds.InstantUnitBuild,
-            "快速生产",
+            UiStrings.Get("FeatureInstantBuild"),
             HotkeyActionIds.Patch(KnownPatchIds.InstantUnitBuild),
             new Point(18, 76));
         AddPatchControl(
             KnownPatchIds.IgnoreBuildDistance,
-            "随处建造",
+            UiStrings.Get("FeatureBuildAnywhere"),
             HotkeyActionIds.Patch(KnownPatchIds.IgnoreBuildDistance),
             new Point(218, 76));
         AddPatchControl(
             KnownPatchIds.AutoRepair,
-            "自动维修",
+            UiStrings.Get("FeatureAutoRepair"),
             HotkeyActionIds.Patch(KnownPatchIds.AutoRepair),
             new Point(18, 104));
 
@@ -309,7 +315,7 @@ public sealed class MainForm : Form
             AutoCheck = false,
             AutoSize = true,
             Location = new Point(218, 104),
-            Text = "解锁建造数量 [Off]",
+            Text = UiStrings.Get("UnitUnlimitedOff"),
         };
         unitUnlimitedControl.Click += (_, _) =>
             ToggleDelayedBuildFeature(
@@ -319,7 +325,7 @@ public sealed class MainForm : Form
             AutoCheck = false,
             AutoSize = true,
             Location = new Point(18, 132),
-            Text = "解锁队列上限 [Off]",
+            Text = UiStrings.Get("QueueLimitOff"),
         };
         queueLimitControl.Click += (_, _) =>
             ToggleDelayedBuildFeature(
@@ -329,27 +335,27 @@ public sealed class MainForm : Form
 
         AddPatchControl(
             KnownPatchIds.ControlAllUnits,
-            "操纵全部",
+            UiStrings.Get("FeatureControlAll"),
             HotkeyActionIds.Patch(KnownPatchIds.ControlAllUnits),
             new Point(18, 194));
         AddPatchControl(
             KnownPatchIds.PsychicDetection,
-            "心灵探测",
+            UiStrings.Get("FeaturePsychicDetection"),
             HotkeyActionIds.Patch(KnownPatchIds.PsychicDetection),
             new Point(218, 194));
         AddPatchControl(
             KnownPatchIds.IgnoreCloak,
-            "无视隐形",
+            UiStrings.Get("FeatureIgnoreCloak"),
             HotkeyActionIds.Patch(KnownPatchIds.IgnoreCloak),
             new Point(18, 222));
         AddPatchControl(
             KnownPatchIds.StableRevealMap,
-            "无视黑雾",
+            UiStrings.Get("FeatureRevealMap"),
             HotkeyActionIds.Patch(KnownPatchIds.StableRevealMap),
             new Point(218, 222));
         AddPatchControl(
             KnownPatchIds.SafeTechUnlock,
-            "科技全开",
+            UiStrings.Get("FeatureTechUnlock"),
             HotkeyActionIds.Patch(KnownPatchIds.SafeTechUnlock),
             new Point(18, 286));
 
@@ -362,11 +368,11 @@ public sealed class MainForm : Form
         techUnlockModeInput.Items.Add(
             new TechUnlockModeOption(
                 TechUnlockMode.Faction,
-                "阵营模式（推荐）"));
+                UiStrings.Get("ModeFactionRecommended")));
         techUnlockModeInput.Items.Add(
             new TechUnlockModeOption(
                 TechUnlockMode.Extended,
-                "扩展模式"));
+                UiStrings.Get("ModeExtended")));
         techUnlockModeInput.SelectedIndex =
             initialSettings.TechUnlockMode == TechUnlockMode.Extended
                 ? 1
@@ -384,11 +390,11 @@ public sealed class MainForm : Form
         autoEditModeInput.Items.Add(
             new AutoEditModeOption(
                 AutoEditMode.Event,
-                "事件模式（推荐）"));
+                UiStrings.Get("ModeEventRecommended")));
         autoEditModeInput.Items.Add(
             new AutoEditModeOption(
                 AutoEditMode.Polling,
-                "轮询模式（兼容）"));
+                UiStrings.Get("ModePollingCompatibility")));
         autoEditModeInput.SelectedIndex =
             initialSettings.AutoEditMode == AutoEditMode.Polling
                 ? 1
@@ -402,7 +408,7 @@ public sealed class MainForm : Form
             AutoCheck = false,
             AutoSize = true,
             Location = new Point(318, 67),
-            Text = "自动修改",
+            Text = UiStrings.Get("ActionAutoEdit"),
         };
         autoEditControl.Click += (_, _) =>
             RunAction(ToggleAutoEdit);
@@ -414,17 +420,19 @@ public sealed class MainForm : Form
         oneTimeGroup = new GroupBox
         {
             Enabled = false,
-            Location = new Point(460, 196),
-            Size = new Size(404, 326),
-            Text = "一次性功能",
+            Location = new Point(526, 196),
+            Size = new Size(498, 326),
+            Text = UiStrings.Get("OneTimeGroup"),
         };
         oneTimeGroup.Controls.Add(
-            CreateSectionLabel("资源与阵营", new Point(18, 24)));
+            CreateSectionLabel(
+                UiStrings.Get("EconomyFactionSection"),
+                new Point(18, 24)));
         oneTimeGroup.Controls.Add(new Label
         {
             AutoSize = true,
             Location = new Point(18, 53),
-            Text = "经济",
+            Text = UiStrings.Get("Credits"),
         });
         moneyInput = new NumericUpDown
         {
@@ -438,7 +446,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(270, 48),
             Size = new Size(116, 25),
-            Text = "修改",
+            Text = UiStrings.Get("ButtonEdit"),
         };
         moneyButton.Click += (_, _) => RunAction(() =>
             actions.SetMoney(decimal.ToUInt32(moneyInput.Value)));
@@ -446,7 +454,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(18, 84),
             Size = new Size(176, 29),
-            Text = "目标阵营经济归零",
+            Text = UiStrings.Get("ActionZeroEconomy"),
         };
         zeroEconomyButton.Click += (_, _) => RunAction(
             actions.ZeroFirstSelectedOwnerEconomy);
@@ -457,7 +465,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(210, 84),
             Size = new Size(176, 29),
-            Text = "目标阵营投降",
+            Text = UiStrings.Get("ActionDefeatOwner"),
         };
         defeatOwnerButton.Click += (_, _) => RunAction(
             actions.DefeatFirstSelectedOwner);
@@ -471,7 +479,9 @@ public sealed class MainForm : Form
         oneTimeGroup.Controls.Add(
             CreateSeparator(new Point(18, 126), 368));
         oneTimeGroup.Controls.Add(
-            CreateSectionLabel("超级武器", new Point(18, 136)));
+            CreateSectionLabel(
+                UiStrings.Get("SuperweaponsSection"),
+                new Point(18, 136)));
 
         Point[] superweaponLocations =
         [
@@ -497,7 +507,7 @@ public sealed class MainForm : Form
         {
             Location = new Point(18, 246),
             Size = new Size(368, 28),
-            Text = "发放已勾选超武",
+            Text = UiStrings.Get("ButtonGrantSelectedSuperweapons"),
         };
         grantSelectedSuperweaponsButton.Click += (_, _) =>
             RunAction(GrantSelectedSuperweapons);
@@ -518,7 +528,7 @@ public sealed class MainForm : Form
             AutoEllipsis = true,
             BorderStyle = BorderStyle.FixedSingle,
             Location = new Point(16, 536),
-            Size = new Size(848, 46),
+            Size = new Size(1008, 46),
             Text = UiStrings.Get("CompatibilityNotice"),
             TextAlign = ContentAlignment.MiddleLeft,
         };
@@ -680,7 +690,9 @@ public sealed class MainForm : Form
     {
         if (failures.Count > 0)
         {
-            resultLabel.Text = $"以下热键注册失败，可能被其他程序占用：{string.Join("、", failures)}";
+            resultLabel.Text = UiStrings.Format(
+                "HotkeyRegistrationFailed",
+                string.Join(", ", failures));
             resultLabel.ForeColor = Color.DarkRed;
         }
         else if (warning is not null)
@@ -690,7 +702,7 @@ public sealed class MainForm : Form
         }
         else
         {
-            resultLabel.Text = "全局热键已注册；操作时游戏可以保持焦点。";
+            resultLabel.Text = UiStrings.Get("GlobalHotkeyRegistered");
             resultLabel.ForeColor = Color.DarkGreen;
         }
     }
@@ -723,10 +735,14 @@ public sealed class MainForm : Form
                 original,
                 out List<string> restoreFailures);
             string restoreSuffix = restoreFailures.Count == 0
-                ? "旧热键已恢复。"
-                : $"旧热键恢复也失败：{string.Join("、", restoreFailures)}";
-            resultLabel.Text =
-                $"新热键被其他程序占用：{string.Join("、", registrationFailures)}；{restoreSuffix}";
+                ? UiStrings.Get("HotkeyRestored")
+                : UiStrings.Format(
+                    "HotkeyRestoreFailed",
+                    string.Join(", ", restoreFailures));
+            resultLabel.Text = UiStrings.Format(
+                "HotkeyNewRegistrationFailed",
+                string.Join(", ", registrationFailures),
+                restoreSuffix);
             resultLabel.ForeColor = Color.DarkRed;
             return;
         }
@@ -737,8 +753,7 @@ public sealed class MainForm : Form
         string? saveError = settingsStore.Save(CaptureSettings());
         if (saveError is null)
         {
-            resultLabel.Text =
-                "热键已保存并立即生效。";
+            resultLabel.Text = UiStrings.Get("HotkeySaved");
             resultLabel.ForeColor = Color.DarkGreen;
             return;
         }
@@ -750,8 +765,11 @@ public sealed class MainForm : Form
             out List<string> rollbackFailures);
         RefreshHotkeyDisplays();
         resultLabel.Text = rollbackFailures.Count == 0
-            ? $"{saveError}；新热键未生效，旧热键已恢复。"
-            : $"{saveError}；旧热键恢复失败：{string.Join("、", rollbackFailures)}";
+            ? UiStrings.Format("HotkeyRollbackSucceeded", saveError)
+            : UiStrings.Format(
+                "HotkeyRollbackFailed",
+                saveError,
+                string.Join(", ", rollbackFailures));
         resultLabel.ForeColor = Color.DarkRed;
     }
 
@@ -833,7 +851,9 @@ public sealed class MainForm : Form
             {
                 CancelCloseForRestoreFailure(
                     e,
-                    $"{binding.DisplayName}补丁字节异常，已停止退出");
+                    UiStrings.Format(
+                        "PatchRestoreBlocked",
+                        binding.DisplayName));
                 return;
             }
 
@@ -846,7 +866,7 @@ public sealed class MainForm : Form
             MessageBox.Show(
                 this,
                 settingsError,
-                "设置未保存",
+                UiStrings.Get("SettingsNotSavedTitle"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
         }
@@ -924,7 +944,7 @@ public sealed class MainForm : Form
             .Select(choice => choice.Id)
             .ToArray();
         return ids.Length == 0
-            ? ActionResult.Fail("请至少勾选一个超级武器。")
+            ? ActionResult.Fail(UiStrings.Get("SelectOneSuperweapon"))
             : actions.GrantSuperweapons(ids);
     }
 
@@ -1006,12 +1026,14 @@ public sealed class MainForm : Form
                 out HotkeyGesture gesture))
         {
             superweaponHotkeyDescription.Text =
-                $"{gesture.DisplayText} 与按钮一次批量发放全部已勾选项";
+                UiStrings.Format(
+                    "HotkeyBatchDescriptionWithGesture",
+                    gesture.DisplayText);
         }
         else
         {
             superweaponHotkeyDescription.Text =
-                "按钮一次批量发放全部已勾选项";
+                UiStrings.Get("HotkeyBatchDescription");
         }
     }
 
@@ -1027,7 +1049,9 @@ public sealed class MainForm : Form
                 $"{binding.BaseText}  {gesture.DisplayText}";
             hotkeyTips.SetToolTip(
                 control,
-                $"全局热键 {gesture.DisplayText}");
+                UiStrings.Format(
+                    "HotkeySystemLabel",
+                    gesture.DisplayText));
         }
         else
         {
@@ -1198,7 +1222,7 @@ public sealed class MainForm : Form
 
         ActionResult result = actions.SetTechUnlockMode(
             KnownPatchIds.SafeTechUnlock,
-            "科技全开",
+            UiStrings.Get("FeatureTechUnlock"),
             SelectedTechUnlockMode);
         resultLabel.Text = result.Message;
         resultLabel.ForeColor =
@@ -1245,14 +1269,14 @@ public sealed class MainForm : Form
     {
         if (!matchControlsAvailable)
         {
-            return ActionResult.Fail("尚未进入可用战局，无法启动自动修改");
+            return ActionResult.Fail(UiStrings.Get("AutoEditNotInMatch"));
         }
 
         SelectedUnitEditRequest? request =
             BuildSelectedUnitEditRequest();
         if (request is null)
         {
-            return ActionResult.Fail("请至少勾选修改等级或修改生命");
+            return ActionResult.Fail(UiStrings.Get("SelectUnitAttribute"));
         }
 
         if (mode == AutoEditMode.Event)
@@ -1303,8 +1327,8 @@ public sealed class MainForm : Form
         return new ActionResult(
             true,
             mode == AutoEditMode.Event
-                ? "自动修改事件模式已启用；选择形成时应用当前设置"
-                : "自动修改轮询模式已启用；每 100ms 持续应用当前设置");
+                ? UiStrings.Get("AutoEditEventEnabled")
+                : UiStrings.Get("AutoEditPollingEnabled"));
     }
 
     private ActionResult StopAutoEdit()
@@ -1348,7 +1372,7 @@ public sealed class MainForm : Form
         }
 
         autoEditControl.Checked = false;
-        return new ActionResult(true, "选中单位自动修改已关闭");
+        return new ActionResult(true, UiStrings.Get("AutoEditDisabled"));
     }
 
     private void RunAutoEditTick()
@@ -1396,7 +1420,7 @@ public sealed class MainForm : Form
         {
             ActionResult stopped = StopAutoEdit();
             resultLabel.Text = stopped.Success
-                ? "等级和生命均未勾选，自动修改已关闭"
+                ? UiStrings.Get("AutoEditNoAttributesDisabled")
                 : stopped.Message;
             resultLabel.ForeColor = stopped.Success
                 ? Color.DarkOrange
@@ -1409,7 +1433,7 @@ public sealed class MainForm : Form
             ActionResult updated =
                 actions.SetSelectionEditEventPolicy(request);
             resultLabel.Text = updated.Success
-                ? "自动修改事件策略已更新"
+                ? UiStrings.Get("AutoEditEventUpdated")
                 : updated.Message;
             resultLabel.ForeColor = updated.Success
                 ? Color.DarkGreen
@@ -1523,11 +1547,11 @@ public sealed class MainForm : Form
     {
         ApplyDelayedBuildState(
             unitUnlimitedControl,
-            "解锁建造数量",
+            UiStrings.Get("UnitUnlimitedLabel"),
             snapshot.UnitUnlimited);
         ApplyDelayedBuildState(
             queueLimitControl,
-            "解锁队列上限",
+            UiStrings.Get("QueueLimitLabel"),
             snapshot.QueueLimit1000);
     }
 
@@ -1634,12 +1658,14 @@ public sealed class MainForm : Form
         FormClosingEventArgs e,
         string message)
     {
-        resultLabel.Text = $"退出前恢复失败：{message}";
+        resultLabel.Text = UiStrings.Format(
+            "RestoreBeforeExitFailed",
+            message);
         resultLabel.ForeColor = Color.DarkRed;
         MessageBox.Show(
             this,
             resultLabel.Text,
-            "MO 离线修改器",
+            UiStrings.Get("AppTitle"),
             MessageBoxButtons.OK,
             MessageBoxIcon.Error);
         e.Cancel = true;
