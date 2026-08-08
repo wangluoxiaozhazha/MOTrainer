@@ -52,6 +52,10 @@
   <data name="FeaturePsychicDetection" xml:space="preserve"><value>Psychic detection</value></data>
   <data name="FeatureRevealMap" xml:space="preserve"><value>Reveal map</value></data>
   <data name="FeatureTechUnlock" xml:space="preserve"><value>Unlock all technology</value></data>
+  <data name="FactionAllies" xml:space="preserve"><value>Allies</value></data>
+  <data name="FactionEpsilon" xml:space="preserve"><value>Epsilon</value></data>
+  <data name="FactionFoehn" xml:space="preserve"><value>Foehn</value></data>
+  <data name="FactionSoviets" xml:space="preserve"><value>Soviets</value></data>
   <data name="GlobalHotkeyRegistered" xml:space="preserve"><value>Global hotkeys registered; the game may remain focused while you use them.</value></data>
   <data name="GlobalStateGroup" xml:space="preserve"><value>Global state</value></data>
   <data name="Health" xml:space="preserve"><value>Health</value></data>

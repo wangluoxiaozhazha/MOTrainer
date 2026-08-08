@@ -52,6 +52,10 @@
   <data name="FeaturePsychicDetection" xml:space="preserve"><value>心灵探测</value></data>
   <data name="FeatureRevealMap" xml:space="preserve"><value>无视黑雾</value></data>
   <data name="FeatureTechUnlock" xml:space="preserve"><value>科技全开</value></data>
+  <data name="FactionAllies" xml:space="preserve"><value>盟军</value></data>
+  <data name="FactionEpsilon" xml:space="preserve"><value>厄普西隆</value></data>
+  <data name="FactionFoehn" xml:space="preserve"><value>焚风</value></data>
+  <data name="FactionSoviets" xml:space="preserve"><value>苏联</value></data>
   <data name="GlobalHotkeyRegistered" xml:space="preserve"><value>全局热键已注册；操作时游戏可以保持焦点。</value></data>
   <data name="GlobalStateGroup" xml:space="preserve"><value>全局状态</value></data>
   <data name="Health" xml:space="preserve"><value>生命</value></data>

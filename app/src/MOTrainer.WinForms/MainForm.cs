@@ -504,30 +504,57 @@ public sealed class MainForm : Form
                 UiStrings.Get("SuperweaponsSection"),
                 new Point(18, 159)));
 
-        Point[] superweaponLocations =
+        (string Title, Point Location, uint[] Ids)[] superweaponFactions =
         [
-            new(18, 181), new(110, 181),
-            new(202, 181), new(294, 181),
-            new(18, 207), new(110, 207),
-            new(202, 207), new(294, 207),
+            (
+                UiStrings.Get("FactionAllies"),
+                new Point(18, 178),
+                [2, 3]),
+            (
+                UiStrings.Get("FactionSoviets"),
+                new Point(156, 178),
+                [0, 1]),
+            (
+                UiStrings.Get("FactionEpsilon"),
+                new Point(18, 242),
+                [7, 28]),
+            (
+                UiStrings.Get("FactionFoehn"),
+                new Point(156, 242),
+                [48, 47]),
         ];
-        for (int index = 0; index < SuperweaponChoices.All.Count; index++)
+        IReadOnlyDictionary<uint, SuperweaponChoice> choicesById =
+            SuperweaponChoices.All.ToDictionary(choice => choice.Id);
+        foreach ((string title, Point location, uint[] ids) in
+            superweaponFactions)
         {
-            SuperweaponChoice choice = SuperweaponChoices.All[index];
-            CheckBox control = new()
+            GroupBox factionGroup = new()
             {
-                AutoSize = true,
-                Checked = initialSettings.SelectedSuperweaponIds.Contains(choice.Id),
-                Location = superweaponLocations[index],
-                Text = choice.DisplayName,
+                Location = location,
+                Size = new Size(132, 60),
+                Text = title,
             };
-            superweaponControls.Add(choice.Id, control);
-            oneTimeGroup.Controls.Add(control);
+            for (int index = 0; index < ids.Length; index++)
+            {
+                SuperweaponChoice choice = choicesById[ids[index]];
+                CheckBox control = new()
+                {
+                    AutoSize = true,
+                    Checked = initialSettings.SelectedSuperweaponIds.Contains(
+                        choice.Id),
+                    Location = new Point(10, 17 + index * 20),
+                    Text = choice.DisplayName,
+                };
+                superweaponControls.Add(choice.Id, control);
+                factionGroup.Controls.Add(control);
+            }
+
+            oneTimeGroup.Controls.Add(factionGroup);
         }
         grantSelectedSuperweaponsButton = new Button
         {
-            Location = new Point(18, 235),
-            Size = new Size(368, 28),
+            Location = new Point(300, 181),
+            Size = new Size(180, 52),
             Text = UiStrings.Get("ButtonGrantSelectedSuperweapons"),
         };
         grantSelectedSuperweaponsButton.Click += (_, _) =>
@@ -538,9 +565,11 @@ public sealed class MainForm : Form
         oneTimeGroup.Controls.Add(grantSelectedSuperweaponsButton);
         superweaponHotkeyDescription = new Label
         {
-            AutoSize = true,
+            AutoEllipsis = true,
+            AutoSize = false,
             ForeColor = Color.DimGray,
-            Location = new Point(18, 271),
+            Location = new Point(300, 241),
+            Size = new Size(180, 62),
         };
         oneTimeGroup.Controls.Add(superweaponHotkeyDescription);
 
