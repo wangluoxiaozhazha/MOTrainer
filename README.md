@@ -14,12 +14,11 @@ for strictly verified game builds.
 
 ## Project status
 
-The current source supports `Auto`, English, and Simplified Chinese display
-languages in one executable. The latest public package,
-[`v0.1.0-rc1`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc1),
-predates the bilingual interface and remains the initial Chinese release
-candidate. Build the current source to preview the English interface until a
-new package is published.
+The latest release candidate,
+[`v0.1.0-rc2`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc2),
+supports `Auto`, English, and Simplified Chinese display languages in one
+executable. It also supports the verified Classic and Steam YR 1.001 game
+profiles documented below.
 
 - [Releases](https://github.com/cmdrmo/MOTrainer/releases)
 - [Compatibility and troubleshooting](docs/COMPATIBILITY.md)
@@ -85,8 +84,8 @@ Download packages only from this repository's
 third-party repacks. When a `.sha256` file is provided, verify the ZIP before
 extracting it.
 
-The original `v0.1.0-rc1` package contains three files that must remain in the
-same directory:
+The release package contains three files that must remain in the same
+directory:
 
 ```text
 MOTrainer.exe

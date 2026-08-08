@@ -26,7 +26,7 @@ body:
     attributes:
       label: MOTrainer version or commit
       description: For a source build, use `git rev-parse --short HEAD`.
-      placeholder: v0.1.0-rc1 or c0b38c7
+      placeholder: v0.1.0-rc2 or f977ffa
     validations:
       required: true
 
