@@ -6,11 +6,12 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>MOTrainer — Offline Trainer</value></data>
   <data name="CompatibilityNotice" xml:space="preserve"><value>Only verified gamemd.exe and Ares.dll hashes are currently supported.</value></data>
-  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>Display language. Restart MOTrainer after changing this setting.</value></data>
+  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>Display language. The interface refreshes after this setting is saved.</value></data>
+  <data name="DisplayLanguageLabel" xml:space="preserve"><value>Language</value></data>
   <data name="HotkeySettings" xml:space="preserve"><value>Hotkeys</value></data>
   <data name="LanguageAuto" xml:space="preserve"><value>Automatic</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="LanguageRestartRequired" xml:space="preserve"><value>Display language saved. Restart MOTrainer to apply it.</value></data>
+  <data name="LanguageRefreshing" xml:space="preserve"><value>Display language saved; refreshing the interface…</value></data>
   <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
   <data name="ActionAddHealth" xml:space="preserve"><value>Heal selected units</value></data>
   <data name="ActionAutoEdit" xml:space="preserve"><value>Auto-edit selected units</value></data>

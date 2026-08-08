@@ -6,7 +6,7 @@ internal sealed record SuperweaponChoice(
 
 internal static class SuperweaponChoices
 {
-    public static IReadOnlyList<SuperweaponChoice> All { get; } =
+    public static IReadOnlyList<SuperweaponChoice> All =>
     [
         new(0, UiStrings.Get("SuperweaponNuclearMissile")),
         new(2, UiStrings.Get("SuperweaponLightningStorm")),

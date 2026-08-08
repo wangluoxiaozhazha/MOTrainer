@@ -24,7 +24,7 @@ internal sealed record HotkeyDefinition(
 
 internal static class HotkeyDefinitions
 {
-    public static IReadOnlyList<HotkeyDefinition> All { get; } =
+    public static IReadOnlyList<HotkeyDefinition> All =>
     [
         new(
             HotkeyActionIds.AutoEdit,

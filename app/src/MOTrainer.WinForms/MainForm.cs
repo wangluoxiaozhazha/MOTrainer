@@ -58,6 +58,7 @@ public sealed class MainForm : Form
     private bool autoEditEnabled;
     private bool matchControlsAvailable;
     private bool patchControlsAvailable;
+    private bool languageRefreshRequested;
     private AutoEditMode? activeAutoEditMode;
     private SelectedUnitEditRequest? autoEditRequest;
 
@@ -87,10 +88,18 @@ public sealed class MainForm : Form
             Size = new Size(680, 46),
             TextAlign = ContentAlignment.MiddleCenter,
         };
+        Label languageLabel = new()
+        {
+            AutoSize = false,
+            Location = new Point(712, 14),
+            Size = new Size(144, 17),
+            Text = UiStrings.Get("DisplayLanguageLabel"),
+            TextAlign = ContentAlignment.MiddleLeft,
+        };
         languageInput = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Location = new Point(712, 27),
+            Location = new Point(712, 34),
             Size = new Size(144, 24),
         };
         languageInput.Items.AddRange(
@@ -534,6 +543,7 @@ public sealed class MainForm : Form
         };
 
         Controls.Add(statusLabel);
+        Controls.Add(languageLabel);
         Controls.Add(languageInput);
         Controls.Add(hotkeySettingsButton);
         Controls.Add(unitGroup);
@@ -568,6 +578,8 @@ public sealed class MainForm : Form
     }
 
     internal HotkeyBindings ConfiguredHotkeys => hotkeyBindings;
+
+    internal bool LanguageRefreshRequested => languageRefreshRequested;
 
     internal void ReloadHotkeys()
     {
@@ -908,10 +920,18 @@ public sealed class MainForm : Form
     private void SaveDisplayLanguage()
     {
         string? error = settingsStore.Save(CaptureSettings());
-        resultLabel.Text = error ?? UiStrings.Get("LanguageRestartRequired");
-        resultLabel.ForeColor = error is null
-            ? Color.DarkOrange
-            : Color.DarkRed;
+        if (error is not null)
+        {
+            languageRefreshRequested = false;
+            resultLabel.Text = error;
+            resultLabel.ForeColor = Color.DarkRed;
+            return;
+        }
+
+        languageRefreshRequested = true;
+        resultLabel.Text = UiStrings.Get("LanguageRefreshing");
+        resultLabel.ForeColor = Color.DarkOrange;
+        BeginInvoke(new Action(Close));
     }
 
     private void AddPatchControl(
@@ -1658,6 +1678,7 @@ public sealed class MainForm : Form
         FormClosingEventArgs e,
         string message)
     {
+        languageRefreshRequested = false;
         resultLabel.Text = UiStrings.Format(
             "RestoreBeforeExitFailed",
             message);
