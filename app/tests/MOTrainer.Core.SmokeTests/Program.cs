@@ -30,6 +30,9 @@ internal static class Program
             ("SelectionService rejects unreasonable count", SelectionServiceRejectsLargeCount),
             ("Patch byte classifier is fail-closed", PatchClassifierIsFailClosed),
             ("Module fingerprint matching is normalized", FingerprintMatchingIsNormalized),
+            ("Session probe skips inaccessible process candidates", SessionProbeSkipsInaccessibleCandidate),
+            ("Session probe explains access-level mismatch", SessionProbeExplainsAccessDenied),
+            ("Session probe distinguishes module enumeration failure", SessionProbeExplainsModuleFailure),
             ("Read-only patch inspection reuses a supplied session snapshot", PatchInspectionReusesSnapshot),
             ("Money action follows CurrentPlayer economy chain", MoneyActionUsesVerifiedChain),
             ("Promotion action traverses every selected friendly unit", PromoteActionTraversesFinalVector),
@@ -165,6 +168,90 @@ internal static class Program
         Assert(
             probe.ProbeCount == 1,
             "The standalone inspection entry point must still verify its own session.");
+    }
+
+    private static void SessionProbeSkipsInaccessibleCandidate()
+    {
+        VersionProfile profile = KnownProfiles.ObservedMentalOmega;
+        using FakeMemoryAccessor memory = new();
+        memory.SetUInt32(
+            profile.Selection.CurrentPlayerAddress,
+            0x00200000);
+        memory.SetInt32(profile.CurrentFrameAddress, 123);
+
+        GameSessionProbe probe = CreateSessionProbe(
+            memory,
+            [100, 200],
+            processId => processId == 100
+                ? throw new UnauthorizedAccessException("denied")
+                : @"C:\game\gamemd.exe",
+            (_, moduleName) => @"C:\game\" + moduleName);
+
+        GameSessionSnapshot snapshot = probe.Probe();
+        Assert(
+            snapshot.State == SessionState.MatchReady,
+            "An inaccessible lower-PID process must not hide an accessible supported game.");
+        Assert(
+            snapshot.ProcessId == 200,
+            "The probe should select the accessible supported candidate.");
+    }
+
+    private static void SessionProbeExplainsAccessDenied()
+    {
+        using FakeMemoryAccessor memory = new();
+        GameSessionProbe probe = CreateSessionProbe(
+            memory,
+            [321],
+            _ => throw new UnauthorizedAccessException("denied"),
+            (_, _) => null);
+
+        GameSessionSnapshot snapshot = probe.Probe();
+        Assert(
+            snapshot.State == SessionState.Error &&
+            snapshot.ProcessId == 321,
+            "An inaccessible process should remain identified in the error snapshot.");
+        Assert(
+            snapshot.Message.Contains("权限不足", StringComparison.Ordinal) &&
+            snapshot.Message.Contains("相同权限级别", StringComparison.Ordinal),
+            "Access denied should explain the integrity-level mismatch and recovery action.");
+    }
+
+    private static void SessionProbeExplainsModuleFailure()
+    {
+        using FakeMemoryAccessor memory = new();
+        GameSessionProbe probe = CreateSessionProbe(
+            memory,
+            [456],
+            _ => @"C:\game\gamemd.exe",
+            (_, _) => throw new InvalidOperationException("module read failed"));
+
+        GameSessionSnapshot snapshot = probe.Probe();
+        Assert(
+            snapshot.State == SessionState.Error &&
+            snapshot.Message.Contains("模块列表", StringComparison.Ordinal),
+            "A module enumeration failure should not be reported as a generic probe failure.");
+    }
+
+    private static GameSessionProbe CreateSessionProbe(
+        FakeMemoryAccessor memory,
+        IReadOnlyList<int> processIds,
+        Func<int, string?> mainModulePathResolver,
+        Func<int, string, string?> modulePathResolver)
+    {
+        VersionProfile profile = KnownProfiles.ObservedMentalOmega;
+        return new GameSessionProbe(
+            "gamemd",
+            [profile],
+            new FakeMemoryAccessorFactory(memory),
+            _ => processIds,
+            mainModulePathResolver,
+            modulePathResolver,
+            path => string.Equals(
+                    Path.GetFileName(path),
+                    profile.Game.FileName,
+                    StringComparison.OrdinalIgnoreCase)
+                ? profile.Game.Sha256
+                : profile.Ares.Sha256);
     }
 
     private static void SelectionServiceFiltersByOwner()
