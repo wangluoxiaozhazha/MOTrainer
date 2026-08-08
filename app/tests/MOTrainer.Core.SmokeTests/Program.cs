@@ -34,6 +34,7 @@ internal static class Program
             ("SelectionService rejects unreasonable count", SelectionServiceRejectsLargeCount),
             ("Patch byte classifier is fail-closed", PatchClassifierIsFailClosed),
             ("Module fingerprint matching is normalized", FingerprintMatchingIsNormalized),
+            ("Steam and classic profiles share the validated layout", SteamAndClassicProfilesShareLayout),
             ("Display language resolution is backward compatible", DisplayLanguageResolutionIsBackwardCompatible),
             ("WinForms English resources cover the visible surface", WinFormsEnglishResourcesCoverSurface),
             ("Core resources cover runtime messages in both languages", CoreResourcesCoverRuntimeMessages),
@@ -502,6 +503,57 @@ internal static class Program
         Assert(
             !fingerprint.Matches("Ares.dll", "aabbcc"),
             "A different module name must not match.");
+    }
+
+    private static void SteamAndClassicProfilesShareLayout()
+    {
+        VersionProfile classic = KnownProfiles.ObservedMentalOmega;
+        VersionProfile steam = KnownProfiles.SteamMentalOmega;
+
+        Assert(
+            KnownProfiles.All.Count == 2 &&
+            KnownProfiles.All.Contains(classic) &&
+            KnownProfiles.All.Contains(steam),
+            "Both validated executable families must be registered.");
+        Assert(
+            steam.Game.Sha256 ==
+                "3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600",
+            "The Steam profile must use the live-validated fingerprint.");
+        Assert(
+            ReferenceEquals(classic.Selection, steam.Selection) &&
+            ReferenceEquals(classic.Patches, steam.Patches) &&
+            ReferenceEquals(classic.Hooks, steam.Hooks) &&
+            ReferenceEquals(classic.SelectionHooks, steam.SelectionHooks) &&
+            ReferenceEquals(classic.TechUnlockHooks, steam.TechUnlockHooks),
+            "The Steam profile must reuse the runtime-validated classic layout.");
+        Assert(
+            classic.Ares == steam.Ares &&
+            classic.CurrentFrameAddress == steam.CurrentFrameAddress &&
+            classic.BuildQueueRootAddress == steam.BuildQueueRootAddress,
+            "Shared modules and global addresses must remain identical.");
+
+        using FakeMemoryAccessor memory = new();
+        memory.SetUInt32(steam.Selection.CurrentPlayerAddress, 0x00200000);
+        memory.SetInt32(steam.CurrentFrameAddress, 123);
+        GameSessionProbe probe = new(
+            "gamemd",
+            KnownProfiles.All,
+            new FakeMemoryAccessorFactory(memory),
+            _ => [808],
+            _ => @"C:\Steam\gamemd.exe",
+            (_, moduleName) => @"C:\Steam\" + moduleName,
+            path => string.Equals(
+                    Path.GetFileName(path),
+                    steam.Game.FileName,
+                    StringComparison.OrdinalIgnoreCase)
+                ? steam.Game.Sha256
+                : steam.Ares.Sha256);
+        GameSessionSnapshot snapshot = probe.Probe();
+        Assert(
+            snapshot.State == SessionState.MatchReady &&
+            snapshot.ProcessId == 808 &&
+            ReferenceEquals(snapshot.Profile, steam),
+            "The session probe must select the Steam profile by its fingerprint.");
     }
 
     private static void MoneyActionUsesVerifiedChain()

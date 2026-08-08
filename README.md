@@ -5,7 +5,7 @@
 MOTrainer is an independent, unofficial, open-source offline trainer for
 [Mental Omega](https://mentalomega.com/). It provides selected-unit editing,
 economy and production controls, battlefield utilities, and superweapon grants
-for a strictly verified game build.
+for strictly verified game builds.
 
 > Offline use only. MOTrainer does not provide anti-cheat bypasses and should
 > not be used in multiplayer environments.
@@ -67,6 +67,7 @@ Hotkeys and mouse controls call the same validated action paths.
 | Default runtime | .NET Framework 4.8 |
 | Display language | Auto, English, Simplified Chinese |
 | Intended use | Mental Omega offline matches |
+| Verified game builds | Classic YR 1.001; Steam YR 1.001 (2024) |
 
 MOTrainer validates the SHA-256 fingerprints of `gamemd.exe` and `Ares.dll`.
 Unknown modules, unavailable match structures, inconsistent bytes, or failed
@@ -139,7 +140,7 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-The current suite contains 37 smoke tests covering core state transitions,
+The current suite contains 38 smoke tests covering core state transitions,
 safety refusals, rollback paths, localization resources, and settings
 compatibility. These tests do not replace validation against the exact supported
 Mental Omega build.

@@ -60,6 +60,7 @@ MOTrainer 是一个面向《Mental Omega》的非官方开源离线修改器。�
 | 默认运行环境 | .NET Framework 4.8 |
 | 界面语言 | 自动、英文、简体中文 |
 | 使用场景 | Mental Omega 离线战局 |
+| 已验证游戏版本 | 经典 YR 1.001；Steam YR 1.001（2024） |
 
 程序会校验目标模块的 SHA-256。模块版本未知、战局结构未就绪、补丁字节不一致或
 写入回读失败时，受影响的操作会被拒绝，不会尝试猜测地址。
@@ -119,7 +120,7 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-当前自动化测试包含 37 项烟雾测试，覆盖核心状态转换、安全拒绝、回滚路径、本地化
+当前自动化测试包含 38 项烟雾测试，覆盖核心状态转换、安全拒绝、回滚路径、本地化
 资源和设置兼容性，但不代替特定 Mental Omega 版本中的实机验证。
 
 默认的紧凑型 .NET Framework 4.8 发布命令：

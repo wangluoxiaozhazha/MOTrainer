@@ -328,9 +328,14 @@ public sealed class GameSessionProbe : IGameSessionProbe
     }
 
     private static string ProfileDisplayName(VersionProfile profile) =>
-        profile.Id == KnownProfiles.ObservedMentalOmegaId
-            ? CoreStrings.Get("ObservedMentalOmegaProfile")
-            : profile.DisplayName;
+        profile.Id switch
+        {
+            KnownProfiles.ObservedMentalOmegaId =>
+                CoreStrings.Get("ClassicYuri1001Profile"),
+            KnownProfiles.SteamMentalOmegaId =>
+                CoreStrings.Get("SteamYuri1001Profile"),
+            _ => profile.DisplayName,
+        };
 
     private readonly record struct FileIdentity(
         string Path,

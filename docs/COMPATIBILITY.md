@@ -22,10 +22,19 @@ address and risking a crash or corrupt match state.
 
 Verified module fingerprints:
 
-| Module | SHA-256 |
-| --- | --- |
-| `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
-| `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
+| Profile | Module | SHA-256 |
+| --- | --- | --- |
+| Classic YR 1.001 | `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
+| Steam YR 1.001 (2024) | `gamemd.exe` | `3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600` |
+| Both profiles | `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
+
+The Steam profile requires the edited `Syringe.exe` compatibility fix
+published through Mental Omega's official Discord support channel. See the
+[official Mental Omega support page](https://mentalomega.com/index.php?page=support).
+MOTrainer does not distribute or fingerprint the injector itself. The official
+fix also targets EA App installations, but an EA App `gamemd.exe` has not been
+separately validated; it is supported only if its SHA-256 matches a listed
+profile.
 
 These fingerprints identify files more precisely than the version shown by a
 launcher. Two installations may display the same Mental Omega version while

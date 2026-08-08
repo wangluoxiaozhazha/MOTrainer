@@ -13,7 +13,8 @@
   <data name="GameUnsupported" xml:space="preserve"><value>Unsupported gamemd.exe: {0}</value></data>
   <data name="MatchReady" xml:space="preserve"><value>Match ready: {0} (PID {1})</value></data>
   <data name="ModuleListReadFailed" xml:space="preserve"><value>Cannot read the gamemd.exe module list: {0}</value></data>
-  <data name="ObservedMentalOmegaProfile" xml:space="preserve"><value>verified Mental Omega build</value></data>
+  <data name="ClassicYuri1001Profile" xml:space="preserve"><value>Classic YR 1.001</value></data>
+  <data name="SteamYuri1001Profile" xml:space="preserve"><value>Steam YR 1.001 (2024)</value></data>
   <data name="ProbeFailed" xml:space="preserve"><value>gamemd.exe (PID {0}) probe failed: {1}</value></data>
   <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>Version verified: {0}; match structures are not ready</value></data>
   <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>Version verified: {0}; waiting to enter a match</value></data>

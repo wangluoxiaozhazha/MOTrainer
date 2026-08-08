@@ -13,7 +13,8 @@
   <data name="GameUnsupported" xml:space="preserve"><value>不受支持的 gamemd.exe：{0}</value></data>
   <data name="MatchReady" xml:space="preserve"><value>战局已就绪：{0}（PID {1}）</value></data>
   <data name="ModuleListReadFailed" xml:space="preserve"><value>无法读取 gamemd.exe 模块列表：{0}</value></data>
-  <data name="ObservedMentalOmegaProfile" xml:space="preserve"><value>Mental Omega 已验证样本</value></data>
+  <data name="ClassicYuri1001Profile" xml:space="preserve"><value>经典 YR 1.001</value></data>
+  <data name="SteamYuri1001Profile" xml:space="preserve"><value>Steam YR 1.001（2024）</value></data>
   <data name="ProbeFailed" xml:space="preserve"><value>gamemd.exe（PID {0}）探测失败：{1}</value></data>
   <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>版本已确认：{0}；战局结构尚未就绪</value></data>
   <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>版本已确认：{0}；等待进入战局</value></data>

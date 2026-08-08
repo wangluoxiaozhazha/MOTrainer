@@ -20,10 +20,18 @@ MOTrainer 当前采用严格的版本绑定策略。只有目标进程及关键�
 
 当前已验证模块：
 
-| 模块 | SHA-256 |
-| --- | --- |
-| `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
-| `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
+| 配置 | 模块 | SHA-256 |
+| --- | --- | --- |
+| 经典 YR 1.001 | `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
+| Steam YR 1.001（2024） | `gamemd.exe` | `3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600` |
+| 两种配置 | `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
+
+Steam 配置需要 Mental Omega 官方 Discord 支持频道发布的修改版
+`Syringe.exe` 兼容补丁，详见
+[Mental Omega 官方支持页](https://mentalomega.com/index.php?page=support)。
+MOTrainer 不分发也不校验该注入器文件。官方兼容补丁同时面向 EA App，
+但本项目尚未单独验证 EA App 的 `gamemd.exe`；只有当其 SHA-256 与表中已验证
+配置一致时，才会被支持。
 
 这里的模块指纹比启动器显示的版本名称更精确。即使两个安装都显示相同的 Mental
 Omega 版本，兼容补丁、来源或本地替换也可能令文件不同。

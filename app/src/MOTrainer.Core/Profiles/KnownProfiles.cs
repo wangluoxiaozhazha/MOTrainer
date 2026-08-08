@@ -8,10 +8,11 @@ namespace MOTrainer.Core.Profiles;
 public static class KnownProfiles
 {
     public const string ObservedMentalOmegaId = "mo-observed-2026-07-24";
+    public const string SteamMentalOmegaId = "mo-steam-2026-08-08";
 
     public static VersionProfile ObservedMentalOmega { get; } = new(
         Id: ObservedMentalOmegaId,
-        DisplayName: "Mental Omega 已验证样本",
+        DisplayName: "Classic YR 1.001",
         Game: new ModuleFingerprint(
             "gamemd.exe",
             "7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747"),
@@ -251,6 +252,16 @@ public static class KnownProfiles
                     FactoryOwnerRejectedRva: 0x00020EA6),
         });
 
+    public static VersionProfile SteamMentalOmega { get; } =
+        ObservedMentalOmega with
+        {
+            Id = SteamMentalOmegaId,
+            DisplayName = "Steam YR 1.001 (2024)",
+            Game = new ModuleFingerprint(
+                "gamemd.exe",
+                "3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600"),
+        };
+
     public static IReadOnlyList<VersionProfile> All { get; } =
-        [ObservedMentalOmega];
+        [ObservedMentalOmega, SteamMentalOmega];
 }
