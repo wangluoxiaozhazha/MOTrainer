@@ -54,6 +54,7 @@ public sealed class MainForm : Form
         hotkeyDisplayBindings = [];
     private GlobalHotkeyManager? hotkeys;
     private bool synchronizingPatchState;
+    private bool actionInProgress;
     private bool autoEditTickActive;
     private bool autoEditEnabled;
     private bool matchControlsAvailable;
@@ -1133,14 +1134,16 @@ public sealed class MainForm : Form
     private void RefreshSession()
     {
         GameSessionSnapshot snapshot = sessionProbe.Probe();
-        statusLabel.Text = snapshot.Message;
-        statusLabel.ForeColor = snapshot.State switch
-        {
-            SessionState.NoProcess => Color.DimGray,
-            SessionState.ProcessFound or SessionState.ModulesReady => Color.DarkOrange,
-            SessionState.Unsupported or SessionState.Error => Color.DarkRed,
-            _ => Color.DarkGreen,
-        };
+        SetTextIfChanged(statusLabel, snapshot.Message);
+        SetForeColorIfChanged(
+            statusLabel,
+            snapshot.State switch
+            {
+                SessionState.NoProcess => Color.DimGray,
+                SessionState.ProcessFound or SessionState.ModulesReady => Color.DarkOrange,
+                SessionState.Unsupported or SessionState.Error => Color.DarkRed,
+                _ => Color.DarkGreen,
+            });
 
         matchControlsAvailable =
             snapshot.State == SessionState.MatchReady;
@@ -1176,16 +1179,23 @@ public sealed class MainForm : Form
 
     private void RunAction(Func<ActionResult> action)
     {
-        SetInteractiveControlsEnabled(false);
+        if (actionInProgress)
+        {
+            return;
+        }
 
+        actionInProgress = true;
         try
         {
             ActionResult result = action();
-            resultLabel.Text = result.Message;
-            resultLabel.ForeColor = result.Success ? Color.DarkGreen : Color.DarkRed;
+            SetTextIfChanged(resultLabel, result.Message);
+            SetForeColorIfChanged(
+                resultLabel,
+                result.Success ? Color.DarkGreen : Color.DarkRed);
         }
         finally
         {
+            actionInProgress = false;
             RefreshSession();
         }
     }
@@ -1562,15 +1572,18 @@ public sealed class MainForm : Form
 
                 PatchInspection inspection =
                     actions.InspectPatch(binding.Id, snapshot);
-                binding.Control.CheckState = inspection.State switch
-                {
-                    PatchRuntimeState.Original => CheckState.Unchecked,
-                    PatchRuntimeState.Enabled => CheckState.Checked,
-                    _ => CheckState.Indeterminate,
-                };
-                binding.Control.Enabled =
+                SetCheckStateIfChanged(
+                    binding.Control,
+                    inspection.State switch
+                    {
+                        PatchRuntimeState.Original => CheckState.Unchecked,
+                        PatchRuntimeState.Enabled => CheckState.Checked,
+                        _ => CheckState.Indeterminate,
+                    });
+                SetEnabledIfChanged(
+                    binding.Control,
                     patchControlsAvailable &&
-                    inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled;
+                    inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled);
             }
         }
         finally
@@ -1630,16 +1643,18 @@ public sealed class MainForm : Form
         string label,
         DelayedFeatureStatus status)
     {
-        control.Enabled = true;
-        control.Checked = status.Desired;
-        control.Text = $"{label} [{status.State}]";
-        control.ForeColor = status.State switch
-        {
-            FeatureState.Pending => Color.DarkOrange,
-            FeatureState.Active => Color.DarkGreen,
-            FeatureState.Failed => Color.DarkRed,
-            _ => SystemColors.ControlText,
-        };
+        SetEnabledIfChanged(control, true);
+        SetCheckedIfChanged(control, status.Desired);
+        SetTextIfChanged(control, $"{label} [{status.State}]");
+        SetForeColorIfChanged(
+            control,
+            status.State switch
+            {
+                FeatureState.Pending => Color.DarkOrange,
+                FeatureState.Active => Color.DarkGreen,
+                FeatureState.Failed => Color.DarkRed,
+                _ => SystemColors.ControlText,
+            });
     }
 
     private void RefreshTechUnlockState(
@@ -1648,16 +1663,19 @@ public sealed class MainForm : Form
     {
         TechUnlockModeInspection inspection =
             actions.InspectTechUnlockMode(binding.Id, session);
-        binding.Control.CheckState = inspection.State switch
-        {
-            PatchRuntimeState.Original => CheckState.Unchecked,
-            PatchRuntimeState.Enabled => CheckState.Checked,
-            _ => CheckState.Indeterminate,
-        };
-        binding.Control.Enabled =
+        SetCheckStateIfChanged(
+            binding.Control,
+            inspection.State switch
+            {
+                PatchRuntimeState.Original => CheckState.Unchecked,
+                PatchRuntimeState.Enabled => CheckState.Checked,
+                _ => CheckState.Indeterminate,
+            });
+        SetEnabledIfChanged(
+            binding.Control,
             patchControlsAvailable &&
-            inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled;
-        techUnlockModeInput.Enabled = binding.Control.Enabled;
+            inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled);
+        SetEnabledIfChanged(techUnlockModeInput, binding.Control.Enabled);
 
         if (inspection.Mode is TechUnlockMode.Faction or TechUnlockMode.Extended)
         {
@@ -1666,62 +1684,88 @@ public sealed class MainForm : Form
                 if (techUnlockModeInput.Items[index] is TechUnlockModeOption option &&
                     option.Mode == inspection.Mode)
                 {
-                    techUnlockModeInput.SelectedIndex = index;
+                    if (techUnlockModeInput.SelectedIndex != index)
+                    {
+                        techUnlockModeInput.SelectedIndex = index;
+                    }
                     break;
                 }
             }
         }
     }
 
-    private void SetInteractiveControlsEnabled(bool enabled)
-    {
-        SetActionControlsEnabled(
-            enabled && matchControlsAvailable);
-        foreach (PatchBinding binding in patchBindings.Values)
-        {
-            binding.Control.Enabled =
-                enabled && patchControlsAvailable;
-        }
-        techUnlockModeInput.Enabled =
-            enabled && patchControlsAvailable;
-        autoEditModeInput.Enabled =
-            enabled && matchControlsAvailable;
-        autoEditControl.Enabled =
-            enabled && matchControlsAvailable;
-        unitUnlimitedControl.Enabled = enabled;
-        queueLimitControl.Enabled = enabled;
-    }
-
     private void SetActionControlsEnabled(bool enabled)
     {
-        oneTimeGroup.Enabled = enabled;
-        autoEditModeInput.Enabled = enabled;
-        editVeterancyControl.Enabled = enabled;
-        editVeterancyInput.Enabled = enabled;
-        editHealthControl.Enabled = enabled;
-        editHealthInput.Enabled = enabled;
-        applyUnitEditButton.Enabled =
+        SetEnabledIfChanged(oneTimeGroup, enabled);
+        SetEnabledIfChanged(autoEditModeInput, enabled);
+        SetEnabledIfChanged(editVeterancyControl, enabled);
+        SetEnabledIfChanged(editVeterancyInput, enabled);
+        SetEnabledIfChanged(editHealthControl, enabled);
+        SetEnabledIfChanged(editHealthInput, enabled);
+        SetEnabledIfChanged(
+            applyUnitEditButton,
             enabled &&
-            (editVeterancyControl.Checked ||
-                editHealthControl.Checked);
-        autoEditControl.Enabled = enabled;
-        moneyButton.Enabled = enabled;
-        addHealthButton.Enabled = enabled;
-        oneHealthButton.Enabled = enabled;
-        transferButton.Enabled = enabled;
-        zeroEconomyButton.Enabled = enabled;
-        defeatOwnerButton.Enabled = enabled;
+            (editVeterancyControl.Checked || editHealthControl.Checked));
+        SetEnabledIfChanged(autoEditControl, enabled);
+        SetEnabledIfChanged(moneyButton, enabled);
+        SetEnabledIfChanged(addHealthButton, enabled);
+        SetEnabledIfChanged(oneHealthButton, enabled);
+        SetEnabledIfChanged(transferButton, enabled);
+        SetEnabledIfChanged(zeroEconomyButton, enabled);
+        SetEnabledIfChanged(defeatOwnerButton, enabled);
     }
 
     private void RefreshUnitEditorInputsAndAutoEdit()
     {
-        editVeterancyInput.Enabled = matchControlsAvailable;
-        editHealthInput.Enabled = matchControlsAvailable;
-        applyUnitEditButton.Enabled =
+        SetEnabledIfChanged(editVeterancyInput, matchControlsAvailable);
+        SetEnabledIfChanged(editHealthInput, matchControlsAvailable);
+        SetEnabledIfChanged(
+            applyUnitEditButton,
             matchControlsAvailable &&
-            (editVeterancyControl.Checked ||
-                editHealthControl.Checked);
+            (editVeterancyControl.Checked || editHealthControl.Checked));
         RefreshAutoEditRequest();
+    }
+
+    private static void SetEnabledIfChanged(Control control, bool enabled)
+    {
+        if (control.Enabled != enabled)
+        {
+            control.Enabled = enabled;
+        }
+    }
+
+    private static void SetTextIfChanged(Control control, string text)
+    {
+        if (!string.Equals(control.Text, text, StringComparison.Ordinal))
+        {
+            control.Text = text;
+        }
+    }
+
+    private static void SetForeColorIfChanged(Control control, Color color)
+    {
+        if (control.ForeColor != color)
+        {
+            control.ForeColor = color;
+        }
+    }
+
+    private static void SetCheckStateIfChanged(
+        CheckBox control,
+        CheckState checkState)
+    {
+        if (control.CheckState != checkState)
+        {
+            control.CheckState = checkState;
+        }
+    }
+
+    private static void SetCheckedIfChanged(CheckBox control, bool value)
+    {
+        if (control.Checked != value)
+        {
+            control.Checked = value;
+        }
     }
 
     private void CancelCloseForRestoreFailure(

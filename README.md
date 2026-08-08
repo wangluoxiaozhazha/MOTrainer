@@ -106,7 +106,7 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-当前自动化测试包含 30 项 Core 烟雾测试。它们覆盖核心状态转换和安全拒绝路径，
+当前自动化测试包含 37 项 Core 烟雾测试。它们覆盖核心状态转换和安全拒绝路径，
 但不代替特定 Mental Omega 版本中的实机验证。
 
 默认的紧凑型 .NET Framework 4.8 发布命令：
@@ -130,6 +130,9 @@ app/src/MOTrainer.WinForms/         Windows 图形界面
 app/tests/MOTrainer.Core.SmokeTests/无第三方测试框架的 Core 烟雾测试
 docs/                               公开说明
 ```
+
+后续代码维护采用随功能改动逐步偿还结构债的方式，详见
+[渐进维护与结构偿债计划](docs/MAINTENANCE_PLAN.md)。
 
 ## 项目关系与致谢
 
