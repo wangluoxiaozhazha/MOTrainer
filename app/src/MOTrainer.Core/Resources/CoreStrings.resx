@@ -18,4 +18,191 @@
   <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>Version verified: {0}; match structures are not ready</value></data>
   <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>Version verified: {0}; waiting to enter a match</value></data>
   <data name="WaitingForAres" xml:space="preserve"><value>gamemd.exe identified; waiting for Ares.dll to load</value></data>
+  <data name="AttributeSeparator" xml:space="preserve"><value>, </value></data>
+  <data name="AutoRepairAddressOverflow" xml:space="preserve"><value>Automatic repair address calculation overflowed</value></data>
+  <data name="AutoRepairDisabled" xml:space="preserve"><value>Automatic repair is disabled</value></data>
+  <data name="AutoRepairEnabled" xml:space="preserve"><value>Automatic repair is enabled</value></data>
+  <data name="AutoRepairInspectionFailed" xml:space="preserve"><value>Failed to inspect automatic repair: {0}</value></data>
+  <data name="AutoRepairNotReady" xml:space="preserve"><value>Automatic repair structures are not ready</value></data>
+  <data name="AutoRepairReadFailed" xml:space="preserve"><value>Cannot read automatic repair state</value></data>
+  <data name="AutoRepairUnknownValue" xml:space="preserve"><value>Automatic repair contains unknown value {0}; operation refused</value></data>
+  <data name="AutoRepairUnsafeValue" xml:space="preserve"><value>Automatic repair is unreadable or contains an unknown value; overwrite refused</value></data>
+  <data name="ConditionalHookInspectionFailed" xml:space="preserve"><value>Failed to inspect conditional hook state: {0}</value></data>
+  <data name="ConditionalHookToggleFailed" xml:space="preserve"><value>Failed to toggle the {0} conditional hook: {1}</value></data>
+  <data name="EconomyLockDisplayName" xml:space="preserve"><value>Economy lock</value></data>
+  <data name="EventHookToggleFailed" xml:space="preserve"><value>Failed to toggle the {0} event hook: {1}</value></data>
+  <data name="FactionAlreadyDefeated" xml:space="preserve"><value>The target faction is already defeated</value></data>
+  <data name="FactionDefeatReadFailed" xml:space="preserve"><value>Cannot read the target faction's defeat state; write refused</value></data>
+  <data name="FactionEconomyReadFailed" xml:space="preserve"><value>Cannot read the target faction's economy; write refused</value></data>
+  <data name="FactionEconomyWriteFailed" xml:space="preserve"><value>Failed to zero the target faction's economy; attempted to restore the original value</value></data>
+  <data name="FactionEconomyZeroed" xml:space="preserve"><value>Target faction economy changed from {0} to zero</value></data>
+  <data name="FactionEconomyZeroFailed" xml:space="preserve"><value>Failed to zero the target faction's economy: {0}</value></data>
+  <data name="FactionMarkedSurrendered" xml:space="preserve"><value>The target faction was marked as surrendered; the game engine will process it when play resumes</value></data>
+  <data name="FactionSurrenderFailed" xml:space="preserve"><value>Failed to surrender the target faction: {0}</value></data>
+  <data name="FactionSurrenderWriteFailed" xml:space="preserve"><value>Failed to write the target faction's surrender flag; attempted to restore the original value</value></data>
+  <data name="FeatureAlreadyDisabled" xml:space="preserve"><value>{0} is already disabled</value></data>
+  <data name="FeatureAlreadyEnabled" xml:space="preserve"><value>{0} is already enabled</value></data>
+  <data name="FeatureDisabledAndRestored" xml:space="preserve"><value>{0} disabled and original bytes restored</value></data>
+  <data name="FeatureEnabled" xml:space="preserve"><value>{0} enabled</value></data>
+  <data name="FeatureModeChangeFailed" xml:space="preserve"><value>Failed to change {0} mode: {1}</value></data>
+  <data name="FeatureToggleFailed" xml:space="preserve"><value>Failed to toggle {0}: {1}</value></data>
+  <data name="FeatureToggleTransitionFailed" xml:space="preserve"><value>Failed to toggle {0}: {1}</value></data>
+  <data name="FeatureWriteFailed" xml:space="preserve"><value>Failed to write or verify {0}; attempted to restore the original value</value></data>
+  <data name="HealthAttribute" xml:space="preserve"><value>health</value></data>
+  <data name="HealthCalculationOverflow" xml:space="preserve"><value>Health calculation overflowed; write refused</value></data>
+  <data name="HealthChangeFailed" xml:space="preserve"><value>Failed to change unit health: {0}</value></data>
+  <data name="HealthIncreased" xml:space="preserve"><value>Increased selected-unit health by {0}</value></data>
+  <data name="HealthMustBePositive" xml:space="preserve"><value>Unit health must be greater than zero</value></data>
+  <data name="HealthReadFailed" xml:space="preserve"><value>Cannot read unit health; operation cancelled</value></data>
+  <data name="HealthSet" xml:space="preserve"><value>Set selected-unit health to {0}</value></data>
+  <data name="HealthWriteFailed" xml:space="preserve"><value>Failed to write or verify health; attempted to restore this operation</value></data>
+  <data name="InvertedFeatureDisabled" xml:space="preserve"><value>{0} disabled (0 -> 1)</value></data>
+  <data name="InvertedFeatureEnabled" xml:space="preserve"><value>{0} enabled (1 -> 0)</value></data>
+  <data name="MoneyChanged" xml:space="preserve"><value>Money changed from {0} to {1}</value></data>
+  <data name="MoneyChangeFailed" xml:space="preserve"><value>Failed to change money: {0}</value></data>
+  <data name="MoneyCurrentPlayerUnavailable" xml:space="preserve"><value>CurrentPlayer is unavailable; money was not changed</value></data>
+  <data name="MoneyReadFailed" xml:space="preserve"><value>Cannot read current money; write refused</value></data>
+  <data name="MoneyWriteVerificationFailed" xml:space="preserve"><value>Failed to write or verify money; attempted to restore the original value</value></data>
+  <data name="NoFriendlyUnitsSelected" xml:space="preserve"><value>No selected units belong to the current player</value></data>
+  <data name="NoUnitsSelected" xml:space="preserve"><value>No units selected</value></data>
+  <data name="OwnerChangeFailed" xml:space="preserve"><value>Failed to change unit ownership: {0}</value></data>
+  <data name="OwnerChanged" xml:space="preserve"><value>Changed {0} selected units to the current player</value></data>
+  <data name="OwnerCurrentPlayerUnavailable" xml:space="preserve"><value>CurrentPlayer is unavailable; ownership was not changed</value></data>
+  <data name="OwnerWriteFailed" xml:space="preserve"><value>Failed to write or verify unit ownership; attempted to restore this operation</value></data>
+  <data name="PatchDefinitionMissing" xml:space="preserve"><value>No patch definition for this version: {0}</value></data>
+  <data name="PatchInspectionFailed" xml:space="preserve"><value>Failed to inspect patch state: {0}</value></data>
+  <data name="RemoteExecutionPageRetained" xml:space="preserve"><value>{0}; the remote page was retained until the game exits to avoid freeing code that may still be running</value></data>
+  <data name="RemoteExecutionUnsupported" xml:space="preserve"><value>The current memory accessor does not support remote execution</value></data>
+  <data name="SafeHookToggleFailed" xml:space="preserve"><value>Failed to toggle the {0} safe hook: {1}</value></data>
+  <data name="SelectedOwnerReadFailed" xml:space="preserve"><value>Cannot read the selected unit Owner; write refused</value></data>
+  <data name="SelectedUnitOperationSucceeded" xml:space="preserve"><value>{0}: {1} selected units</value></data>
+  <data name="SelectedUnitOwnerReadFailed" xml:space="preserve"><value>Cannot read selected-unit ownership; operation cancelled</value></data>
+  <data name="SelectionEditHookDefinitionMissing" xml:space="preserve"><value>This version has no selection auto-edit event-hook definition</value></data>
+  <data name="SelectionEditModeToggleFailed" xml:space="preserve"><value>Failed to change selection auto-edit event mode: {0}</value></data>
+  <data name="SelectionUnavailable" xml:space="preserve"><value>Selection vector unavailable: {0}</value></data>
+  <data name="SelectUnitAttribute" xml:space="preserve"><value>Select at least one unit attribute to edit</value></data>
+  <data name="SuperweaponAllocationFailed" xml:space="preserve"><value>Failed to allocate the superweapon remote code page</value></data>
+  <data name="SuperweaponBatchExecuted" xml:space="preserve"><value>Executed a batch of {0} superweapons</value></data>
+  <data name="SuperweaponBatchExecutedSerialized" xml:space="preserve"><value>Executed {0} superweapon IDs sequentially in one batch thread</value></data>
+  <data name="SuperweaponExecutedById" xml:space="preserve"><value>Executed superweapon ID {0}</value></data>
+  <data name="SuperweaponExecutionFailed" xml:space="preserve"><value>Superweapon execution failed: {0}</value></data>
+  <data name="SuperweaponIdUnsupported" xml:space="preserve"><value>Superweapon ID is outside the verified range</value></data>
+  <data name="SuperweaponPageReleaseFailed" xml:space="preserve"><value>Superweapon executed, but the remote code page could not be released</value></data>
+  <data name="SuperweaponPayloadFailed" xml:space="preserve"><value>Failed to write or verify the superweapon payload, or to change it to RX protection</value></data>
+  <data name="TechUnlockDefinitionMissing" xml:space="preserve"><value>No tech-unlock hook definition for this version: {0}</value></data>
+  <data name="TechUnlockHookInspectionFailed" xml:space="preserve"><value>Failed to inspect tech-unlock hook state: {0}</value></data>
+  <data name="TechUnlockModeInspectionFailed" xml:space="preserve"><value>Failed to inspect tech-unlock mode: {0}</value></data>
+  <data name="UnitAttributeAddressOverflow" xml:space="preserve"><value>Unit attribute address calculation overflowed; write refused</value></data>
+  <data name="UnitAttributeChangeFailed" xml:space="preserve"><value>Failed to edit selected-unit attributes: {0}</value></data>
+  <data name="UnitAttributesChanged" xml:space="preserve"><value>Changed {1} for {0} units</value></data>
+  <data name="UnitAttributeWriteFailed" xml:space="preserve"><value>Failed to write or verify unit attributes; attempted to restore this operation</value></data>
+  <data name="UnitOwnerChanged" xml:space="preserve"><value>Unit ownership changed before the write; operation cancelled</value></data>
+  <data name="UnitsAlreadyOwned" xml:space="preserve"><value>All selected units already belong to the current player</value></data>
+  <data name="UnitStateChanged" xml:space="preserve"><value>Unit state changed before the write; operation cancelled</value></data>
+  <data name="UnknownVeterancy" xml:space="preserve"><value>Unknown unit veterancy</value></data>
+  <data name="VeterancyApplied" xml:space="preserve"><value>Set {0} current-player units to elite</value></data>
+  <data name="VeterancyAttribute" xml:space="preserve"><value>veterancy</value></data>
+  <data name="VeterancyChangeFailed" xml:space="preserve"><value>Failed to promote selected units: {0}</value></data>
+  <data name="VeterancyHookInspectionFailed" xml:space="preserve"><value>Failed to inspect selection veterancy hook state: {0}</value></data>
+  <data name="VeterancyReadbackFailed" xml:space="preserve"><value>Veterancy verification failed; attempted to restore this operation</value></data>
+  <data name="VeterancyReadFailed" xml:space="preserve"><value>Cannot read unit veterancy; operation cancelled</value></data>
+  <data name="VeterancyWriteFailed" xml:space="preserve"><value>Veterancy write failed; attempted to restore units changed by this operation</value></data>
+  <data name="BuildLimitPatchesActive" xml:space="preserve"><value>All four BuildLimit patches are active</value></data>
+  <data name="BuildLimitPatchesApplied" xml:space="preserve"><value>Applied all four BuildLimit patches</value></data>
+  <data name="BuildLimitPatchesRestored" xml:space="preserve"><value>Restored the original bytes at all four sites</value></data>
+  <data name="BuildLimitUnlockDisplayName" xml:space="preserve"><value>Unlimited build count</value></data>
+  <data name="BuildQueueUnavailable" xml:space="preserve"><value>The build-queue structure is not available</value></data>
+  <data name="ModuleUnavailable" xml:space="preserve"><value>Module unavailable: {0}</value></data>
+  <data name="NotEnabled" xml:space="preserve"><value>Not enabled</value></data>
+  <data name="NotPreset" xml:space="preserve"><value>Not preset</value></data>
+  <data name="OldQueueRestoreFailed" xml:space="preserve"><value>Failed to restore the old queue address; migration refused</value></data>
+  <data name="PatchBytesChanged" xml:space="preserve"><value>Bytes changed before the write; operation cancelled</value></data>
+  <data name="PatchBytesUnknown" xml:space="preserve"><value>Patch sites contain unknown or mixed bytes; operation refused</value></data>
+  <data name="PatchDisabled" xml:space="preserve"><value>Patch is disabled</value></data>
+  <data name="PatchDisabledResult" xml:space="preserve"><value>Patch disabled and original bytes restored</value></data>
+  <data name="PatchEnabled" xml:space="preserve"><value>Patch is enabled</value></data>
+  <data name="PatchEnabledResult" xml:space="preserve"><value>Patch enabled</value></data>
+  <data name="PatchOwnedByAnotherSession" xml:space="preserve"><value>An enabled patch not owned by this session was detected</value></data>
+  <data name="PatchRollbackFailed" xml:space="preserve"><value>Failed to restore earlier writes from this operation</value></data>
+  <data name="PatchRollbackSucceeded" xml:space="preserve"><value>Restored earlier writes from this operation</value></data>
+  <data name="PatchSiteReadFailed" xml:space="preserve"><value>Cannot read patch site: {0}+0x{1:X}</value></data>
+  <data name="PatchWriteFailed" xml:space="preserve"><value>Patch write or verification failed; {0}</value></data>
+  <data name="QueueLimitActive" xml:space="preserve"><value>Queue capacity limit is 1000</value></data>
+  <data name="QueueLimitApplied" xml:space="preserve"><value>Queue limit applied; original value was {0}</value></data>
+  <data name="QueueLimitReapplied" xml:space="preserve"><value>Reapplied after the queue structure refreshed</value></data>
+  <data name="QueueLimitRestored" xml:space="preserve"><value>Queue limit restored to {0}</value></data>
+  <data name="QueueLimitWriteFailed" xml:space="preserve"><value>Failed to write queue limit 999</value></data>
+  <data name="QueuePresetWaiting" xml:space="preserve"><value>Preset; waiting for the base build list</value></data>
+  <data name="QueueRestoreFailed" xml:space="preserve"><value>The queue field changed or the original value could not be restored</value></data>
+  <data name="QueueUnknownValue" xml:space="preserve"><value>Queue field changed to unknown value {0}; overwrite refused</value></data>
+  <data name="RemoteThreadCompleted" xml:space="preserve"><value>Remote thread completed</value></data>
+  <data name="RemoteThreadCreateFailed" xml:space="preserve"><value>Failed to create remote thread: {0}</value></data>
+  <data name="RemoteThreadParametersInvalid" xml:space="preserve"><value>Remote thread parameters are invalid</value></data>
+  <data name="RemoteThreadTimedOut" xml:space="preserve"><value>Timed out waiting for the remote thread</value></data>
+  <data name="RemoteThreadWaitFailed" xml:space="preserve"><value>Failed to wait for the remote thread or read its exit code</value></data>
+  <data name="SuperweaponExecutorInvalid" xml:space="preserve"><value>Superweapon executor definition is invalid</value></data>
+  <data name="WaitingForBuildSystem" xml:space="preserve"><value>Waiting for the build system</value></data>
+  <data name="WaitingForGameModules" xml:space="preserve"><value>Waiting for game modules</value></data>
+  <data name="InstantBuildAllocationFailed" xml:space="preserve"><value>Failed to allocate the instant-build remote code page</value></data>
+  <data name="InstantBuildDisableEntryChanged" xml:space="preserve"><value>The instant-build entry changed before disabling; restore refused</value></data>
+  <data name="InstantBuildDisabled" xml:space="preserve"><value>Player-only instant build is disabled</value></data>
+  <data name="InstantBuildDisabledAndRestored" xml:space="preserve"><value>Player-only instant build disabled; entry and remote page restored</value></data>
+  <data name="InstantBuildEnabled" xml:space="preserve"><value>Current-player-only instant build is enabled</value></data>
+  <data name="InstantBuildEntryChanged" xml:space="preserve"><value>The instant-build entry changed before the write; operation cancelled</value></data>
+  <data name="InstantBuildEntryReadFailed" xml:space="preserve"><value>Cannot read the instant-build hook entry</value></data>
+  <data name="InstantBuildEntryRestoreFailed" xml:space="preserve"><value>Failed to restore the instant-build entry; remote page left intact</value></data>
+  <data name="InstantBuildEntryWriteFailed" xml:space="preserve"><value>Failed to write the instant-build entry; attempted to restore original bytes</value></data>
+  <data name="InstantBuildPageReleaseFailed" xml:space="preserve"><value>Instant-build entry restored, but the remote page could not be released; it will be reclaimed when the game exits</value></data>
+  <data name="InstantBuildRemotePageFailed" xml:space="preserve"><value>Failed to write the instant-build remote page or change its protection</value></data>
+  <data name="InstantBuildUnknownBytes" xml:space="preserve"><value>The instant-build entry contains unknown bytes; operation refused</value></data>
+  <data name="InstantBuildUnknownTarget" xml:space="preserve"><value>The instant-build entry jumps to unknown remote code; operation refused</value></data>
+  <data name="OldEventPolicyRestored" xml:space="preserve"><value>{0}; previous event policy restored</value></data>
+  <data name="OldEventPolicyRestoreFailed" xml:space="preserve"><value>{0}; failed to restore the previous event policy: {1}</value></data>
+  <data name="RemoteCodePagesUnsupported" xml:space="preserve"><value>The current memory accessor does not support remote code pages</value></data>
+  <data name="SelectionEditEventDisabled" xml:space="preserve"><value>Selection auto-edit event mode is disabled</value></data>
+  <data name="SelectionEditEventDisabledAndRestored" xml:space="preserve"><value>Selection auto-edit event mode disabled; both entries and the remote page restored</value></data>
+  <data name="SelectionEditEventEnabled" xml:space="preserve"><value>Selection auto-edit dual-path event mode is enabled</value></data>
+  <data name="SelectionHookAllocationFailed" xml:space="preserve"><value>Failed to allocate the selection-hook remote code page</value></data>
+  <data name="SelectionHookDisableEntryChanged" xml:space="preserve"><value>A selection entry changed before disabling; restore refused</value></data>
+  <data name="SelectionHookEntryChanged" xml:space="preserve"><value>A selection entry changed before the write; operation cancelled</value></data>
+  <data name="SelectionHookEntryReadFailed" xml:space="preserve"><value>Cannot read the object-selection hook entries</value></data>
+  <data name="SelectionHookEntryWriteRollbackFailed" xml:space="preserve"><value>Failed to write a selection entry and some installed entries could not be restored; remote page left intact</value></data>
+  <data name="SelectionHookEntryWriteRolledBack" xml:space="preserve"><value>Failed to write a selection entry; restored installed entries</value></data>
+  <data name="SelectionHookPageReleaseFailed" xml:space="preserve"><value>Both selection entries were restored, but the remote page could not be released; it will be reclaimed when the game exits</value></data>
+  <data name="SelectionHookPolicyMismatch" xml:space="preserve"><value>Selection-hook remote code does not match the current policy; operation refused</value></data>
+  <data name="SelectionHookRemotePageFailed" xml:space="preserve"><value>Failed to write the selection-hook remote page or change its protection</value></data>
+  <data name="SelectionHookRestoreRollbackFailed" xml:space="preserve"><value>Failed to restore a selection entry and rollback to the enabled state is incomplete; remote page left intact</value></data>
+  <data name="SelectionHookRestoreRolledBack" xml:space="preserve"><value>Failed to restore a selection entry; rolled back to the enabled state</value></data>
+  <data name="SelectionHookUnknownBytes" xml:space="preserve"><value>Selection entries contain unknown or inconsistent bytes; operation refused</value></data>
+  <data name="SelectionHookUnknownTarget" xml:space="preserve"><value>A selection entry jumps to unknown remote code; operation refused</value></data>
+  <data name="TechUnlockAllocationFailed" xml:space="preserve"><value>Failed to allocate the tech-unlock remote code page</value></data>
+  <data name="TechUnlockChangedToExtendedMode" xml:space="preserve"><value>Changed tech unlock to extended mode and requested a sidebar rebuild</value></data>
+  <data name="TechUnlockChangedToExtendedModeRecheckFailed" xml:space="preserve"><value>Changed tech unlock to extended mode, but the sidebar refresh notification failed</value></data>
+  <data name="TechUnlockChangedToFactionMode" xml:space="preserve"><value>Changed tech unlock to faction mode and requested a sidebar rebuild</value></data>
+  <data name="TechUnlockChangedToFactionModeRecheckFailed" xml:space="preserve"><value>Changed tech unlock to faction mode, but the sidebar refresh notification failed</value></data>
+  <data name="TechUnlockDisableEntryChanged" xml:space="preserve"><value>A tech-unlock entry changed before disabling; restore refused</value></data>
+  <data name="TechUnlockDisabled" xml:space="preserve"><value>Safe tech unlock is disabled</value></data>
+  <data name="TechUnlockDisabledAndRestored" xml:space="preserve"><value>Tech unlock disabled; entries and remote page restored; sidebar rebuild requested</value></data>
+  <data name="TechUnlockDisabledRecheckFailed" xml:space="preserve"><value>Tech unlock disabled and remote page released, but the sidebar refresh notification failed</value></data>
+  <data name="TechUnlockDisableFactoryChanged" xml:space="preserve"><value>The tech-unlock factory-hook entry changed before disabling; restore refused</value></data>
+  <data name="TechUnlockEntriesReadFailed" xml:space="preserve"><value>Cannot read the two tech-unlock hook entries</value></data>
+  <data name="TechUnlockEntryChanged" xml:space="preserve"><value>A tech-unlock entry changed before the write; operation cancelled</value></data>
+  <data name="TechUnlockExtendedModeEnabled" xml:space="preserve"><value>Tech-unlock extended mode is enabled</value></data>
+  <data name="TechUnlockExtendedModeEnabledRebuildRequested" xml:space="preserve"><value>Tech-unlock extended mode enabled; sidebar rebuild requested</value></data>
+  <data name="TechUnlockExtendedModeWriteFailed" xml:space="preserve"><value>Failed to write the factory hook while changing to extended mode</value></data>
+  <data name="TechUnlockFactoryRestoreFailed" xml:space="preserve"><value>Failed to restore the factory hook; attempted to roll the primary hook back to enabled</value></data>
+  <data name="TechUnlockFactoryUnknownTarget" xml:space="preserve"><value>The tech-unlock factory hook points to unknown code; operation refused</value></data>
+  <data name="TechUnlockFactionModeEnabled" xml:space="preserve"><value>Tech-unlock faction mode is enabled</value></data>
+  <data name="TechUnlockFactionModeEnabledRebuildRequested" xml:space="preserve"><value>Tech-unlock faction mode enabled; sidebar rebuild requested</value></data>
+  <data name="TechUnlockFactionModeRestoreFailed" xml:space="preserve"><value>Failed to restore the factory hook while changing to faction mode</value></data>
+  <data name="TechUnlockModeChangeUnsupported" xml:space="preserve"><value>Unsupported tech-unlock mode change: {0} -> {1}</value></data>
+  <data name="TechUnlockPageReleaseFailed" xml:space="preserve"><value>Tech-unlock entries restored, but the remote page could not be released; it will be reclaimed when the game exits</value></data>
+  <data name="TechUnlockPrimaryRestoreFailed" xml:space="preserve"><value>Failed to restore the primary tech-unlock hook; remote page left intact</value></data>
+  <data name="TechUnlockRecheckAndReleaseFailed" xml:space="preserve"><value>Tech-unlock entries restored; sidebar refresh and remote-page release both failed</value></data>
+  <data name="TechUnlockRecheckAndRollbackFailed" xml:space="preserve"><value>Tech-tree refresh notification and entry rollback both failed; exit the game immediately</value></data>
+  <data name="TechUnlockRecheckFailedRolledBack" xml:space="preserve"><value>Both hooks were installed, but the tech-tree refresh notification failed; changes rolled back</value></data>
+  <data name="TechUnlockRemotePageFailed" xml:space="preserve"><value>Failed to write the tech-unlock remote page or change its protection</value></data>
+  <data name="TechUnlockStateInconsistent" xml:space="preserve"><value>Tech-unlock hook states are inconsistent; operation refused</value></data>
+  <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>A tech-unlock entry jumps to unknown remote code; operation refused</value></data>
+  <data name="TechUnlockWriteFailed" xml:space="preserve"><value>Failed to write the tech-unlock hooks; attempted to restore original bytes</value></data>
 </root>

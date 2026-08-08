@@ -1,5 +1,6 @@
 using MOTrainer.Core.Memory;
 using MOTrainer.Core.Hooks;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Profiles;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Processes;
@@ -39,13 +40,13 @@ public sealed class GameActionService
             if (!memory.TryRead(profile.Selection.CurrentPlayerAddress, out uint currentPlayer) ||
                 currentPlayer == 0)
             {
-                return ActionResult.Fail("CurrentPlayer 不可用，拒绝修改金钱");
+                return ActionResult.Fail(CoreStrings.Get("MoneyCurrentPlayerUnavailable"));
             }
 
             uint target = checked(currentPlayer + profile.EconomyOffset);
             if (!memory.TryRead(target, out uint original))
             {
-                return ActionResult.Fail("无法读取当前金钱，拒绝写入");
+                return ActionResult.Fail(CoreStrings.Get("MoneyReadFailed"));
             }
 
             if (!memory.TryWrite(target, amount) ||
@@ -53,14 +54,18 @@ public sealed class GameActionService
                 readBack != amount)
             {
                 memory.TryWrite(target, original);
-                return ActionResult.Fail("金钱写入或回读失败，已尝试恢复原值");
+                return ActionResult.Fail(CoreStrings.Get("MoneyWriteVerificationFailed"));
             }
 
-            return new ActionResult(true, $"金钱已由 {original} 修改为 {amount}", 1);
+            return new ActionResult(
+                true,
+                CoreStrings.Format("MoneyChanged", original, amount),
+                1);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"金钱修改失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("MoneyChangeFailed", exception.Message));
         }
     }
 
@@ -82,12 +87,13 @@ public sealed class GameActionService
 
             if (!selection.IsSuccess)
             {
-                return ActionResult.Fail($"选择向量不可用：{selection.Status}");
+                return ActionResult.Fail(
+                    CoreStrings.Format("SelectionUnavailable", selection.Status));
             }
 
             if (selection.Objects.Count == 0)
             {
-                return ActionResult.Fail("没有选中属于当前玩家的单位");
+                return ActionResult.Fail(CoreStrings.Get("NoFriendlyUnitsSelected"));
             }
 
             List<(uint Address, float Original)> targets = new(selection.Objects.Count);
@@ -100,7 +106,7 @@ public sealed class GameActionService
                     owner != selection.CurrentPlayer ||
                     !memory.TryRead(veterancyAddress, out float original))
                 {
-                    return ActionResult.Fail("单位状态在写入前发生变化，已取消本次操作");
+                    return ActionResult.Fail(CoreStrings.Get("UnitStateChanged"));
                 }
 
                 targets.Add((veterancyAddress, original));
@@ -114,7 +120,7 @@ public sealed class GameActionService
                 if (!memory.TryWrite(address, elite))
                 {
                     RestoreVeterancy(memory, targets, written);
-                    return ActionResult.Fail("升星写入失败，已尝试恢复本次已修改单位");
+                    return ActionResult.Fail(CoreStrings.Get("VeterancyWriteFailed"));
                 }
 
                 written++;
@@ -126,18 +132,19 @@ public sealed class GameActionService
                     readBack != elite)
                 {
                     RestoreVeterancy(memory, targets, targets.Count);
-                    return ActionResult.Fail("升星回读失败，已尝试恢复本次修改");
+                    return ActionResult.Fail(CoreStrings.Get("VeterancyReadbackFailed"));
                 }
             }
 
             return new ActionResult(
                 true,
-                $"已将 {targets.Count} 个当前玩家单位设为三星",
+                CoreStrings.Format("VeterancyApplied", targets.Count),
                 targets.Count);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"选中单位升星失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("VeterancyChangeFailed", exception.Message));
         }
     }
 
@@ -146,11 +153,11 @@ public sealed class GameActionService
     {
         if (request.Veterancy is null && request.Health is null)
         {
-            return ActionResult.Fail("请至少选择一项要修改的单位属性");
+            return ActionResult.Fail(CoreStrings.Get("SelectUnitAttribute"));
         }
         if (request.Health is <= 0)
         {
-            return ActionResult.Fail("单位生命值必须大于 0");
+            return ActionResult.Fail(CoreStrings.Get("HealthMustBePositive"));
         }
         if (!TryGetReadySession(
                 out int processId,
@@ -175,14 +182,14 @@ public sealed class GameActionService
             if (!selection.IsSuccess)
             {
                 return ActionResult.Fail(
-                    $"选择向量不可用：{selection.Status}");
+                    CoreStrings.Format("SelectionUnavailable", selection.Status));
             }
             if (selection.Objects.Count == 0)
             {
                 return ActionResult.Fail(
                     allCurrentPlayer
-                        ? "没有选中属于当前玩家的单位"
-                        : "没有选中单位");
+                        ? CoreStrings.Get("NoFriendlyUnitsSelected")
+                        : CoreStrings.Get("NoUnitsSelected"));
             }
 
             List<UnitEditWrite> writes = [];
@@ -196,7 +203,7 @@ public sealed class GameActionService
                         owner != selection.CurrentPlayer)
                     {
                         return ActionResult.Fail(
-                            "单位归属在写入前发生变化，已取消本次操作");
+                            CoreStrings.Get("UnitOwnerChanged"));
                     }
                 }
 
@@ -208,7 +215,7 @@ public sealed class GameActionService
                         UnitVeterancyLevel.Veteran => 1.0f,
                         UnitVeterancyLevel.Elite => 2.0f,
                         _ => throw new InvalidOperationException(
-                            "未知单位等级"),
+                            CoreStrings.Get("UnknownVeterancy")),
                     };
                     if (!TryPrepareUnitEditWrite(
                             memory,
@@ -219,7 +226,7 @@ public sealed class GameActionService
                             out UnitEditWrite write))
                     {
                         return ActionResult.Fail(
-                            "无法读取单位等级，已取消本次操作");
+                            CoreStrings.Get("VeterancyReadFailed"));
                     }
 
                     writes.Add(write);
@@ -236,7 +243,7 @@ public sealed class GameActionService
                             out UnitEditWrite write))
                     {
                         return ActionResult.Fail(
-                            "无法读取单位生命值，已取消本次操作");
+                            CoreStrings.Get("HealthReadFailed"));
                     }
 
                     writes.Add(write);
@@ -254,32 +261,35 @@ public sealed class GameActionService
                         writes,
                         Math.Min(written + 1, writes.Count));
                     return ActionResult.Fail(
-                        "单位属性写入或回读失败，已尝试恢复本次修改");
+                        CoreStrings.Get("UnitAttributeWriteFailed"));
                 }
 
                 written++;
             }
 
-            string attributes = string.Join(
-                "、",
+                string attributes = string.Join(
+                    CoreStrings.Get("AttributeSeparator"),
                 new[]
                 {
-                    request.Veterancy is null ? null : "等级",
-                    request.Health is null ? null : "生命",
+                    request.Veterancy is null ? null : CoreStrings.Get("VeterancyAttribute"),
+                    request.Health is null ? null : CoreStrings.Get("HealthAttribute"),
                 }.Where(value => value is not null));
             return new ActionResult(
                 true,
-                $"已修改 {selection.Objects.Count} 个单位的{attributes}",
+                CoreStrings.Format(
+                    "UnitAttributesChanged",
+                    selection.Objects.Count,
+                    attributes),
                 selection.Objects.Count);
         }
         catch (OverflowException)
         {
-            return ActionResult.Fail("单位属性地址计算溢出，拒绝写入");
+            return ActionResult.Fail(CoreStrings.Get("UnitAttributeAddressOverflow"));
         }
         catch (Exception exception)
         {
             return ActionResult.Fail(
-                $"选中单位组合修改失败：{exception.Message}");
+                CoreStrings.Format("UnitAttributeChangeFailed", exception.Message));
         }
     }
 
@@ -287,14 +297,14 @@ public sealed class GameActionService
     {
         return ChangeSelectedUnitHealth(
             current => checked(current + amount),
-            $"选中单位生命值增加 {amount}");
+            CoreStrings.Format("HealthIncreased", amount));
     }
 
     public ActionResult SetSelectedUnitsHealth(int value)
     {
         return ChangeSelectedUnitHealth(
             _ => value,
-            $"选中单位生命值设为 {value}");
+            CoreStrings.Format("HealthSet", value));
     }
 
     public ActionResult TransferSelectedUnitsToCurrentPlayer()
@@ -315,11 +325,11 @@ public sealed class GameActionService
             if (!selection.IsSuccess)
             {
                 return ActionResult.Fail(
-                    $"选择向量不可用：{selection.Status}");
+                    CoreStrings.Format("SelectionUnavailable", selection.Status));
             }
             if (selection.Objects.Count == 0)
             {
-                return ActionResult.Fail("没有选中单位");
+                return ActionResult.Fail(CoreStrings.Get("NoUnitsSelected"));
             }
 
             if (!memory.TryRead(
@@ -327,7 +337,7 @@ public sealed class GameActionService
                     out uint currentPlayer) ||
                 currentPlayer == 0)
             {
-                return ActionResult.Fail("CurrentPlayer 不可用，拒绝修改单位归属");
+                return ActionResult.Fail(CoreStrings.Get("OwnerCurrentPlayerUnavailable"));
             }
 
             List<UnitEditWrite> writes = [];
@@ -338,7 +348,7 @@ public sealed class GameActionService
                 if (!memory.TryRead(ownerAddress, out uint originalOwner))
                 {
                     return ActionResult.Fail(
-                        "无法读取选中单位归属，已取消本次操作");
+                        CoreStrings.Get("SelectedUnitOwnerReadFailed"));
                 }
 
                 if (originalOwner == currentPlayer)
@@ -356,7 +366,7 @@ public sealed class GameActionService
             {
                 return new ActionResult(
                     true,
-                    "选中单位均已属于当前玩家",
+                    CoreStrings.Get("UnitsAlreadyOwned"),
                     0);
             }
 
@@ -371,7 +381,7 @@ public sealed class GameActionService
                         writes,
                         Math.Min(written + 1, writes.Count));
                     return ActionResult.Fail(
-                        "单位归属写入或回读失败，已尝试恢复本次修改");
+                        CoreStrings.Get("OwnerWriteFailed"));
                 }
 
                 written++;
@@ -379,12 +389,13 @@ public sealed class GameActionService
 
             return new ActionResult(
                 true,
-                $"已将 {writes.Count} 个选中单位归属改为当前玩家",
+                CoreStrings.Format("OwnerChanged", writes.Count),
                 writes.Count);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"单位归属修改失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("OwnerChangeFailed", exception.Message));
         }
     }
 
@@ -414,7 +425,7 @@ public sealed class GameActionService
             uint economyAddress = checked(owner + profile.EconomyOffset);
             if (!memory.TryRead(economyAddress, out uint original))
             {
-                return ActionResult.Fail("无法读取目标阵营经济，拒绝写入");
+                return ActionResult.Fail(CoreStrings.Get("FactionEconomyReadFailed"));
             }
 
             if (!TryWriteAndVerify(
@@ -423,17 +434,18 @@ public sealed class GameActionService
                     0u,
                     original))
             {
-                return ActionResult.Fail("目标阵营经济清零失败，已尝试恢复原值");
+                return ActionResult.Fail(CoreStrings.Get("FactionEconomyWriteFailed"));
             }
 
             return new ActionResult(
                 true,
-                $"目标阵营经济已由 {original} 清零",
+                CoreStrings.Format("FactionEconomyZeroed", original),
                 1);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"目标阵营经济清零失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("FactionEconomyZeroFailed", exception.Message));
         }
     }
 
@@ -464,7 +476,7 @@ public sealed class GameActionService
                 owner + profile.DefeatedStateOffset);
             if (!memory.TryRead(defeatedAddress, out byte original))
             {
-                return ActionResult.Fail("无法读取目标阵营失败状态，拒绝写入");
+                return ActionResult.Fail(CoreStrings.Get("FactionDefeatReadFailed"));
             }
 
             const byte defeated = 1;
@@ -474,19 +486,20 @@ public sealed class GameActionService
                     defeated,
                     original))
             {
-                return ActionResult.Fail("目标阵营投降标记写入失败，已尝试恢复原值");
+                return ActionResult.Fail(CoreStrings.Get("FactionSurrenderWriteFailed"));
             }
 
             return new ActionResult(
                 true,
                 original == defeated
-                    ? "目标阵营已经处于失败状态"
-                    : "目标阵营已标记为投降；继续游戏后由引擎处理",
+                    ? CoreStrings.Get("FactionAlreadyDefeated")
+                    : CoreStrings.Get("FactionMarkedSurrendered"),
                 original == defeated ? 0 : 1);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"目标阵营投降失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("FactionSurrenderFailed", exception.Message));
         }
     }
 
@@ -560,7 +573,7 @@ public sealed class GameActionService
             if (ids.Count == 0 ||
                 ids.Any(id => id > definition.MaximumId))
             {
-                return ActionResult.Fail("超武 ID 超出已验证范围");
+                return ActionResult.Fail(CoreStrings.Get("SuperweaponIdUnsupported"));
             }
 
             using IMemoryAccessor memory =
@@ -569,7 +582,7 @@ public sealed class GameActionService
                 memory is not IRemoteThreadExecutor threadExecutor)
             {
                 return ActionResult.Fail(
-                    "当前内存访问器不支持远程执行");
+                    CoreStrings.Get("RemoteExecutionUnsupported"));
             }
 
             ActionResult result = ExecuteSuperweaponBatch(
@@ -586,13 +599,13 @@ public sealed class GameActionService
             return new ActionResult(
                 true,
                 ids.Count == 1
-                    ? $"已执行超武 ID {ids[0]}"
-                    : $"已在单个批处理线程中顺序执行 {ids.Count} 个超武 ID");
+                    ? CoreStrings.Format("SuperweaponExecutedById", ids[0])
+                    : CoreStrings.Format("SuperweaponBatchExecutedSerialized", ids.Count));
         }
         catch (Exception exception)
         {
             return ActionResult.Fail(
-                $"超武执行失败：{exception.Message}");
+                CoreStrings.Format("SuperweaponExecutionFailed", exception.Message));
         }
     }
 
@@ -609,7 +622,7 @@ public sealed class GameActionService
                 payload.Length,
                 out uint remoteAddress))
         {
-            return ActionResult.Fail("无法分配超武远程代码页");
+            return ActionResult.Fail(CoreStrings.Get("SuperweaponAllocationFailed"));
         }
 
         byte[] readback = new byte[payload.Length];
@@ -624,7 +637,7 @@ public sealed class GameActionService
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
             return ActionResult.Fail(
-                "超武载荷写入、回读或 RX 权限切换失败");
+                CoreStrings.Get("SuperweaponPayloadFailed"));
         }
 
         RemoteThreadExecutionResult execution =
@@ -639,19 +652,21 @@ public sealed class GameActionService
         if (!execution.Completed)
         {
             return ActionResult.Fail(
-                $"{execution.Message}；为避免释放仍在执行的代码，远程页保留至游戏退出");
+                CoreStrings.Format(
+                    "RemoteExecutionPageRetained",
+                    execution.Message));
         }
         if (!remoteMemory.TryFreeRemotePage(remoteAddress))
         {
             return ActionResult.Fail(
-                "超武已执行，但远程代码页释放失败");
+                CoreStrings.Get("SuperweaponPageReleaseFailed"));
         }
 
         return new ActionResult(
             true,
             ids.Count == 1
-                ? $"已执行超武 ID {ids[0]}"
-                : $"已执行 {ids.Count} 项超武批处理");
+                ? CoreStrings.Format("SuperweaponExecutedById", ids[0])
+                : CoreStrings.Format("SuperweaponBatchExecuted", ids.Count));
     }
 
     private static byte[] BuildSuperweaponBatch(
@@ -737,7 +752,7 @@ public sealed class GameActionService
             {
                 return new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    $"读取条件 Hook 状态失败：{exception.Message}");
+                    CoreStrings.Format("ConditionalHookInspectionFailed", exception.Message));
             }
         }
 
@@ -759,7 +774,7 @@ public sealed class GameActionService
             {
                 return new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    $"读取框选三星 Hook 状态失败：{exception.Message}");
+                    CoreStrings.Format("VeterancyHookInspectionFailed", exception.Message));
             }
         }
 
@@ -781,7 +796,7 @@ public sealed class GameActionService
             {
                 return new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    $"读取科技全开 Hook 状态失败：{exception.Message}");
+                    CoreStrings.Format("TechUnlockHookInspectionFailed", exception.Message));
             }
         }
 
@@ -789,7 +804,7 @@ public sealed class GameActionService
         {
             return new PatchInspection(
                 PatchRuntimeState.Unknown,
-                $"当前版本没有补丁配置：{patchId}");
+                CoreStrings.Format("PatchDefinitionMissing", patchId));
         }
 
         try
@@ -802,7 +817,7 @@ public sealed class GameActionService
         {
             return new PatchInspection(
                 PatchRuntimeState.Unknown,
-                $"读取补丁状态失败：{exception.Message}");
+                CoreStrings.Format("PatchInspectionFailed", exception.Message));
         }
     }
 
@@ -836,7 +851,7 @@ public sealed class GameActionService
             return new TechUnlockModeInspection(
                 null,
                 PatchRuntimeState.Unknown,
-                $"当前版本没有科技全开 Hook 配置：{patchId}");
+                CoreStrings.Format("TechUnlockDefinitionMissing", patchId));
         }
 
         try
@@ -854,7 +869,7 @@ public sealed class GameActionService
             return new TechUnlockModeInspection(
                 null,
                 PatchRuntimeState.Unknown,
-                $"读取科技全开模式失败：{exception.Message}");
+                CoreStrings.Format("TechUnlockModeInspectionFailed", exception.Message));
         }
     }
 
@@ -877,7 +892,7 @@ public sealed class GameActionService
                 out PlayerTechUnlockHookDefinition? techUnlockHook))
         {
             return ActionResult.Fail(
-                $"当前版本没有科技全开 Hook 配置：{displayName}");
+                CoreStrings.Format("TechUnlockDefinitionMissing", displayName));
         }
 
         try
@@ -893,13 +908,19 @@ public sealed class GameActionService
 
             string message = transition.Success
                 ? transition.Message
-                : $"{displayName}切换失败：{transition.Message}";
+                : CoreStrings.Format(
+                    "FeatureToggleTransitionFailed",
+                    displayName,
+                    transition.Message);
             return new ActionResult(transition.Success, message);
         }
         catch (Exception exception)
         {
             return ActionResult.Fail(
-                $"{displayName}模式切换失败：{exception.Message}");
+                CoreStrings.Format(
+                    "FeatureModeChangeFailed",
+                    displayName,
+                    exception.Message));
         }
     }
 
@@ -943,13 +964,19 @@ public sealed class GameActionService
 
                 string message = transition.Success
                     ? transition.Message
-                    : $"{displayName}切换失败：{transition.Message}";
+                    : CoreStrings.Format(
+                        "FeatureToggleTransitionFailed",
+                        displayName,
+                        transition.Message);
                 return new ActionResult(transition.Success, message);
             }
             catch (Exception exception)
             {
                 return ActionResult.Fail(
-                    $"{displayName}条件 Hook 切换失败：{exception.Message}");
+                    CoreStrings.Format(
+                        "ConditionalHookToggleFailed",
+                        displayName,
+                        exception.Message));
             }
         }
 
@@ -970,13 +997,19 @@ public sealed class GameActionService
 
                 string message = transition.Success
                     ? transition.Message
-                    : $"{displayName}切换失败：{transition.Message}";
+                    : CoreStrings.Format(
+                        "FeatureToggleTransitionFailed",
+                        displayName,
+                        transition.Message);
                 return new ActionResult(transition.Success, message);
             }
             catch (Exception exception)
             {
                 return ActionResult.Fail(
-                    $"{displayName}事件 Hook 切换失败：{exception.Message}");
+                    CoreStrings.Format(
+                        "EventHookToggleFailed",
+                        displayName,
+                        exception.Message));
             }
         }
 
@@ -997,19 +1030,26 @@ public sealed class GameActionService
 
                 string message = transition.Success
                     ? transition.Message
-                    : $"{displayName}切换失败：{transition.Message}";
+                    : CoreStrings.Format(
+                        "FeatureToggleTransitionFailed",
+                        displayName,
+                        transition.Message);
                 return new ActionResult(transition.Success, message);
             }
             catch (Exception exception)
             {
                 return ActionResult.Fail(
-                    $"{displayName}安全 Hook 切换失败：{exception.Message}");
+                    CoreStrings.Format(
+                        "SafeHookToggleFailed",
+                        displayName,
+                        exception.Message));
             }
         }
 
         if (!profile.Patches.TryGetValue(patchId, out PatchDefinition? patch))
         {
-            return ActionResult.Fail($"当前版本没有补丁配置：{displayName}");
+            return ActionResult.Fail(
+                CoreStrings.Format("PatchDefinitionMissing", displayName));
         }
 
         try
@@ -1022,15 +1062,19 @@ public sealed class GameActionService
 
             string message = transition.Success
                 ? enabled
-                    ? $"{displayName}已启用"
-                    : $"{displayName}已关闭并恢复原字节"
+                    ? CoreStrings.Format("FeatureEnabled", displayName)
+                    : CoreStrings.Format("FeatureDisabledAndRestored", displayName)
                 : transition.Message;
 
             return new ActionResult(transition.Success, message);
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"{displayName}切换失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format(
+                    "FeatureToggleFailed",
+                    displayName,
+                    exception.Message));
         }
     }
 
@@ -1051,7 +1095,7 @@ public sealed class GameActionService
                 out SelectionVeterancyHookDefinition? selectionHook))
         {
             return ActionResult.Fail(
-                "当前版本没有选中单位自动修改事件 Hook 配置");
+                CoreStrings.Get("SelectionEditHookDefinitionMissing"));
         }
 
         SelectionEditHookPolicy? policy = request is null
@@ -1085,7 +1129,7 @@ public sealed class GameActionService
         catch (Exception exception)
         {
             return ActionResult.Fail(
-                $"选中单位自动修改事件模式切换失败：{exception.Message}");
+                CoreStrings.Format("SelectionEditModeToggleFailed", exception.Message));
         }
     }
 
@@ -1098,7 +1142,7 @@ public sealed class GameActionService
     {
         return SetPatchEnabled(
             KnownPatchIds.EconomyNoDecrease,
-            "锁定经济",
+            CoreStrings.Get("EconomyLockDisplayName"),
             enabled);
     }
 
@@ -1125,27 +1169,27 @@ public sealed class GameActionService
             {
                 return new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    "无法读取自动维修状态");
+                    CoreStrings.Get("AutoRepairReadFailed"));
             }
 
             return value switch
             {
                 1 => new PatchInspection(
                     PatchRuntimeState.Original,
-                    "自动维修处于关闭状态"),
+                    CoreStrings.Get("AutoRepairDisabled")),
                 0 => new PatchInspection(
                     PatchRuntimeState.Enabled,
-                    "自动维修处于启用状态"),
+                    CoreStrings.Get("AutoRepairEnabled")),
                 _ => new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    $"自动维修字段为未知值 {value}，拒绝操作"),
+                    CoreStrings.Format("AutoRepairUnknownValue", value)),
             };
         }
         catch (Exception exception)
         {
             return new PatchInspection(
                 PatchRuntimeState.Unknown,
-                $"读取自动维修状态失败：{exception.Message}");
+                CoreStrings.Format("AutoRepairInspectionFailed", exception.Message));
         }
     }
 
@@ -1172,7 +1216,7 @@ public sealed class GameActionService
                 original is not (0 or 1))
             {
                 return ActionResult.Fail(
-                    "自动维修字段不可读或包含未知值，拒绝覆盖");
+                    CoreStrings.Get("AutoRepairUnsafeValue"));
             }
 
             byte target = enabled ? (byte)0 : (byte)1;
@@ -1181,8 +1225,8 @@ public sealed class GameActionService
                 return new ActionResult(
                     true,
                     enabled
-                        ? $"{displayName}已经启用"
-                        : $"{displayName}已经关闭");
+                        ? CoreStrings.Format("FeatureAlreadyEnabled", displayName)
+                        : CoreStrings.Format("FeatureAlreadyDisabled", displayName));
             }
 
             if (!memory.TryWrite(address, in target) ||
@@ -1191,20 +1235,23 @@ public sealed class GameActionService
             {
                 memory.TryWrite(address, in original);
                 return ActionResult.Fail(
-                    $"{displayName}写入或回读失败，已尝试恢复原值");
+                    CoreStrings.Format("FeatureWriteFailed", displayName));
             }
 
             return new ActionResult(
                 true,
                 enabled
-                    ? $"{displayName}已启用（1 → 0）"
-                    : $"{displayName}已关闭（0 → 1）",
+                    ? CoreStrings.Format("InvertedFeatureEnabled", displayName)
+                    : CoreStrings.Format("InvertedFeatureDisabled", displayName),
                 1);
         }
         catch (Exception exception)
         {
             return ActionResult.Fail(
-                $"{displayName}切换失败：{exception.Message}");
+                CoreStrings.Format(
+                    "FeatureToggleFailed",
+                    displayName,
+                    exception.Message));
         }
     }
 
@@ -1220,7 +1267,7 @@ public sealed class GameActionService
                 out uint root) ||
             root == 0)
         {
-            error = "自动维修结构尚未就绪";
+            error = CoreStrings.Get("AutoRepairNotReady");
             return false;
         }
 
@@ -1232,7 +1279,7 @@ public sealed class GameActionService
         }
         catch (OverflowException)
         {
-            error = "自动维修地址计算溢出";
+            error = CoreStrings.Get("AutoRepairAddressOverflow");
             return false;
         }
     }
@@ -1361,12 +1408,13 @@ public sealed class GameActionService
 
             if (!selection.IsSuccess)
             {
-                return ActionResult.Fail($"选择向量不可用：{selection.Status}");
+                return ActionResult.Fail(
+                    CoreStrings.Format("SelectionUnavailable", selection.Status));
             }
 
             if (selection.Objects.Count == 0)
             {
-                return ActionResult.Fail("没有选中单位");
+                return ActionResult.Fail(CoreStrings.Get("NoUnitsSelected"));
             }
 
             List<UnitEditWrite> writes = [];
@@ -1377,7 +1425,7 @@ public sealed class GameActionService
                 if (!memory.TryRead(healthAddress, out int original))
                 {
                     return ActionResult.Fail(
-                        "单位状态在写入前发生变化，已取消本次操作");
+                        CoreStrings.Get("UnitStateChanged"));
                 }
 
                 int target = transform(original);
@@ -1398,7 +1446,7 @@ public sealed class GameActionService
                         writes,
                         Math.Min(written + 1, writes.Count));
                     return ActionResult.Fail(
-                        "生命值写入或回读失败，已尝试恢复本次修改");
+                        CoreStrings.Get("HealthWriteFailed"));
                 }
 
                 written++;
@@ -1406,16 +1454,20 @@ public sealed class GameActionService
 
             return new ActionResult(
                 true,
-                $"{successPrefix}：{writes.Count} 个选中单位",
+                CoreStrings.Format(
+                    "SelectedUnitOperationSucceeded",
+                    successPrefix,
+                    writes.Count),
                 writes.Count);
         }
         catch (OverflowException)
         {
-            return ActionResult.Fail("生命值计算溢出，拒绝写入");
+            return ActionResult.Fail(CoreStrings.Get("HealthCalculationOverflow"));
         }
         catch (Exception exception)
         {
-            return ActionResult.Fail($"生命值修改失败：{exception.Message}");
+            return ActionResult.Fail(
+                CoreStrings.Format("HealthChangeFailed", exception.Message));
         }
     }
 
@@ -1441,13 +1493,13 @@ public sealed class GameActionService
                 .Read(SelectionScope.First, currentPlayerOnly: false);
         if (!selection.IsSuccess)
         {
-            error = $"选择向量不可用：{selection.Status}";
+            error = CoreStrings.Format("SelectionUnavailable", selection.Status);
             return false;
         }
 
         if (selection.Objects.Count == 0)
         {
-            error = "没有选中单位";
+            error = CoreStrings.Get("NoUnitsSelected");
             return false;
         }
 
@@ -1456,7 +1508,7 @@ public sealed class GameActionService
             objectAddress + profile.Selection.OwnerOffset);
         if (!memory.TryRead(ownerAddress, out owner) || owner == 0)
         {
-            error = "无法读取选中单位 Owner，拒绝写入";
+            error = CoreStrings.Get("SelectedOwnerReadFailed");
             return false;
         }
 

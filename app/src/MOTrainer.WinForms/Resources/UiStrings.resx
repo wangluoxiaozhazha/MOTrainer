@@ -109,12 +109,12 @@
   <data name="SettingsUnknownSuperweapon" xml:space="preserve"><value>superweapon.selectedIds contains unknown ID {0}; it was ignored</value></data>
   <data name="SettingsWrongRoot" xml:space="preserve"><value>The settings file root element is not configuration</value></data>
   <data name="WarningSeparator" xml:space="preserve"><value>; </value></data>
-  <data name="SuperweaponBarrier" xml:space="preserve"><value>Shield</value></data>
+  <data name="SuperweaponBlasticade" xml:space="preserve"><value>Blasticade</value></data>
   <data name="SuperweaponChronosphere" xml:space="preserve"><value>Chronosphere</value></data>
   <data name="SuperweaponGeneticMutator" xml:space="preserve"><value>Genetic Mutator</value></data>
   <data name="SuperweaponIronCurtain" xml:space="preserve"><value>Iron Curtain</value></data>
   <data name="SuperweaponLightningStorm" xml:space="preserve"><value>Lightning Storm</value></data>
-  <data name="SuperweaponMentalOmega" xml:space="preserve"><value>Mental Omega</value></data>
+  <data name="SuperweaponGreatTempest" xml:space="preserve"><value>Great Tempest</value></data>
   <data name="SuperweaponNuclearMissile" xml:space="preserve"><value>Nuclear Missile</value></data>
   <data name="SuperweaponPsychicDominator" xml:space="preserve"><value>Psychic Dominator</value></data>
   <data name="SuperweaponsSection" xml:space="preserve"><value>Superweapons</value></data>

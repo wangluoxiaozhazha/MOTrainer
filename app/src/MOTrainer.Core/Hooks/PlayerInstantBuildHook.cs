@@ -1,4 +1,5 @@
 using MOTrainer.Core.Memory;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Processes;
 
@@ -21,7 +22,7 @@ public sealed class PlayerInstantBuildHook
         this.memory = memory;
         remoteMemory = memory as IRemoteCodeMemory ??
             throw new InvalidOperationException(
-                "当前内存访问器不支持远程代码页");
+                CoreStrings.Get("RemoteCodePagesUnsupported"));
         this.modules = modules;
     }
 
@@ -76,7 +77,7 @@ public sealed class PlayerInstantBuildHook
         {
             return new HookInspection(
                 PatchRuntimeState.ModuleUnavailable,
-                $"模块不可用：{definition.ModuleName}",
+                CoreStrings.Format("ModuleUnavailable", definition.ModuleName),
                 0,
                 0);
         }
@@ -86,7 +87,7 @@ public sealed class PlayerInstantBuildHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "无法读取快速生产 Hook 入口",
+                CoreStrings.Get("InstantBuildEntryReadFailed"),
                 entryAddress,
                 0);
         }
@@ -95,7 +96,7 @@ public sealed class PlayerInstantBuildHook
         {
             return new HookInspection(
                 PatchRuntimeState.Original,
-                "仅玩家快速生产处于关闭状态",
+                CoreStrings.Get("InstantBuildDisabled"),
                 entryAddress,
                 0);
         }
@@ -104,7 +105,7 @@ public sealed class PlayerInstantBuildHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "快速生产入口包含未知字节，拒绝操作",
+                CoreStrings.Get("InstantBuildUnknownBytes"),
                 entryAddress,
                 0);
         }
@@ -117,14 +118,14 @@ public sealed class PlayerInstantBuildHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "快速生产入口跳转到未知远程代码，拒绝操作",
+                CoreStrings.Get("InstantBuildUnknownTarget"),
                 entryAddress,
                 remoteAddress);
         }
 
         return new HookInspection(
             PatchRuntimeState.Enabled,
-            "仅当前玩家快速生产已启用",
+            CoreStrings.Get("InstantBuildEnabled"),
             entryAddress,
             remoteAddress);
     }
@@ -137,7 +138,7 @@ public sealed class PlayerInstantBuildHook
                 RemotePageSize,
                 out uint remoteAddress))
         {
-            return Fail("无法分配快速生产远程代码页");
+            return Fail(CoreStrings.Get("InstantBuildAllocationFailed"));
         }
 
         byte[] stub = BuildStub(definition, entryAddress, remoteAddress);
@@ -156,7 +157,7 @@ public sealed class PlayerInstantBuildHook
         if (!prepared)
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("快速生产远程代码页写入或权限切换失败");
+            return Fail(CoreStrings.Get("InstantBuildRemotePageFailed"));
         }
 
         byte[] current = new byte[definition.OriginalBytes.Length];
@@ -164,7 +165,7 @@ public sealed class PlayerInstantBuildHook
             !current.SequenceEqual(definition.OriginalBytes))
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("写入前快速生产入口发生变化，已取消操作");
+            return Fail(CoreStrings.Get("InstantBuildEntryChanged"));
         }
 
         if (!memory.TryWriteCodeBytes(entryAddress, entry) ||
@@ -174,13 +175,13 @@ public sealed class PlayerInstantBuildHook
                 entryAddress,
                 definition.OriginalBytes);
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("快速生产入口写入失败，已尝试恢复原字节");
+            return Fail(CoreStrings.Get("InstantBuildEntryWriteFailed"));
         }
 
         return new PatchTransitionResult(
             true,
             PatchRuntimeState.Enabled,
-            "仅当前玩家快速生产已启用");
+            CoreStrings.Get("InstantBuildEnabled"));
     }
 
     private PatchTransitionResult Disable(
@@ -194,7 +195,7 @@ public sealed class PlayerInstantBuildHook
             definition.OriginalBytes.Length);
         if (!ReadbackMatches(entryAddress, expectedEntry))
         {
-            return Fail("禁用前快速生产入口发生变化，拒绝恢复");
+            return Fail(CoreStrings.Get("InstantBuildDisableEntryChanged"));
         }
 
         if (!memory.TryWriteCodeBytes(
@@ -202,14 +203,14 @@ public sealed class PlayerInstantBuildHook
                 definition.OriginalBytes) ||
             !ReadbackMatches(entryAddress, definition.OriginalBytes))
         {
-            return Fail("快速生产入口恢复失败，远程页保持不动");
+            return Fail(CoreStrings.Get("InstantBuildEntryRestoreFailed"));
         }
 
         bool pageFreed =
             remoteMemory.TryFreeRemotePage(remoteAddress);
         string message = pageFreed
-            ? "仅玩家快速生产已关闭，入口和远程页均已恢复"
-            : "快速生产入口已恢复，但远程页释放失败；页面将在游戏退出时回收";
+            ? CoreStrings.Get("InstantBuildDisabledAndRestored")
+            : CoreStrings.Get("InstantBuildPageReleaseFailed");
 
         return new PatchTransitionResult(
             true,

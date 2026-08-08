@@ -18,4 +18,191 @@
   <data name="VersionVerifiedStructuresNotReady" xml:space="preserve"><value>版本已确认：{0}；战局结构尚未就绪</value></data>
   <data name="VersionVerifiedWaitingForMatch" xml:space="preserve"><value>版本已确认：{0}；等待进入战局</value></data>
   <data name="WaitingForAres" xml:space="preserve"><value>已识别 gamemd.exe，等待 Ares.dll 加载</value></data>
+  <data name="AttributeSeparator" xml:space="preserve"><value>、</value></data>
+  <data name="AutoRepairAddressOverflow" xml:space="preserve"><value>自动维修地址计算溢出</value></data>
+  <data name="AutoRepairDisabled" xml:space="preserve"><value>自动维修处于关闭状态</value></data>
+  <data name="AutoRepairEnabled" xml:space="preserve"><value>自动维修处于启用状态</value></data>
+  <data name="AutoRepairInspectionFailed" xml:space="preserve"><value>读取自动维修状态失败：{0}</value></data>
+  <data name="AutoRepairNotReady" xml:space="preserve"><value>自动维修结构尚未就绪</value></data>
+  <data name="AutoRepairReadFailed" xml:space="preserve"><value>无法读取自动维修状态</value></data>
+  <data name="AutoRepairUnknownValue" xml:space="preserve"><value>自动维修字段为未知值 {0}，拒绝操作</value></data>
+  <data name="AutoRepairUnsafeValue" xml:space="preserve"><value>自动维修字段不可读或包含未知值，拒绝覆盖</value></data>
+  <data name="ConditionalHookInspectionFailed" xml:space="preserve"><value>读取条件 Hook 状态失败：{0}</value></data>
+  <data name="ConditionalHookToggleFailed" xml:space="preserve"><value>{0}条件 Hook 切换失败：{1}</value></data>
+  <data name="EconomyLockDisplayName" xml:space="preserve"><value>锁定经济</value></data>
+  <data name="EventHookToggleFailed" xml:space="preserve"><value>{0}事件 Hook 切换失败：{1}</value></data>
+  <data name="FactionAlreadyDefeated" xml:space="preserve"><value>目标阵营已经处于失败状态</value></data>
+  <data name="FactionDefeatReadFailed" xml:space="preserve"><value>无法读取目标阵营失败状态，拒绝写入</value></data>
+  <data name="FactionEconomyReadFailed" xml:space="preserve"><value>无法读取目标阵营经济，拒绝写入</value></data>
+  <data name="FactionEconomyWriteFailed" xml:space="preserve"><value>目标阵营经济清零失败，已尝试恢复原值</value></data>
+  <data name="FactionEconomyZeroed" xml:space="preserve"><value>目标阵营经济已由 {0} 清零</value></data>
+  <data name="FactionEconomyZeroFailed" xml:space="preserve"><value>目标阵营经济清零失败：{0}</value></data>
+  <data name="FactionMarkedSurrendered" xml:space="preserve"><value>目标阵营已标记为投降；继续游戏后由引擎处理</value></data>
+  <data name="FactionSurrenderFailed" xml:space="preserve"><value>目标阵营投降失败：{0}</value></data>
+  <data name="FactionSurrenderWriteFailed" xml:space="preserve"><value>目标阵营投降标记写入失败，已尝试恢复原值</value></data>
+  <data name="FeatureAlreadyDisabled" xml:space="preserve"><value>{0}已经关闭</value></data>
+  <data name="FeatureAlreadyEnabled" xml:space="preserve"><value>{0}已经启用</value></data>
+  <data name="FeatureDisabledAndRestored" xml:space="preserve"><value>{0}已关闭并恢复原字节</value></data>
+  <data name="FeatureEnabled" xml:space="preserve"><value>{0}已启用</value></data>
+  <data name="FeatureModeChangeFailed" xml:space="preserve"><value>{0}模式切换失败：{1}</value></data>
+  <data name="FeatureToggleFailed" xml:space="preserve"><value>{0}切换失败：{1}</value></data>
+  <data name="FeatureToggleTransitionFailed" xml:space="preserve"><value>{0}切换失败：{1}</value></data>
+  <data name="FeatureWriteFailed" xml:space="preserve"><value>{0}写入或回读失败，已尝试恢复原值</value></data>
+  <data name="HealthAttribute" xml:space="preserve"><value>生命</value></data>
+  <data name="HealthCalculationOverflow" xml:space="preserve"><value>生命值计算溢出，拒绝写入</value></data>
+  <data name="HealthChangeFailed" xml:space="preserve"><value>生命值修改失败：{0}</value></data>
+  <data name="HealthIncreased" xml:space="preserve"><value>选中单位生命值增加 {0}</value></data>
+  <data name="HealthMustBePositive" xml:space="preserve"><value>单位生命值必须大于 0</value></data>
+  <data name="HealthReadFailed" xml:space="preserve"><value>无法读取单位生命值，已取消本次操作</value></data>
+  <data name="HealthSet" xml:space="preserve"><value>选中单位生命值设为 {0}</value></data>
+  <data name="HealthWriteFailed" xml:space="preserve"><value>生命值写入或回读失败，已尝试恢复本次修改</value></data>
+  <data name="InvertedFeatureDisabled" xml:space="preserve"><value>{0}已关闭（0 → 1）</value></data>
+  <data name="InvertedFeatureEnabled" xml:space="preserve"><value>{0}已启用（1 → 0）</value></data>
+  <data name="MoneyChanged" xml:space="preserve"><value>金钱已由 {0} 修改为 {1}</value></data>
+  <data name="MoneyChangeFailed" xml:space="preserve"><value>金钱修改失败：{0}</value></data>
+  <data name="MoneyCurrentPlayerUnavailable" xml:space="preserve"><value>CurrentPlayer 不可用，拒绝修改金钱</value></data>
+  <data name="MoneyReadFailed" xml:space="preserve"><value>无法读取当前金钱，拒绝写入</value></data>
+  <data name="MoneyWriteVerificationFailed" xml:space="preserve"><value>金钱写入或回读失败，已尝试恢复原值</value></data>
+  <data name="NoFriendlyUnitsSelected" xml:space="preserve"><value>没有选中属于当前玩家的单位</value></data>
+  <data name="NoUnitsSelected" xml:space="preserve"><value>没有选中单位</value></data>
+  <data name="OwnerChangeFailed" xml:space="preserve"><value>单位归属修改失败：{0}</value></data>
+  <data name="OwnerChanged" xml:space="preserve"><value>已将 {0} 个选中单位归属改为当前玩家</value></data>
+  <data name="OwnerCurrentPlayerUnavailable" xml:space="preserve"><value>CurrentPlayer 不可用，拒绝修改单位归属</value></data>
+  <data name="OwnerWriteFailed" xml:space="preserve"><value>单位归属写入或回读失败，已尝试恢复本次修改</value></data>
+  <data name="PatchDefinitionMissing" xml:space="preserve"><value>当前版本没有补丁配置：{0}</value></data>
+  <data name="PatchInspectionFailed" xml:space="preserve"><value>读取补丁状态失败：{0}</value></data>
+  <data name="RemoteExecutionPageRetained" xml:space="preserve"><value>{0}；为避免释放仍在执行的代码，远程页保留至游戏退出</value></data>
+  <data name="RemoteExecutionUnsupported" xml:space="preserve"><value>当前内存访问器不支持远程执行</value></data>
+  <data name="SafeHookToggleFailed" xml:space="preserve"><value>{0}安全 Hook 切换失败：{1}</value></data>
+  <data name="SelectedOwnerReadFailed" xml:space="preserve"><value>无法读取选中单位 Owner，拒绝写入</value></data>
+  <data name="SelectedUnitOperationSucceeded" xml:space="preserve"><value>{0}：{1} 个选中单位</value></data>
+  <data name="SelectedUnitOwnerReadFailed" xml:space="preserve"><value>无法读取选中单位归属，已取消本次操作</value></data>
+  <data name="SelectionEditHookDefinitionMissing" xml:space="preserve"><value>当前版本没有选中单位自动修改事件 Hook 配置</value></data>
+  <data name="SelectionEditModeToggleFailed" xml:space="preserve"><value>选中单位自动修改事件模式切换失败：{0}</value></data>
+  <data name="SelectionUnavailable" xml:space="preserve"><value>选择向量不可用：{0}</value></data>
+  <data name="SelectUnitAttribute" xml:space="preserve"><value>请至少选择一项要修改的单位属性</value></data>
+  <data name="SuperweaponAllocationFailed" xml:space="preserve"><value>无法分配超武远程代码页</value></data>
+  <data name="SuperweaponBatchExecuted" xml:space="preserve"><value>已执行 {0} 项超武批处理</value></data>
+  <data name="SuperweaponBatchExecutedSerialized" xml:space="preserve"><value>已在单个批处理线程中顺序执行 {0} 个超武 ID</value></data>
+  <data name="SuperweaponExecutedById" xml:space="preserve"><value>已执行超武 ID {0}</value></data>
+  <data name="SuperweaponExecutionFailed" xml:space="preserve"><value>超武执行失败：{0}</value></data>
+  <data name="SuperweaponIdUnsupported" xml:space="preserve"><value>超武 ID 超出已验证范围</value></data>
+  <data name="SuperweaponPageReleaseFailed" xml:space="preserve"><value>超武已执行，但远程代码页释放失败</value></data>
+  <data name="SuperweaponPayloadFailed" xml:space="preserve"><value>超武载荷写入、回读或 RX 权限切换失败</value></data>
+  <data name="TechUnlockDefinitionMissing" xml:space="preserve"><value>当前版本没有科技全开 Hook 配置：{0}</value></data>
+  <data name="TechUnlockHookInspectionFailed" xml:space="preserve"><value>读取科技全开 Hook 状态失败：{0}</value></data>
+  <data name="TechUnlockModeInspectionFailed" xml:space="preserve"><value>读取科技全开模式失败：{0}</value></data>
+  <data name="UnitAttributeAddressOverflow" xml:space="preserve"><value>单位属性地址计算溢出，拒绝写入</value></data>
+  <data name="UnitAttributeChangeFailed" xml:space="preserve"><value>选中单位组合修改失败：{0}</value></data>
+  <data name="UnitAttributesChanged" xml:space="preserve"><value>已修改 {0} 个单位的{1}</value></data>
+  <data name="UnitAttributeWriteFailed" xml:space="preserve"><value>单位属性写入或回读失败，已尝试恢复本次修改</value></data>
+  <data name="UnitOwnerChanged" xml:space="preserve"><value>单位归属在写入前发生变化，已取消本次操作</value></data>
+  <data name="UnitsAlreadyOwned" xml:space="preserve"><value>选中单位均已属于当前玩家</value></data>
+  <data name="UnitStateChanged" xml:space="preserve"><value>单位状态在写入前发生变化，已取消本次操作</value></data>
+  <data name="UnknownVeterancy" xml:space="preserve"><value>未知单位等级</value></data>
+  <data name="VeterancyApplied" xml:space="preserve"><value>已将 {0} 个当前玩家单位设为三星</value></data>
+  <data name="VeterancyAttribute" xml:space="preserve"><value>等级</value></data>
+  <data name="VeterancyChangeFailed" xml:space="preserve"><value>选中单位升星失败：{0}</value></data>
+  <data name="VeterancyHookInspectionFailed" xml:space="preserve"><value>读取框选三星 Hook 状态失败：{0}</value></data>
+  <data name="VeterancyReadbackFailed" xml:space="preserve"><value>升星回读失败，已尝试恢复本次修改</value></data>
+  <data name="VeterancyReadFailed" xml:space="preserve"><value>无法读取单位等级，已取消本次操作</value></data>
+  <data name="VeterancyWriteFailed" xml:space="preserve"><value>升星写入失败，已尝试恢复本次已修改单位</value></data>
+  <data name="BuildLimitPatchesActive" xml:space="preserve"><value>四处 BuildLimit 补丁已生效</value></data>
+  <data name="BuildLimitPatchesApplied" xml:space="preserve"><value>四处 BuildLimit 补丁已应用</value></data>
+  <data name="BuildLimitPatchesRestored" xml:space="preserve"><value>已恢复四处原字节</value></data>
+  <data name="BuildLimitUnlockDisplayName" xml:space="preserve"><value>解锁建造数量</value></data>
+  <data name="BuildQueueUnavailable" xml:space="preserve"><value>建造队列结构尚未出现</value></data>
+  <data name="ModuleUnavailable" xml:space="preserve"><value>模块不可用：{0}</value></data>
+  <data name="NotEnabled" xml:space="preserve"><value>未启用</value></data>
+  <data name="NotPreset" xml:space="preserve"><value>未预设</value></data>
+  <data name="OldQueueRestoreFailed" xml:space="preserve"><value>旧队列地址恢复失败，拒绝迁移</value></data>
+  <data name="PatchBytesChanged" xml:space="preserve"><value>写入前字节发生变化，已取消操作</value></data>
+  <data name="PatchBytesUnknown" xml:space="preserve"><value>补丁点包含未知或混合字节，拒绝操作</value></data>
+  <data name="PatchDisabled" xml:space="preserve"><value>补丁处于关闭状态</value></data>
+  <data name="PatchDisabledResult" xml:space="preserve"><value>补丁已关闭并恢复原字节</value></data>
+  <data name="PatchEnabled" xml:space="preserve"><value>补丁处于启用状态</value></data>
+  <data name="PatchEnabledResult" xml:space="preserve"><value>补丁已启用</value></data>
+  <data name="PatchOwnedByAnotherSession" xml:space="preserve"><value>检测到非本次会话拥有的启用补丁</value></data>
+  <data name="PatchRollbackFailed" xml:space="preserve"><value>恢复本次此前写入时发生失败</value></data>
+  <data name="PatchRollbackSucceeded" xml:space="preserve"><value>已恢复本次此前写入</value></data>
+  <data name="PatchSiteReadFailed" xml:space="preserve"><value>无法读取补丁点：{0}+0x{1:X}</value></data>
+  <data name="PatchWriteFailed" xml:space="preserve"><value>补丁写入或回读失败，{0}</value></data>
+  <data name="QueueLimitActive" xml:space="preserve"><value>队列容量上限为 1000</value></data>
+  <data name="QueueLimitApplied" xml:space="preserve"><value>队列上限已应用；原值 {0}</value></data>
+  <data name="QueueLimitReapplied" xml:space="preserve"><value>队列结构刷新后已重新应用</value></data>
+  <data name="QueueLimitRestored" xml:space="preserve"><value>队列上限已恢复为 {0}</value></data>
+  <data name="QueueLimitWriteFailed" xml:space="preserve"><value>写入队列上限 999 失败</value></data>
+  <data name="QueuePresetWaiting" xml:space="preserve"><value>已预设，等待基地建造列表</value></data>
+  <data name="QueueRestoreFailed" xml:space="preserve"><value>队列字段已变化或原值恢复失败</value></data>
+  <data name="QueueUnknownValue" xml:space="preserve"><value>队列字段变为未知值 {0}，拒绝覆盖</value></data>
+  <data name="RemoteThreadCompleted" xml:space="preserve"><value>远程线程已完成</value></data>
+  <data name="RemoteThreadCreateFailed" xml:space="preserve"><value>创建远程线程失败：{0}</value></data>
+  <data name="RemoteThreadParametersInvalid" xml:space="preserve"><value>远程线程参数无效</value></data>
+  <data name="RemoteThreadTimedOut" xml:space="preserve"><value>远程线程等待超时</value></data>
+  <data name="RemoteThreadWaitFailed" xml:space="preserve"><value>远程线程等待或退出码读取失败</value></data>
+  <data name="SuperweaponExecutorInvalid" xml:space="preserve"><value>超武执行器定义无效</value></data>
+  <data name="WaitingForBuildSystem" xml:space="preserve"><value>等待建造系统出现</value></data>
+  <data name="WaitingForGameModules" xml:space="preserve"><value>等待游戏模块就绪</value></data>
+  <data name="InstantBuildAllocationFailed" xml:space="preserve"><value>无法分配快速生产远程代码页</value></data>
+  <data name="InstantBuildDisableEntryChanged" xml:space="preserve"><value>禁用前快速生产入口发生变化，拒绝恢复</value></data>
+  <data name="InstantBuildDisabled" xml:space="preserve"><value>仅玩家快速生产处于关闭状态</value></data>
+  <data name="InstantBuildDisabledAndRestored" xml:space="preserve"><value>仅玩家快速生产已关闭，入口和远程页均已恢复</value></data>
+  <data name="InstantBuildEnabled" xml:space="preserve"><value>仅当前玩家快速生产已启用</value></data>
+  <data name="InstantBuildEntryChanged" xml:space="preserve"><value>写入前快速生产入口发生变化，已取消操作</value></data>
+  <data name="InstantBuildEntryReadFailed" xml:space="preserve"><value>无法读取快速生产 Hook 入口</value></data>
+  <data name="InstantBuildEntryRestoreFailed" xml:space="preserve"><value>快速生产入口恢复失败，远程页保持不动</value></data>
+  <data name="InstantBuildEntryWriteFailed" xml:space="preserve"><value>快速生产入口写入失败，已尝试恢复原字节</value></data>
+  <data name="InstantBuildPageReleaseFailed" xml:space="preserve"><value>快速生产入口已恢复，但远程页释放失败；页面将在游戏退出时回收</value></data>
+  <data name="InstantBuildRemotePageFailed" xml:space="preserve"><value>快速生产远程代码页写入或权限切换失败</value></data>
+  <data name="InstantBuildUnknownBytes" xml:space="preserve"><value>快速生产入口包含未知字节，拒绝操作</value></data>
+  <data name="InstantBuildUnknownTarget" xml:space="preserve"><value>快速生产入口跳转到未知远程代码，拒绝操作</value></data>
+  <data name="OldEventPolicyRestored" xml:space="preserve"><value>{0}；旧事件策略已恢复</value></data>
+  <data name="OldEventPolicyRestoreFailed" xml:space="preserve"><value>{0}；旧事件策略恢复失败：{1}</value></data>
+  <data name="RemoteCodePagesUnsupported" xml:space="preserve"><value>当前内存访问器不支持远程代码页</value></data>
+  <data name="SelectionEditEventDisabled" xml:space="preserve"><value>选中单位自动修改事件模式处于关闭状态</value></data>
+  <data name="SelectionEditEventDisabledAndRestored" xml:space="preserve"><value>选中单位自动修改事件模式已关闭，双入口和远程页均已恢复</value></data>
+  <data name="SelectionEditEventEnabled" xml:space="preserve"><value>选中单位自动修改双路径事件模式已启用</value></data>
+  <data name="SelectionHookAllocationFailed" xml:space="preserve"><value>无法分配对象选择远程代码页</value></data>
+  <data name="SelectionHookDisableEntryChanged" xml:space="preserve"><value>禁用前对象选择入口发生变化，拒绝恢复</value></data>
+  <data name="SelectionHookEntryChanged" xml:space="preserve"><value>写入前对象选择入口发生变化，已取消操作</value></data>
+  <data name="SelectionHookEntryReadFailed" xml:space="preserve"><value>无法读取对象选择 Hook 入口</value></data>
+  <data name="SelectionHookEntryWriteRollbackFailed" xml:space="preserve"><value>对象选择入口写入失败，且部分入口恢复失败；远程页保持不动</value></data>
+  <data name="SelectionHookEntryWriteRolledBack" xml:space="preserve"><value>对象选择入口写入失败，已恢复已安装入口</value></data>
+  <data name="SelectionHookPageReleaseFailed" xml:space="preserve"><value>对象选择双入口已恢复，但远程页释放失败；页面将在游戏退出时回收</value></data>
+  <data name="SelectionHookPolicyMismatch" xml:space="preserve"><value>对象选择远程代码与当前策略不匹配，拒绝操作</value></data>
+  <data name="SelectionHookRemotePageFailed" xml:space="preserve"><value>对象选择远程代码页写入或权限切换失败</value></data>
+  <data name="SelectionHookRestoreRollbackFailed" xml:space="preserve"><value>对象选择入口恢复失败，且启用状态回滚不完整；远程页保持不动</value></data>
+  <data name="SelectionHookRestoreRolledBack" xml:space="preserve"><value>对象选择入口恢复失败，已回滚到启用状态</value></data>
+  <data name="SelectionHookUnknownBytes" xml:space="preserve"><value>对象选择入口包含未知或不一致字节，拒绝操作</value></data>
+  <data name="SelectionHookUnknownTarget" xml:space="preserve"><value>对象选择入口跳转到未知远程代码，拒绝操作</value></data>
+  <data name="TechUnlockAllocationFailed" xml:space="preserve"><value>无法分配科技全开远程代码页</value></data>
+  <data name="TechUnlockChangedToExtendedMode" xml:space="preserve"><value>已切换到科技全开扩展模式，并请求侧栏重建</value></data>
+  <data name="TechUnlockChangedToExtendedModeRecheckFailed" xml:space="preserve"><value>已切换到科技全开扩展模式，但侧栏重检通知失败</value></data>
+  <data name="TechUnlockChangedToFactionMode" xml:space="preserve"><value>已切换到科技全开阵营模式，并请求侧栏重建</value></data>
+  <data name="TechUnlockChangedToFactionModeRecheckFailed" xml:space="preserve"><value>已切换到科技全开阵营模式，但侧栏重检通知失败</value></data>
+  <data name="TechUnlockDisableEntryChanged" xml:space="preserve"><value>禁用前科技全开 Hook 入口发生变化，拒绝恢复</value></data>
+  <data name="TechUnlockDisabled" xml:space="preserve"><value>安全科技全开处于关闭状态</value></data>
+  <data name="TechUnlockDisabledAndRestored" xml:space="preserve"><value>科技全开已关闭，入口和远程页均已恢复，已请求侧栏重建</value></data>
+  <data name="TechUnlockDisabledRecheckFailed" xml:space="preserve"><value>科技全开已关闭并释放远程页，但侧栏重检通知失败</value></data>
+  <data name="TechUnlockDisableFactoryChanged" xml:space="preserve"><value>禁用前科技全开工厂 Hook 入口发生变化，拒绝恢复</value></data>
+  <data name="TechUnlockEntriesReadFailed" xml:space="preserve"><value>无法读取科技全开双 Hook 入口</value></data>
+  <data name="TechUnlockEntryChanged" xml:space="preserve"><value>写入前科技全开入口发生变化，已取消操作</value></data>
+  <data name="TechUnlockExtendedModeEnabled" xml:space="preserve"><value>科技全开扩展模式已启用</value></data>
+  <data name="TechUnlockExtendedModeEnabledRebuildRequested" xml:space="preserve"><value>科技全开扩展模式已启用，已请求侧栏重建</value></data>
+  <data name="TechUnlockExtendedModeWriteFailed" xml:space="preserve"><value>切换扩展模式时工厂 Hook 写入失败</value></data>
+  <data name="TechUnlockFactoryRestoreFailed" xml:space="preserve"><value>工厂 Hook 恢复失败，已尝试将前置 Hook 回滚为启用</value></data>
+  <data name="TechUnlockFactoryUnknownTarget" xml:space="preserve"><value>科技全开工厂 Hook 指向未知代码，拒绝操作</value></data>
+  <data name="TechUnlockFactionModeEnabled" xml:space="preserve"><value>科技全开阵营模式已启用</value></data>
+  <data name="TechUnlockFactionModeEnabledRebuildRequested" xml:space="preserve"><value>科技全开阵营模式已启用，已请求侧栏重建</value></data>
+  <data name="TechUnlockFactionModeRestoreFailed" xml:space="preserve"><value>切换阵营模式时工厂 Hook 恢复失败</value></data>
+  <data name="TechUnlockModeChangeUnsupported" xml:space="preserve"><value>不支持的科技全开模式切换：{0} -> {1}</value></data>
+  <data name="TechUnlockPageReleaseFailed" xml:space="preserve"><value>科技全开入口已恢复，但远程页释放失败；页面将在游戏退出时回收</value></data>
+  <data name="TechUnlockPrimaryRestoreFailed" xml:space="preserve"><value>科技全开前置 Hook 恢复失败，远程页保持不动</value></data>
+  <data name="TechUnlockRecheckAndReleaseFailed" xml:space="preserve"><value>科技全开入口已恢复；侧栏重检和远程页释放失败</value></data>
+  <data name="TechUnlockRecheckAndRollbackFailed" xml:space="preserve"><value>科技树重检通知失败且入口回滚失败，请立即退出游戏</value></data>
+  <data name="TechUnlockRecheckFailedRolledBack" xml:space="preserve"><value>双 Hook 已安装但科技树重检通知失败，已回滚</value></data>
+  <data name="TechUnlockRemotePageFailed" xml:space="preserve"><value>科技全开远程代码页写入或权限切换失败</value></data>
+  <data name="TechUnlockStateInconsistent" xml:space="preserve"><value>科技全开 Hook 状态不一致，拒绝操作</value></data>
+  <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>科技全开入口跳转到未知远程代码，拒绝操作</value></data>
+  <data name="TechUnlockWriteFailed" xml:space="preserve"><value>科技全开 Hook 写入失败，已尝试恢复原字节</value></data>
 </root>

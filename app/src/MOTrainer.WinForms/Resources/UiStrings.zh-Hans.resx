@@ -109,12 +109,12 @@
   <data name="SettingsUnknownSuperweapon" xml:space="preserve"><value>superweapon.selectedIds 包含未知 ID，已忽略 {0}</value></data>
   <data name="SettingsWrongRoot" xml:space="preserve"><value>设置文件根节点不是 configuration</value></data>
   <data name="WarningSeparator" xml:space="preserve"><value>；</value></data>
-  <data name="SuperweaponBarrier" xml:space="preserve"><value>屏障</value></data>
+  <data name="SuperweaponBlasticade" xml:space="preserve"><value>屏障</value></data>
   <data name="SuperweaponChronosphere" xml:space="preserve"><value>超时空</value></data>
   <data name="SuperweaponGeneticMutator" xml:space="preserve"><value>基因</value></data>
   <data name="SuperweaponIronCurtain" xml:space="preserve"><value>铁幕</value></data>
   <data name="SuperweaponLightningStorm" xml:space="preserve"><value>闪电</value></data>
-  <data name="SuperweaponMentalOmega" xml:space="preserve"><value>顶点</value></data>
+  <data name="SuperweaponGreatTempest" xml:space="preserve"><value>顶点</value></data>
   <data name="SuperweaponNuclearMissile" xml:space="preserve"><value>核弹</value></data>
   <data name="SuperweaponPsychicDominator" xml:space="preserve"><value>心控</value></data>
   <data name="SuperweaponsSection" xml:space="preserve"><value>超级武器</value></data>

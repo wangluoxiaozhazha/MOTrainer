@@ -1,6 +1,7 @@
 using MOTrainer.Core.Actions;
 using MOTrainer.Core.Features;
 using MOTrainer.Core.Hooks;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Memory;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Profiles;
@@ -11,6 +12,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Resources;
 using System.Xml.Linq;
 
 namespace MOTrainer.Core.SmokeTests;
@@ -34,6 +36,7 @@ internal static class Program
             ("Module fingerprint matching is normalized", FingerprintMatchingIsNormalized),
             ("Display language resolution is backward compatible", DisplayLanguageResolutionIsBackwardCompatible),
             ("WinForms English resources cover the visible surface", WinFormsEnglishResourcesCoverSurface),
+            ("Core resources cover runtime messages in both languages", CoreResourcesCoverRuntimeMessages),
             ("Session probe localizes startup and access messages", SessionProbeLocalizesMessages),
             ("Session probe skips inaccessible process candidates", SessionProbeSkipsInaccessibleCandidate),
             ("Session probe explains access-level mismatch", SessionProbeExplainsAccessDenied),
@@ -309,6 +312,57 @@ internal static class Program
                 "The English WinForms surface should not contain Chinese labels.");
         });
     }
+
+    private static void CoreResourcesCoverRuntimeMessages()
+    {
+        ResourceManager resources = new(
+            "MOTrainer.Core.Resources.CoreStrings",
+            typeof(CoreStrings).Assembly);
+        ResourceSet english = resources.GetResourceSet(
+            CultureInfo.GetCultureInfo("en"),
+            createIfNotExists: true,
+            tryParents: true) ?? throw new InvalidOperationException(
+                "English Core resource set is unavailable.");
+        ResourceSet chinese = resources.GetResourceSet(
+            CultureInfo.GetCultureInfo("zh-Hans"),
+            createIfNotExists: true,
+            tryParents: false) ?? throw new InvalidOperationException(
+                "Simplified Chinese Core resource set is unavailable.");
+
+        Dictionary<string, string> englishEntries = english
+            .Cast<System.Collections.DictionaryEntry>()
+            .ToDictionary(
+                entry => (string)entry.Key,
+                entry => entry.Value as string ??
+                    throw new InvalidOperationException(
+                        $"English Core resource {entry.Key} is not text."));
+        Dictionary<string, string> chineseEntries = chinese
+            .Cast<System.Collections.DictionaryEntry>()
+            .ToDictionary(
+                entry => (string)entry.Key,
+                entry => entry.Value as string ??
+                    throw new InvalidOperationException(
+                        $"Simplified Chinese Core resource {entry.Key} is not text."));
+
+        Assert(
+            englishEntries.Keys.ToHashSet(StringComparer.Ordinal)
+                .SetEquals(chineseEntries.Keys),
+            "English and Simplified Chinese Core resources must contain the same keys.");
+        Assert(
+            englishEntries.Values.All(text =>
+                !Regex.IsMatch(text, @"\p{IsCJKUnifiedIdeographs}")),
+            "English Core runtime messages should not contain Chinese text.");
+        Assert(
+            englishEntries.All(entry =>
+                PlaceholderIndexes(entry.Value).SetEquals(
+                    PlaceholderIndexes(chineseEntries[entry.Key]))),
+            "Core resource placeholders must match between English and Simplified Chinese.");
+    }
+
+    private static HashSet<string> PlaceholderIndexes(string template) =>
+        Regex.Matches(template, @"\{(\d+)(?:[^}]*)\}")
+            .Select(match => match.Groups[1].Value)
+            .ToHashSet(StringComparer.Ordinal);
 
     private static void SessionProbeExplainsAccessDenied()
     {

@@ -1,4 +1,5 @@
 using MOTrainer.Core.Memory;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Processes;
 
@@ -22,7 +23,7 @@ public sealed class PlayerTechUnlockCompositeHook
         this.memory = memory;
         remoteMemory = memory as IRemoteCodeMemory ??
             throw new InvalidOperationException(
-                "当前内存访问器不支持远程代码页");
+                CoreStrings.Get("RemoteCodePagesUnsupported"));
         this.modules = modules;
     }
 
@@ -90,7 +91,10 @@ public sealed class PlayerTechUnlockCompositeHook
             _ => new PatchTransitionResult(
                 false,
                 PatchRuntimeState.Unknown,
-                $"不支持的科技全开模式切换：{inspection.Mode} -> {mode}"),
+                CoreStrings.Format(
+                    "TechUnlockModeChangeUnsupported",
+                    inspection.Mode,
+                    mode)),
         };
     }
 
@@ -106,7 +110,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return Unknown(
                 PatchRuntimeState.ModuleUnavailable,
-                $"模块不可用：{definition.ModuleName}");
+                CoreStrings.Format("ModuleUnavailable", definition.ModuleName));
         }
 
         byte[] requirementBytes =
@@ -118,7 +122,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "无法读取科技全开双 Hook 入口",
+                CoreStrings.Get("TechUnlockEntriesReadFailed"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -135,7 +139,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Original,
-                "安全科技全开处于关闭状态",
+                CoreStrings.Get("TechUnlockDisabled"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -151,7 +155,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "科技全开 Hook 状态不一致，拒绝操作",
+                CoreStrings.Get("TechUnlockStateInconsistent"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -175,7 +179,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "科技全开入口跳转到未知远程代码，拒绝操作",
+                CoreStrings.Get("TechUnlockUnknownTarget"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -187,7 +191,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Enabled,
-                "科技全开阵营模式已启用",
+                CoreStrings.Get("TechUnlockFactionModeEnabled"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -203,7 +207,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             return new HookInspection(
                 PatchRuntimeState.Unknown,
-                "科技全开工厂 Hook 指向未知代码，拒绝操作",
+                CoreStrings.Get("TechUnlockFactoryUnknownTarget"),
                 moduleBase,
                 requirementEntry,
                 factoryEntry,
@@ -213,7 +217,7 @@ public sealed class PlayerTechUnlockCompositeHook
 
         return new HookInspection(
             PatchRuntimeState.Enabled,
-            "科技全开扩展模式已启用",
+            CoreStrings.Get("TechUnlockExtendedModeEnabled"),
             moduleBase,
             requirementEntry,
             factoryEntry,
@@ -230,7 +234,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 RemotePageSize,
                 out uint remoteAddress))
         {
-            return Fail("无法分配科技全开远程代码页");
+            return Fail(CoreStrings.Get("TechUnlockAllocationFailed"));
         }
 
         byte[] requirementStub = BuildRequirementStub(
@@ -274,7 +278,7 @@ public sealed class PlayerTechUnlockCompositeHook
         if (!prepared)
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("科技全开远程代码页写入或权限切换失败");
+            return Fail(CoreStrings.Get("TechUnlockRemotePageFailed"));
         }
 
         if (!ReadbackMatches(
@@ -285,7 +289,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 definition.FactoryOwnerOriginalBytes))
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("写入前科技全开入口发生变化，已取消操作");
+            return Fail(CoreStrings.Get("TechUnlockEntryChanged"));
         }
 
         bool requirementWritten =
@@ -308,7 +312,7 @@ public sealed class PlayerTechUnlockCompositeHook
         {
             RestoreOriginalEntries(definition, inspection);
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("科技全开 Hook 写入失败，已尝试恢复原字节");
+            return Fail(CoreStrings.Get("TechUnlockWriteFailed"));
         }
 
         if (!TryRequestTechTreeRecheck(definition))
@@ -317,16 +321,16 @@ public sealed class PlayerTechUnlockCompositeHook
                 RestoreOriginalEntries(definition, inspection);
             remoteMemory.TryFreeRemotePage(remoteAddress);
             return Fail(restored
-                ? "双 Hook 已安装但科技树重检通知失败，已回滚"
-                : "科技树重检通知失败且入口回滚失败，请立即退出游戏");
+                ? CoreStrings.Get("TechUnlockRecheckFailedRolledBack")
+                : CoreStrings.Get("TechUnlockRecheckAndRollbackFailed"));
         }
 
         return new PatchTransitionResult(
             true,
             PatchRuntimeState.Enabled,
             mode == TechUnlockMode.Faction
-                ? "科技全开阵营模式已启用，已请求侧栏重建"
-                : "科技全开扩展模式已启用，已请求侧栏重建");
+                ? CoreStrings.Get("TechUnlockFactionModeEnabledRebuildRequested")
+                : CoreStrings.Get("TechUnlockExtendedModeEnabledRebuildRequested"));
     }
 
     private PatchTransitionResult EnableFactoryOwnerBypass(
@@ -347,7 +351,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 inspection.FactoryEntry,
                 factoryEntry))
         {
-            return Fail("切换扩展模式时工厂 Hook 写入失败");
+            return Fail(CoreStrings.Get("TechUnlockExtendedModeWriteFailed"));
         }
 
         bool recheckRequested = TryRequestTechTreeRecheck(definition);
@@ -355,8 +359,8 @@ public sealed class PlayerTechUnlockCompositeHook
             true,
             PatchRuntimeState.Enabled,
             recheckRequested
-                ? "已切换到科技全开扩展模式，并请求侧栏重建"
-                : "已切换到科技全开扩展模式，但侧栏重检通知失败");
+                ? CoreStrings.Get("TechUnlockChangedToExtendedMode")
+                : CoreStrings.Get("TechUnlockChangedToExtendedModeRecheckFailed"));
     }
 
     private PatchTransitionResult DisableFactoryOwnerBypass(
@@ -375,7 +379,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 inspection.FactoryEntry,
                 definition.FactoryOwnerOriginalBytes))
         {
-            return Fail("切换阵营模式时工厂 Hook 恢复失败");
+            return Fail(CoreStrings.Get("TechUnlockFactionModeRestoreFailed"));
         }
 
         bool recheckRequested = TryRequestTechTreeRecheck(definition);
@@ -383,8 +387,8 @@ public sealed class PlayerTechUnlockCompositeHook
             true,
             PatchRuntimeState.Enabled,
             recheckRequested
-                ? "已切换到科技全开阵营模式，并请求侧栏重建"
-                : "已切换到科技全开阵营模式，但侧栏重检通知失败");
+                ? CoreStrings.Get("TechUnlockChangedToFactionMode")
+                : CoreStrings.Get("TechUnlockChangedToFactionModeRecheckFailed"));
     }
 
     private PatchTransitionResult Disable(
@@ -399,7 +403,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 inspection.RequirementEntry,
                 requirementEnabled))
         {
-            return Fail("禁用前科技全开 Hook 入口发生变化，拒绝恢复");
+            return Fail(CoreStrings.Get("TechUnlockDisableEntryChanged"));
         }
 
         byte[]? factoryEnabled = inspection.Mode == TechUnlockMode.Extended
@@ -411,7 +415,7 @@ public sealed class PlayerTechUnlockCompositeHook
         if (factoryEnabled is not null &&
             !ReadbackMatches(inspection.FactoryEntry, factoryEnabled))
         {
-            return Fail("禁用前科技全开工厂 Hook 入口发生变化，拒绝恢复");
+            return Fail(CoreStrings.Get("TechUnlockDisableFactoryChanged"));
         }
 
         bool requirementRestored =
@@ -423,7 +427,7 @@ public sealed class PlayerTechUnlockCompositeHook
                 definition.OriginalBytes);
         if (!requirementRestored)
         {
-            return Fail("科技全开前置 Hook 恢复失败，远程页保持不动");
+            return Fail(CoreStrings.Get("TechUnlockPrimaryRestoreFailed"));
         }
 
         bool factoryRestored =
@@ -439,7 +443,7 @@ public sealed class PlayerTechUnlockCompositeHook
             memory.TryWriteCodeBytes(
                 inspection.RequirementEntry,
                 requirementEnabled);
-            return Fail("工厂 Hook 恢复失败，已尝试将前置 Hook 回滚为启用");
+            return Fail(CoreStrings.Get("TechUnlockFactoryRestoreFailed"));
         }
 
         bool recheckRequested =
@@ -449,13 +453,13 @@ public sealed class PlayerTechUnlockCompositeHook
         string message = (recheckRequested, pageFreed) switch
         {
             (true, true) =>
-                "科技全开已关闭，入口和远程页均已恢复，已请求侧栏重建",
+                CoreStrings.Get("TechUnlockDisabledAndRestored"),
             (false, true) =>
-                "科技全开已关闭并释放远程页，但侧栏重检通知失败",
+                CoreStrings.Get("TechUnlockDisabledRecheckFailed"),
             (true, false) =>
-                "科技全开入口已恢复，但远程页释放失败；页面将在游戏退出时回收",
+                CoreStrings.Get("TechUnlockPageReleaseFailed"),
             _ =>
-                "科技全开入口已恢复；侧栏重检和远程页释放失败",
+                CoreStrings.Get("TechUnlockRecheckAndReleaseFailed"),
         };
 
         return new PatchTransitionResult(

@@ -1,4 +1,5 @@
 using MOTrainer.Core.Actions;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Memory;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Profiles;
@@ -86,8 +87,8 @@ public sealed class DelayedBuildPolicyService
             session.Profile is null)
         {
             return unitDesired
-                ? Pending(true, "等待游戏模块就绪")
-                : Off("未预设");
+                ? Pending(true, CoreStrings.Get("WaitingForGameModules"))
+                : Off(CoreStrings.Get("NotPreset"));
         }
 
         PatchInspection inspection =
@@ -98,7 +99,7 @@ public sealed class DelayedBuildPolicyService
             {
                 ActionResult result = actions.SetPatchEnabled(
                     KnownPatchIds.UnitUnlimited,
-                    "解锁建造数量",
+                    CoreStrings.Get("BuildLimitUnlockDisplayName"),
                     true);
                 if (!result.Success)
                 {
@@ -106,26 +107,26 @@ public sealed class DelayedBuildPolicyService
                 }
 
                 unitOwnedProcessId = processId;
-                return Active(true, "四处 BuildLimit 补丁已应用");
+                return Active(true, CoreStrings.Get("BuildLimitPatchesApplied"));
             }
 
             return inspection.State == PatchRuntimeState.Enabled
-                ? Active(true, "四处 BuildLimit 补丁已生效")
+                ? Active(true, CoreStrings.Get("BuildLimitPatchesActive"))
                 : Failed(true, inspection.Message);
         }
 
         if (unitOwnedProcessId != processId)
         {
             return inspection.State == PatchRuntimeState.Enabled
-                ? Failed(false, "检测到非本次会话拥有的启用补丁")
-                : Off("未启用");
+                ? Failed(false, CoreStrings.Get("PatchOwnedByAnotherSession"))
+                : Off(CoreStrings.Get("NotEnabled"));
         }
 
         if (inspection.State == PatchRuntimeState.Enabled)
         {
             ActionResult result = actions.SetPatchEnabled(
                 KnownPatchIds.UnitUnlimited,
-                "解锁建造数量",
+                CoreStrings.Get("BuildLimitUnlockDisplayName"),
                 false);
             if (!result.Success)
             {
@@ -138,7 +139,7 @@ public sealed class DelayedBuildPolicyService
         }
 
         unitOwnedProcessId = null;
-        return Off("已恢复四处原字节");
+        return Off(CoreStrings.Get("BuildLimitPatchesRestored"));
     }
 
     private DelayedFeatureStatus ReconcileQueue(
@@ -148,20 +149,20 @@ public sealed class DelayedBuildPolicyService
             session.Profile is not VersionProfile profile)
         {
             return queueDesired
-                ? Pending(true, "等待建造系统出现")
-                : Off("未预设");
+                ? Pending(true, CoreStrings.Get("WaitingForBuildSystem"))
+                : Off(CoreStrings.Get("NotPreset"));
         }
 
         if (!queueDesired && queueRestore is not null)
         {
             if (!TryRestoreQueue(queueRestore))
             {
-                return Failed(false, "队列字段已变化或原值恢复失败");
+                return Failed(false, CoreStrings.Get("QueueRestoreFailed"));
             }
 
             uint restored = queueRestore.OriginalValue;
             queueRestore = null;
-            return Off($"队列上限已恢复为 {restored}");
+            return Off(CoreStrings.Format("QueueLimitRestored", restored));
         }
 
         if (!TryResolveQueueAddress(
@@ -171,8 +172,8 @@ public sealed class DelayedBuildPolicyService
                 out uint current))
         {
             return queueDesired
-                ? Pending(true, "已预设，等待基地建造列表")
-                : Off("建造队列结构尚未出现");
+                ? Pending(true, CoreStrings.Get("QueuePresetWaiting"))
+                : Off(CoreStrings.Get("BuildQueueUnavailable"));
         }
 
         if (queueDesired)
@@ -184,34 +185,34 @@ public sealed class DelayedBuildPolicyService
                 if (queueRestore is not null &&
                     !TryRestoreQueue(queueRestore))
                 {
-                    return Failed(true, "旧队列地址恢复失败，拒绝迁移");
+                    return Failed(true, CoreStrings.Get("OldQueueRestoreFailed"));
                 }
 
                 QueueRestorePoint restore =
                     new(processId, address, current);
                 if (!TryWriteQueueValue(processId, address, QueueLimitValue))
                 {
-                    return Failed(true, "写入队列上限 999 失败");
+                    return Failed(true, CoreStrings.Get("QueueLimitWriteFailed"));
                 }
 
                 queueRestore = restore;
-                return Active(true, $"队列上限已应用；原值 {current}");
+                return Active(true, CoreStrings.Format("QueueLimitApplied", current));
             }
 
             if (current == QueueLimitValue)
             {
-                return Active(true, "队列容量上限为 1000");
+                return Active(true, CoreStrings.Get("QueueLimitActive"));
             }
             if (current == queueRestore.OriginalValue &&
                 TryWriteQueueValue(processId, address, QueueLimitValue))
             {
-                return Active(true, "队列结构刷新后已重新应用");
+                return Active(true, CoreStrings.Get("QueueLimitReapplied"));
             }
 
-            return Failed(true, $"队列字段变为未知值 {current}，拒绝覆盖");
+            return Failed(true, CoreStrings.Format("QueueUnknownValue", current));
         }
 
-        return Off("未启用");
+        return Off(CoreStrings.Get("NotEnabled"));
     }
 
     private bool TryResolveQueueAddress(

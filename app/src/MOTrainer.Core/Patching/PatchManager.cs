@@ -1,4 +1,5 @@
 using MOTrainer.Core.Memory;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Processes;
 
 namespace MOTrainer.Core.Patching;
@@ -30,7 +31,7 @@ public sealed class PatchManager
             {
                 return new PatchInspection(
                     PatchRuntimeState.ModuleUnavailable,
-                    $"模块不可用：{site.ModuleName}");
+                    CoreStrings.Format("ModuleUnavailable", site.ModuleName));
             }
 
             byte[] actual = new byte[site.OriginalBytes.Length];
@@ -38,7 +39,7 @@ public sealed class PatchManager
             {
                 return new PatchInspection(
                     PatchRuntimeState.Unknown,
-                    $"无法读取补丁点：{site.ModuleName}+0x{site.Rva:X}");
+                    CoreStrings.Format("PatchSiteReadFailed", site.ModuleName, site.Rva));
             }
 
             states.Add(PatchByteClassifier.Classify(site, actual));
@@ -46,17 +47,21 @@ public sealed class PatchManager
 
         if (states.All(state => state == PatchByteState.Original))
         {
-            return new PatchInspection(PatchRuntimeState.Original, "补丁处于关闭状态");
+            return new PatchInspection(
+                PatchRuntimeState.Original,
+                CoreStrings.Get("PatchDisabled"));
         }
 
         if (states.All(state => state == PatchByteState.Enabled))
         {
-            return new PatchInspection(PatchRuntimeState.Enabled, "补丁处于启用状态");
+            return new PatchInspection(
+                PatchRuntimeState.Enabled,
+                CoreStrings.Get("PatchEnabled"));
         }
 
         return new PatchInspection(
             PatchRuntimeState.Unknown,
-            "补丁点包含未知或混合字节，拒绝操作");
+            CoreStrings.Get("PatchBytesUnknown"));
     }
 
     public PatchTransitionResult SetEnabled(
@@ -89,7 +94,7 @@ public sealed class PatchManager
                 return new PatchTransitionResult(
                     false,
                     PatchRuntimeState.ModuleUnavailable,
-                    $"模块不可用：{site.ModuleName}");
+                    CoreStrings.Format("ModuleUnavailable", site.ModuleName));
             }
 
             byte[] actual = new byte[site.OriginalBytes.Length];
@@ -100,7 +105,7 @@ public sealed class PatchManager
                 return new PatchTransitionResult(
                     false,
                     PatchRuntimeState.Unknown,
-                    "写入前字节发生变化，已取消操作");
+                    CoreStrings.Get("PatchBytesChanged"));
             }
 
             sites.Add(new ResolvedPatchSite(site, address, actual));
@@ -118,12 +123,12 @@ public sealed class PatchManager
             {
                 bool restored = RestorePreviousBytes(sites, changed + 1);
                 string suffix = restored
-                    ? "已恢复本次此前写入"
-                    : "恢复本次此前写入时发生失败";
+                    ? CoreStrings.Get("PatchRollbackSucceeded")
+                    : CoreStrings.Get("PatchRollbackFailed");
                 return new PatchTransitionResult(
                     false,
                     PatchRuntimeState.Unknown,
-                    $"补丁写入或回读失败，{suffix}");
+                    CoreStrings.Format("PatchWriteFailed", suffix));
             }
 
             changed++;
@@ -132,7 +137,9 @@ public sealed class PatchManager
         return new PatchTransitionResult(
             true,
             desired,
-            enabled ? "补丁已启用" : "补丁已关闭并恢复原字节");
+            enabled
+                ? CoreStrings.Get("PatchEnabledResult")
+                : CoreStrings.Get("PatchDisabledResult"));
     }
 
     private bool TryResolve(PatchSite site, out uint address)
