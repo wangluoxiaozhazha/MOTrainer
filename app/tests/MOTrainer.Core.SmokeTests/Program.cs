@@ -1,14 +1,18 @@
 using MOTrainer.Core.Actions;
 using MOTrainer.Core.Features;
 using MOTrainer.Core.Hooks;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Memory;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Profiles;
 using MOTrainer.Core.Selection;
 using MOTrainer.Core.Session;
 using MOTrainer.WinForms;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Resources;
 using System.Xml.Linq;
 
 namespace MOTrainer.Core.SmokeTests;
@@ -30,6 +34,11 @@ internal static class Program
             ("SelectionService rejects unreasonable count", SelectionServiceRejectsLargeCount),
             ("Patch byte classifier is fail-closed", PatchClassifierIsFailClosed),
             ("Module fingerprint matching is normalized", FingerprintMatchingIsNormalized),
+            ("Steam and classic profiles share the validated layout", SteamAndClassicProfilesShareLayout),
+            ("Display language resolution is backward compatible", DisplayLanguageResolutionIsBackwardCompatible),
+            ("WinForms English resources cover the visible surface", WinFormsEnglishResourcesCoverSurface),
+            ("Core resources cover runtime messages in both languages", CoreResourcesCoverRuntimeMessages),
+            ("Session probe localizes startup and access messages", SessionProbeLocalizesMessages),
             ("Session probe skips inaccessible process candidates", SessionProbeSkipsInaccessibleCandidate),
             ("Session probe explains access-level mismatch", SessionProbeExplainsAccessDenied),
             ("Session probe distinguishes module enumeration failure", SessionProbeExplainsModuleFailure),
@@ -196,24 +205,187 @@ internal static class Program
             "The probe should select the accessible supported candidate.");
     }
 
+    private static void DisplayLanguageResolutionIsBackwardCompatible()
+    {
+        Assert(
+            DisplayCulture.Resolve(
+                DisplayLanguage.Auto,
+                CultureInfo.GetCultureInfo("zh-TW")).Name == "zh-Hans",
+            "Automatic language should use Simplified Chinese on Chinese Windows.");
+        Assert(
+            DisplayCulture.Resolve(
+                DisplayLanguage.Auto,
+                CultureInfo.GetCultureInfo("en-AU")).Name == "en",
+            "Automatic language should use English on non-Chinese Windows.");
+        Assert(
+            DisplayCulture.Resolve(
+                DisplayLanguage.English,
+                CultureInfo.GetCultureInfo("zh-CN")).Name == "en",
+            "An explicit language should override the installed UI culture.");
+
+        string path = System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(),
+            "motrainer-language-" + Guid.NewGuid().ToString("N") + ".config");
+        try
+        {
+            File.WriteAllText(
+                path,
+                "<configuration><appSettings>" +
+                "<add key=\"ui.language\" value=\"English\" />" +
+                "</appSettings></configuration>");
+            Assert(
+                DisplayCulture.ReadConfiguredLanguage(path) ==
+                    DisplayLanguage.English,
+                "The bootstrap reader should honor a persisted explicit language.");
+
+            File.WriteAllText(path, "<configuration>");
+            Assert(
+                DisplayCulture.ReadConfiguredLanguage(path) ==
+                    DisplayLanguage.Auto,
+                "A malformed legacy config should fail safely to Automatic.");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    private static void SessionProbeLocalizesMessages()
+    {
+        RunWithUiCulture("en", () =>
+        {
+            Assert(
+                GameSessionSnapshot.NotRunning.Message ==
+                    "Game is not running",
+                "The invariant startup status should be English.");
+
+            using FakeMemoryAccessor memory = new();
+            GameSessionProbe deniedProbe = CreateSessionProbe(
+                memory,
+                [321],
+                _ => throw new UnauthorizedAccessException("denied"),
+                (_, _) => null);
+            Assert(
+                deniedProbe.Probe().Message.Contains(
+                    "insufficient permission",
+                    StringComparison.Ordinal),
+                "The access refusal should be understandable in English.");
+        });
+
+        RunWithUiCulture("zh-Hans", () =>
+        {
+            Assert(
+                GameSessionSnapshot.NotRunning.Message == "游戏未启动",
+                "The startup status should use the Simplified Chinese satellite resource.");
+
+            using FakeMemoryAccessor memory = new();
+            GameSessionProbe deniedProbe = CreateSessionProbe(
+                memory,
+                [321],
+                _ => throw new UnauthorizedAccessException("denied"),
+                (_, _) => null);
+            Assert(
+                deniedProbe.Probe().Message.Contains(
+                    "权限不足",
+                    StringComparison.Ordinal),
+                "The access refusal should remain available in Simplified Chinese.");
+        });
+    }
+
+    private static void WinFormsEnglishResourcesCoverSurface()
+    {
+        RunWithUiCulture("en", () =>
+        {
+            string[] visibleText =
+            [
+                UiStrings.Get("AppTitle"),
+                UiStrings.Get("SelectedUnitsGroup"),
+                UiStrings.Get("GlobalStateGroup"),
+                UiStrings.Get("OneTimeGroup"),
+                UiStrings.Get("HotkeySettingsTitle"),
+                UiStrings.Get("SettingsReadFailed"),
+                .. HotkeyDefinitions.All.Select(item => item.DisplayName),
+                .. SuperweaponChoices.All.Select(item => item.DisplayName),
+            ];
+            Assert(
+                visibleText.All(text =>
+                    !Regex.IsMatch(text, @"\p{IsCJKUnifiedIdeographs}")),
+                "The English WinForms surface should not contain Chinese labels.");
+        });
+    }
+
+    private static void CoreResourcesCoverRuntimeMessages()
+    {
+        ResourceManager resources = new(
+            "MOTrainer.Core.Resources.CoreStrings",
+            typeof(CoreStrings).Assembly);
+        ResourceSet english = resources.GetResourceSet(
+            CultureInfo.GetCultureInfo("en"),
+            createIfNotExists: true,
+            tryParents: true) ?? throw new InvalidOperationException(
+                "English Core resource set is unavailable.");
+        ResourceSet chinese = resources.GetResourceSet(
+            CultureInfo.GetCultureInfo("zh-Hans"),
+            createIfNotExists: true,
+            tryParents: false) ?? throw new InvalidOperationException(
+                "Simplified Chinese Core resource set is unavailable.");
+
+        Dictionary<string, string> englishEntries = english
+            .Cast<System.Collections.DictionaryEntry>()
+            .ToDictionary(
+                entry => (string)entry.Key,
+                entry => entry.Value as string ??
+                    throw new InvalidOperationException(
+                        $"English Core resource {entry.Key} is not text."));
+        Dictionary<string, string> chineseEntries = chinese
+            .Cast<System.Collections.DictionaryEntry>()
+            .ToDictionary(
+                entry => (string)entry.Key,
+                entry => entry.Value as string ??
+                    throw new InvalidOperationException(
+                        $"Simplified Chinese Core resource {entry.Key} is not text."));
+
+        Assert(
+            englishEntries.Keys.ToHashSet(StringComparer.Ordinal)
+                .SetEquals(chineseEntries.Keys),
+            "English and Simplified Chinese Core resources must contain the same keys.");
+        Assert(
+            englishEntries.Values.All(text =>
+                !Regex.IsMatch(text, @"\p{IsCJKUnifiedIdeographs}")),
+            "English Core runtime messages should not contain Chinese text.");
+        Assert(
+            englishEntries.All(entry =>
+                PlaceholderIndexes(entry.Value).SetEquals(
+                    PlaceholderIndexes(chineseEntries[entry.Key]))),
+            "Core resource placeholders must match between English and Simplified Chinese.");
+    }
+
+    private static HashSet<string> PlaceholderIndexes(string template) =>
+        Regex.Matches(template, @"\{(\d+)(?:[^}]*)\}")
+            .Select(match => match.Groups[1].Value)
+            .ToHashSet(StringComparer.Ordinal);
+
     private static void SessionProbeExplainsAccessDenied()
     {
-        using FakeMemoryAccessor memory = new();
-        GameSessionProbe probe = CreateSessionProbe(
-            memory,
-            [321],
-            _ => throw new UnauthorizedAccessException("denied"),
-            (_, _) => null);
+        RunWithUiCulture("zh-Hans", () =>
+        {
+            using FakeMemoryAccessor memory = new();
+            GameSessionProbe probe = CreateSessionProbe(
+                memory,
+                [321],
+                _ => throw new UnauthorizedAccessException("denied"),
+                (_, _) => null);
 
-        GameSessionSnapshot snapshot = probe.Probe();
-        Assert(
-            snapshot.State == SessionState.Error &&
-            snapshot.ProcessId == 321,
-            "An inaccessible process should remain identified in the error snapshot.");
-        Assert(
-            snapshot.Message.Contains("权限不足", StringComparison.Ordinal) &&
-            snapshot.Message.Contains("相同权限级别", StringComparison.Ordinal),
-            "Access denied should explain the integrity-level mismatch and recovery action.");
+            GameSessionSnapshot snapshot = probe.Probe();
+            Assert(
+                snapshot.State == SessionState.Error &&
+                snapshot.ProcessId == 321,
+                "An inaccessible process should remain identified in the error snapshot.");
+            Assert(
+                snapshot.Message.Contains("权限不足", StringComparison.Ordinal) &&
+                snapshot.Message.Contains("相同权限级别", StringComparison.Ordinal),
+                "Access denied should explain the integrity-level mismatch and recovery action.");
+        });
     }
 
     private static void SessionProbeExplainsModuleFailure()
@@ -331,6 +503,57 @@ internal static class Program
         Assert(
             !fingerprint.Matches("Ares.dll", "aabbcc"),
             "A different module name must not match.");
+    }
+
+    private static void SteamAndClassicProfilesShareLayout()
+    {
+        VersionProfile classic = KnownProfiles.ObservedMentalOmega;
+        VersionProfile steam = KnownProfiles.SteamMentalOmega;
+
+        Assert(
+            KnownProfiles.All.Count == 2 &&
+            KnownProfiles.All.Contains(classic) &&
+            KnownProfiles.All.Contains(steam),
+            "Both validated executable families must be registered.");
+        Assert(
+            steam.Game.Sha256 ==
+                "3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600",
+            "The Steam profile must use the live-validated fingerprint.");
+        Assert(
+            ReferenceEquals(classic.Selection, steam.Selection) &&
+            ReferenceEquals(classic.Patches, steam.Patches) &&
+            ReferenceEquals(classic.Hooks, steam.Hooks) &&
+            ReferenceEquals(classic.SelectionHooks, steam.SelectionHooks) &&
+            ReferenceEquals(classic.TechUnlockHooks, steam.TechUnlockHooks),
+            "The Steam profile must reuse the runtime-validated classic layout.");
+        Assert(
+            classic.Ares == steam.Ares &&
+            classic.CurrentFrameAddress == steam.CurrentFrameAddress &&
+            classic.BuildQueueRootAddress == steam.BuildQueueRootAddress,
+            "Shared modules and global addresses must remain identical.");
+
+        using FakeMemoryAccessor memory = new();
+        memory.SetUInt32(steam.Selection.CurrentPlayerAddress, 0x00200000);
+        memory.SetInt32(steam.CurrentFrameAddress, 123);
+        GameSessionProbe probe = new(
+            "gamemd",
+            KnownProfiles.All,
+            new FakeMemoryAccessorFactory(memory),
+            _ => [808],
+            _ => @"C:\Steam\gamemd.exe",
+            (_, moduleName) => @"C:\Steam\" + moduleName,
+            path => string.Equals(
+                    Path.GetFileName(path),
+                    steam.Game.FileName,
+                    StringComparison.OrdinalIgnoreCase)
+                ? steam.Game.Sha256
+                : steam.Ares.Sha256);
+        GameSessionSnapshot snapshot = probe.Probe();
+        Assert(
+            snapshot.State == SessionState.MatchReady &&
+            snapshot.ProcessId == 808 &&
+            ReferenceEquals(snapshot.Profile, steam),
+            "The session probe must select the Steam profile by its fingerprint.");
     }
 
     private static void MoneyActionUsesVerifiedChain()
@@ -1800,6 +2023,7 @@ internal static class Program
                 "Unique test hotkey must be accepted.");
             TrainerSettings expected = defaults with
             {
+                DisplayLanguage = DisplayLanguage.English,
                 ModifyVeterancy = false,
                 Veterancy = UnitVeterancyLevel.Veteran,
                 ModifyHealth = true,
@@ -1816,6 +2040,7 @@ internal static class Program
             TrainerSettingsLoadResult loaded = store.Load();
             Assert(
                 loaded.Warning is null &&
+                loaded.Settings.DisplayLanguage == expected.DisplayLanguage &&
                 loaded.Settings.ModifyVeterancy == expected.ModifyVeterancy &&
                 loaded.Settings.Veterancy == expected.Veterancy &&
                 loaded.Settings.ModifyHealth == expected.ModifyHealth &&
@@ -1839,6 +2064,10 @@ internal static class Program
                 "Saving settings must preserve unrelated keys and startup.");
             appSettings.Elements("add")
                 .Single(element =>
+                    (string?)element.Attribute("key") == "ui.language")
+                .SetAttributeValue("value", "Klingon");
+            appSettings.Elements("add")
+                .Single(element =>
                     (string?)element.Attribute("key") == "unit.health")
                 .SetAttributeValue("value", "-3");
             appSettings.Elements("add")
@@ -1856,6 +2085,7 @@ internal static class Program
             TrainerSettingsLoadResult fallback = store.Load();
             Assert(
                 fallback.Warning is not null &&
+                fallback.Settings.DisplayLanguage == DisplayLanguage.Auto &&
                 fallback.Settings.Health ==
                     TrainerSettings.CreateDefaults().Health &&
                 fallback.Settings.Hotkeys[
@@ -1882,6 +2112,7 @@ internal static class Program
                 """);
             TrainerSettingsLoadResult migrated = store.Load();
             Assert(
+                migrated.Settings.DisplayLanguage == DisplayLanguage.Auto &&
                 migrated.Settings.Hotkeys[
                     HotkeyActionIds.AutoEdit] ==
                     HotkeyGesture.Ctrl(Keys.A),
@@ -1917,6 +2148,23 @@ internal static class Program
         if (!condition)
         {
             throw new InvalidOperationException(message);
+        }
+    }
+
+    private static void RunWithUiCulture(
+        string cultureName,
+        Action action)
+    {
+        CultureInfo previous = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentUICulture =
+                CultureInfo.GetCultureInfo(cultureName);
+            action();
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = previous;
         }
     }
 }

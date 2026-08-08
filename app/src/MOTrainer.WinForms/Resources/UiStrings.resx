@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>MOTrainer — Offline Trainer</value></data>
+  <data name="CompatibilityNotice" xml:space="preserve"><value>Only verified gamemd.exe and Ares.dll hashes are currently supported.</value></data>
+  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>Display language. The interface refreshes after this setting is saved.</value></data>
+  <data name="DisplayLanguageLabel" xml:space="preserve"><value>Language</value></data>
+  <data name="HotkeySettings" xml:space="preserve"><value>Hotkeys</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>Automatic</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageRefreshing" xml:space="preserve"><value>Display language saved; refreshing the interface…</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="ActionAddHealth" xml:space="preserve"><value>Heal selected units</value></data>
+  <data name="ActionAutoEdit" xml:space="preserve"><value>Auto apply</value></data>
+  <data name="AutoApplyTooltip" xml:space="preserve"><value>Automatically applies the selected rank and health settings.</value></data>
+  <data name="AutoModeLabel" xml:space="preserve"><value>Mode:</value></data>
+  <data name="AutoModeTooltip" xml:space="preserve"><value>On selection applies once when a selection is formed. Continuous reapplies every 100 ms.</value></data>
+  <data name="ActionDefeatOwner" xml:space="preserve"><value>Defeat selected owner</value></data>
+  <data name="ActionGrantSuperweapons" xml:space="preserve"><value>Grant selected superweapons</value></data>
+  <data name="ActionSetOneHealth" xml:space="preserve"><value>Set selected health to 1</value></data>
+  <data name="ActionTransferOwner" xml:space="preserve"><value>Take ownership of selected units</value></data>
+  <data name="ActionZeroEconomy" xml:space="preserve"><value>Zero selected owner's credits</value></data>
+  <data name="AutoEditDisabled" xml:space="preserve"><value>Automatic selected-unit editing disabled</value></data>
+  <data name="AutoEditEventEnabled" xml:space="preserve"><value>Event mode enabled; current settings apply when a selection is formed</value></data>
+  <data name="AutoEditEventUpdated" xml:space="preserve"><value>Event-mode automatic edit policy updated</value></data>
+  <data name="AutoEditNoAttributesDisabled" xml:space="preserve"><value>Neither rank nor health is selected; automatic editing disabled</value></data>
+  <data name="AutoEditNotInMatch" xml:space="preserve"><value>Cannot start automatic editing before entering a supported match</value></data>
+  <data name="AutoEditPollingEnabled" xml:space="preserve"><value>Polling mode enabled; current settings apply every 100 ms</value></data>
+  <data name="BattlefieldSection" xml:space="preserve"><value>Battlefield intelligence and control</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ButtonEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="ButtonEditSelected" xml:space="preserve"><value>Edit selected units</value></data>
+  <data name="ButtonGrantSelectedSuperweapons" xml:space="preserve"><value>Grant selected superweapons</value></data>
+  <data name="ButtonHeal" xml:space="preserve"><value>Heal</value></data>
+  <data name="ButtonResetDefaults" xml:space="preserve"><value>Reset defaults</value></data>
+  <data name="ButtonSave" xml:space="preserve"><value>Save</value></data>
+  <data name="ButtonSetHealthOne" xml:space="preserve"><value>Set HP to 1</value></data>
+  <data name="ButtonTakeOwnership" xml:space="preserve"><value>Take ownership</value></data>
+  <data name="Credits" xml:space="preserve"><value>Credits</value></data>
+  <data name="EconomyFactionSection" xml:space="preserve"><value>Credits and factions</value></data>
+  <data name="EconomyProductionSection" xml:space="preserve"><value>Economy and production</value></data>
+  <data name="FeatureAutoRepair" xml:space="preserve"><value>Automatic repair</value></data>
+  <data name="FeatureBuildAnywhere" xml:space="preserve"><value>Build anywhere</value></data>
+  <data name="FeatureControlAll" xml:space="preserve"><value>Control all units</value></data>
+  <data name="FeatureIgnoreCloak" xml:space="preserve"><value>Detect cloaked units</value></data>
+  <data name="FeatureInstantBuild" xml:space="preserve"><value>Instant build</value></data>
+  <data name="FeatureLockEconomy" xml:space="preserve"><value>Lock credits</value></data>
+  <data name="FeatureLockPower" xml:space="preserve"><value>Lock power</value></data>
+  <data name="FeaturePsychicDetection" xml:space="preserve"><value>Psychic detection</value></data>
+  <data name="FeatureRevealMap" xml:space="preserve"><value>Reveal map</value></data>
+  <data name="FeatureTechUnlock" xml:space="preserve"><value>Unlock all technology</value></data>
+  <data name="FactionAllies" xml:space="preserve"><value>Allies</value></data>
+  <data name="FactionEpsilon" xml:space="preserve"><value>Epsilon</value></data>
+  <data name="FactionFoehn" xml:space="preserve"><value>Foehn</value></data>
+  <data name="FactionSoviets" xml:space="preserve"><value>Soviets</value></data>
+  <data name="GlobalHotkeyRegistered" xml:space="preserve"><value>Global hotkeys registered; the game may remain focused while you use them.</value></data>
+  <data name="GlobalStateGroup" xml:space="preserve"><value>Global state</value></data>
+  <data name="Health" xml:space="preserve"><value>Health</value></data>
+  <data name="HotkeyBatchDescription" xml:space="preserve"><value>The button grants every selected item in one batch</value></data>
+  <data name="HotkeyBatchDescriptionWithGesture" xml:space="preserve"><value>{0}; the button grants every selected item in one batch</value></data>
+  <data name="HotkeyConflict" xml:space="preserve"><value>{0} is already assigned to “{1}”.</value></data>
+  <data name="HotkeyInstruction" xml:space="preserve"><value>Focus a shortcut box and press the desired combination. Include Ctrl, Alt, or Shift. Changes apply only after you select Save.</value></data>
+  <data name="HotkeyModifierRequired" xml:space="preserve"><value>A shortcut must include Ctrl, Alt, or Shift.</value></data>
+  <data name="HotkeyNewRegistrationFailed" xml:space="preserve"><value>New shortcuts are already in use: {0}; {1}</value></data>
+  <data name="HotkeyPressMainKey" xml:space="preserve"><value>Hold a modifier and press a main key.</value></data>
+  <data name="HotkeyRegistrationFailed" xml:space="preserve"><value>These shortcuts could not be registered and may be in use: {0}</value></data>
+  <data name="HotkeyResetPending" xml:space="preserve"><value>Defaults restored in this window; select Save to apply them.</value></data>
+  <data name="HotkeyReserved" xml:space="preserve"><value>{0} is reserved by the system; choose another shortcut.</value></data>
+  <data name="HotkeyRestoreFailed" xml:space="preserve"><value>Restoring the previous shortcuts also failed: {0}</value></data>
+  <data name="HotkeyRestored" xml:space="preserve"><value>Previous shortcuts restored.</value></data>
+  <data name="HotkeyRollbackFailed" xml:space="preserve"><value>{0}; restoring the previous shortcuts failed: {1}</value></data>
+  <data name="HotkeyRollbackSucceeded" xml:space="preserve"><value>{0}; new shortcuts were not applied and the previous shortcuts were restored.</value></data>
+  <data name="HotkeySaved" xml:space="preserve"><value>Shortcuts saved and applied immediately.</value></data>
+  <data name="HotkeySetPending" xml:space="preserve"><value>“{0}” changed to {1}; waiting to be saved.</value></data>
+  <data name="HotkeySettingsTitle" xml:space="preserve"><value>Hotkey settings</value></data>
+  <data name="HotkeySystemLabel" xml:space="preserve"><value>Global shortcut {0}</value></data>
+  <data name="HotkeyUnknownAction" xml:space="preserve"><value>unknown action</value></data>
+  <data name="HotkeyUnsaved" xml:space="preserve"><value>Current changes have not been saved.</value></data>
+  <data name="ModeEventRecommended" xml:space="preserve"><value>On selection (recommended)</value></data>
+  <data name="ModeExtended" xml:space="preserve"><value>Extended mode</value></data>
+  <data name="ModeFactionRecommended" xml:space="preserve"><value>Faction mode (recommended)</value></data>
+  <data name="ModePollingCompatibility" xml:space="preserve"><value>Continuous (compatibility)</value></data>
+  <data name="OneTimeGroup" xml:space="preserve"><value>One-time actions</value></data>
+  <data name="PatchRestoreBlocked" xml:space="preserve"><value>{0} patch bytes are unexpected; exit cancelled</value></data>
+  <data name="QueueLimitOff" xml:space="preserve"><value>Remove queue limit [Off]</value></data>
+  <data name="QueueLimitLabel" xml:space="preserve"><value>Remove queue limit</value></data>
+  <data name="Rank" xml:space="preserve"><value>Rank</value></data>
+  <data name="RankElite" xml:space="preserve"><value>Elite / three-star</value></data>
+  <data name="RankRookie" xml:space="preserve"><value>Rookie</value></data>
+  <data name="RankVeteran" xml:space="preserve"><value>Veteran</value></data>
+  <data name="RestoreBeforeExitFailed" xml:space="preserve"><value>Restore before exit failed: {0}</value></data>
+  <data name="SelectOneSuperweapon" xml:space="preserve"><value>Select at least one superweapon.</value></data>
+  <data name="SelectUnitAttribute" xml:space="preserve"><value>Select rank, health, or both.</value></data>
+  <data name="SelectedUnitsGroup" xml:space="preserve"><value>Selected-unit editor</value></data>
+  <data name="SettingsNotSavedTitle" xml:space="preserve"><value>Settings not saved</value></data>
+  <data name="SettingsConflictHotkey" xml:space="preserve"><value>{0} conflicts with {1}; the default was used</value></data>
+  <data name="SettingsInvalidBoolean" xml:space="preserve"><value>{0} is not a valid Boolean; the default was used</value></data>
+  <data name="SettingsInvalidHotkey" xml:space="preserve"><value>{0} is not a valid shortcut; the default was used</value></data>
+  <data name="SettingsInvalidOption" xml:space="preserve"><value>{0} is not a valid option; the default was used</value></data>
+  <data name="SettingsInvalidUInt" xml:space="preserve"><value>{0} is not a valid unsigned integer; the default was used</value></data>
+  <data name="SettingsMissingRoot" xml:space="preserve"><value>The settings file has no configuration root element</value></data>
+  <data name="SettingsOutOfRange" xml:space="preserve"><value>{0} is outside the valid range; the default was used</value></data>
+  <data name="SettingsReadFailed" xml:space="preserve"><value>Settings could not be read; defaults were used: {0}</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>Settings could not be saved: {0}</value></data>
+  <data name="SettingsUnknownHotkeyAction" xml:space="preserve"><value>{0} refers to an unknown action and was ignored</value></data>
+  <data name="SettingsUnknownSuperweapon" xml:space="preserve"><value>superweapon.selectedIds contains unknown ID {0}; it was ignored</value></data>
+  <data name="SettingsWrongRoot" xml:space="preserve"><value>The settings file root element is not configuration</value></data>
+  <data name="WarningSeparator" xml:space="preserve"><value>; </value></data>
+  <data name="SuperweaponBlasticade" xml:space="preserve"><value>Blasticade</value></data>
+  <data name="SuperweaponChronosphere" xml:space="preserve"><value>Chronosphere</value></data>
+  <data name="SuperweaponGeneticMutator" xml:space="preserve"><value>Genetic Mutator</value></data>
+  <data name="SuperweaponIronCurtain" xml:space="preserve"><value>Iron Curtain</value></data>
+  <data name="SuperweaponLightningStorm" xml:space="preserve"><value>Lightning Storm</value></data>
+  <data name="SuperweaponGreatTempest" xml:space="preserve"><value>Great Tempest</value></data>
+  <data name="SuperweaponNuclearMissile" xml:space="preserve"><value>Nuclear Missile</value></data>
+  <data name="SuperweaponPsychicDominator" xml:space="preserve"><value>Psychic Dominator</value></data>
+  <data name="SuperweaponsSection" xml:space="preserve"><value>Superweapons</value></data>
+  <data name="TechnologySection" xml:space="preserve"><value>Technology</value></data>
+  <data name="UnitUnlimitedLabel" xml:space="preserve"><value>Remove build limit</value></data>
+  <data name="UnitUnlimitedOff" xml:space="preserve"><value>Remove build limit [Off]</value></data>
+</root>

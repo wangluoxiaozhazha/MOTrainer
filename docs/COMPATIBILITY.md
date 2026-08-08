@@ -1,58 +1,78 @@
-# 兼容性说明
+# Compatibility and troubleshooting
 
-MOTrainer 当前采用严格的版本绑定策略。只有目标进程及关键模块与已验证指纹一致
-时，程序才会启用对应操作。
+[English](COMPATIBILITY.md) | [简体中文](COMPATIBILITY.zh-CN.md)
 
-这种限制是有意设计的：不同 Mental Omega、Ares 或游戏可执行文件版本可能改变
-代码和对象布局。对未知版本猜测地址，比暂时拒绝功能更容易造成崩溃或破坏战局。
+MOTrainer deliberately uses strict version binding. Operations are enabled only
+when the target process and critical modules match fingerprints that have been
+validated against the expected code and object layouts.
 
-## 当前支持环境
+Different Mental Omega, Ares, compatibility-patch, or locally replaced builds
+may use different layouts. Refusing an unknown target is safer than guessing an
+address and risking a crash or corrupt match state.
 
-| 项目 | 当前范围 |
+## Supported environment
+
+| Item | Current scope |
 | --- | --- |
-| 操作系统 | Windows |
-| 目标进程 | `gamemd.exe`，32 位（x86） |
-| 默认运行环境 | .NET Framework 4.8 |
-| 界面语言 | 简体中文 |
-| 使用场景 | Mental Omega 离线战局 |
+| Operating system | Windows |
+| Target process | 32-bit `gamemd.exe` |
+| Default runtime | .NET Framework 4.8 |
+| Display language | Auto, English, Simplified Chinese |
+| Intended use | Mental Omega offline matches |
 
-当前已验证模块：
+Verified module fingerprints:
 
-| 模块 | SHA-256 |
-| --- | --- |
-| `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
-| `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
+| Profile | Module | SHA-256 |
+| --- | --- | --- |
+| Classic YR 1.001 | `gamemd.exe` | `7CD005D263FDE203D9C84548200A057A8DF61D724DA3C6BD1E521EEB61CD0747` |
+| Steam YR 1.001 (2024) | `gamemd.exe` | `3E81A61775D2745D1DABE397325EF663CD994FFC194DA4E998E3BF5D2D308600` |
+| Both profiles | `Ares.dll` | `93CE890F387A6C1B3240A2DD7B674F25FEC5A0E96F0B0D0306796B2EDF7B5B83` |
 
-这里的模块指纹比启动器显示的版本名称更精确。即使两个安装都显示相同的 Mental
-Omega 版本，兼容补丁、来源或本地替换也可能令文件不同。
+The Steam profile requires the edited `Syringe.exe` compatibility fix
+published through Mental Omega's official Discord support channel. See the
+[official Mental Omega support page](https://mentalomega.com/index.php?page=support).
+MOTrainer does not distribute or fingerprint the injector itself. The official
+fix also targets EA App installations, but an EA App `gamemd.exe` has not been
+separately validated; it is supported only if its SHA-256 matches a listed
+profile.
 
-## 查看本地模块指纹
+These fingerprints identify files more precisely than the version shown by a
+launcher. Two installations may display the same Mental Omega version while
+still differing because of their source, compatibility patches, or local file
+replacement.
 
-在 Mental Omega 目录打开 PowerShell：
+## Check local fingerprints
+
+Open PowerShell in the Mental Omega directory and run:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 .\gamemd.exe, .\Ares.dll
 ```
 
-哈希不匹配并不表示文件有问题，只表示它不是当前已经验证的目标。请不要为了匹配
-本工具而从不明来源替换游戏文件。
+A mismatch does not mean that the game files are defective. It only means that
+they are not the currently verified target. Do not replace game files from an
+untrusted source merely to match this trainer.
 
-## 程序状态
+## Status messages
 
-程序顶部会显示当前检测状态。常见状态包括：
+The top status bar reports what the trainer can safely access:
 
-- 未启动：尚未发现目标游戏进程；
-- 版本已确认、等待进入战局：模块兼容，但玩家或战局结构尚未就绪；
-- 战局结构尚未就绪：游戏已加载，相关对象仍不可安全访问；
-- 版本不受支持：模块 SHA-256 不在当前支持列表；
-- 游戏已就绪：可以使用依赖战局对象的功能。
+- **Game is not running:** no target process was found.
+- **Version verified; waiting to enter a match:** modules are compatible, but
+  player or match structures are not ready.
+- **Match structures are not ready:** the process is loaded, but related
+  objects cannot yet be accessed safely.
+- **Unsupported game:** one or more SHA-256 fingerprints are not supported.
+- **Match ready:** operations that depend on match objects are available.
 
-`解锁建造数量` 和 `解锁队列上限` 支持提前预设。它们在游戏或建造结构尚未
-出现时显示等待状态，结构就绪后再应用；其他依赖战局的操作不会提前执行。
+Remove-build-limit and remove-queue-limit can be preset. They stay pending until
+the corresponding game structures exist. Other match-dependent actions are not
+executed early.
 
-## 运行与更新
+## Runtime and updates
 
-默认发布包由三个文件组成，必须保持在同一目录：
+The original `v0.1.0-rc1` release consists of three files that must remain
+together:
 
 ```text
 MOTrainer.exe
@@ -60,67 +80,83 @@ MOTrainer.Core.dll
 MOTrainer.exe.config
 ```
 
-`.NET Framework 4.8` 是首个公开版本的默认依赖：
+Bilingual builds additionally contain `zh-Hans\MOTrainer.resources.dll` and
+`zh-Hans\MOTrainer.Core.resources.dll`. Preserve the directory structure when
+copying or packaging the application.
 
-- [官方下载页](https://dotnet.microsoft.com/download/dotnet-framework/net48)
-- [Microsoft 安装说明](https://learn.microsoft.com/dotnet/framework/install/)
+.NET Framework 4.8 is the default public-release dependency:
 
-源码同时保留 `net8.0-windows` 目标，用于开发和兼容性验证；它不是首版默认下载。
+- [.NET Framework 4.8 download](https://dotnet.microsoft.com/download/dotnet-framework/net48)
+- [Microsoft installation guidance](https://learn.microsoft.com/dotnet/framework/install/)
 
-## 进程权限与多开
+The source also targets `net8.0-windows` for development and compatibility
+testing. It is not the default compact release target.
 
-修改器需要读取游戏进程的主模块、模块列表和战局内存。游戏与修改器应使用相同的
-权限级别：如果游戏通过管理员权限启动，修改器也需要以管理员权限启动；如果游戏
-以普通权限运行，不建议单独提升修改器权限。
+## Process permissions and multiple instances
 
-发现多个 `gamemd.exe` 时，修改器会逐一检查候选进程，并优先使用版本受支持且
-战局就绪程度最高的实例。某个候选进程无法访问时，不会阻止继续检查其他候选。
-如果所有候选都无法访问，状态栏会显示权限不足提示；模块列表无法读取等其他探测
-故障会单独报告，不再统一显示为一般性的“进程探测失败”。
+MOTrainer must inspect the main module, module list, and match memory of the game
+process. Run the game and trainer at the same privilege level. If the game runs
+as administrator, the trainer also needs administrator privileges. If the game
+runs normally, do not elevate only the trainer.
 
-`MOTrainer.exe.config` 保存等级、生命、自动修改模式、经济输入、科技模式、
-超级武器选择和热键。持续内存状态及“自动修改已开启”不会作为下次启动时的默认
-状态保存。更新前建议备份配置；如果旧配置引起提示或异常，请使用新版本附带的
-默认配置重新设置。
+When several `gamemd.exe` processes exist, MOTrainer examines every candidate
+and prefers a supported process with the most complete match state. Failure to
+access one candidate does not prevent checking the others. If no candidate can
+be accessed, the status bar explains the permission mismatch. Module-list and
+other probe failures are reported separately.
 
-## 功能边界
+`MOTrainer.exe.config` stores the language, veterancy, health, auto-edit mode,
+credit input, technology mode, selected superweapons, and hotkeys. Persistent
+memory state and the active auto-edit state are not enabled automatically at the
+next launch. Back up the configuration before updating. Restore the default
+configuration if an older file produces warnings or unexpected behavior.
 
-- 选中单位的等级和生命修改默认只作用于当前玩家拥有的对象；友军和敌军对象会被
-  跳过。
-- 独立的加血与扣血快捷操作作用于全部选中对象，不检查己方、友军或敌军归属。
-- 占有单位、目标阵营经济归零和目标阵营投降根据选中对象确定目标，使用前应确认
-  当前选择。
-- 快速生产只为当前玩家生效；其他阵营保留正常生产逻辑。
-- 科技全开的阵营模式保留正常阵营和工厂归属过滤；扩展模式会进一步放宽当前玩家
-  的工厂归属限制。
-- 修改器退出时会尝试恢复由当前修改器实例安装的持续补丁。已经发生的一次性结果
-  不会撤销；部分游戏自身持久化的状态也可能继续影响当前存档。
-- 本工具不支持联机环境，也不提供反作弊绕过。
+## Feature boundaries
 
-## 安全软件提示
+- Veterancy and combined health editing normally affect only selected objects
+  owned by the current player; allied and enemy objects are skipped.
+- Standalone heal and set-health-to-1 actions affect every selected object and
+  do not filter by ownership.
+- Ownership transfer, faction-economy reset, and faction surrender determine
+  their target from the current selection. Confirm the selection first.
+- Instant production affects only the current player. Other factions retain
+  normal production behavior.
+- Tech-unlock faction mode retains normal faction and factory-owner filtering.
+  Extended mode additionally relaxes factory ownership for the current player.
+- On exit, the trainer attempts to restore persistent patches installed by the
+  current trainer instance. One-time results are not undone, and state persisted
+  by the game may continue to affect the current save.
+- Multiplayer use and anti-cheat bypasses are not supported.
 
-进程内存修改器会使用其他普通桌面程序很少需要的系统能力，包括打开游戏进程、
-读写内存、临时远程代码页和全局热键。这些行为可能触发启发式检测，不能仅凭
-“是否报毒”判断文件来源。
+## Antivirus notices
 
-建议：
+A process-memory trainer uses capabilities that ordinary desktop applications
+rarely need: opening another process, reading and writing memory, creating
+temporary remote code pages, and registering global hotkeys. These behaviors
+may trigger heuristic detection; a detection alone does not establish the
+origin of a file.
 
-1. 只从项目正式 GitHub Release 下载；
-2. 核对 Release 页面公布的 SHA-256；
-3. 不使用第三方重新打包版本；
-4. 有疑虑时从公开源码自行构建。
+Recommended practice:
 
-项目不会要求关闭安全软件，也不会要求将整个游戏目录加入排除列表。
+1. Download only from the official GitHub Releases page.
+2. Verify the published SHA-256.
+3. Avoid third-party repacks.
+4. Review and build the public source if you remain uncertain.
 
-## 反馈其他版本
+The project does not ask users to disable security software or exclude an entire
+game directory.
 
-如果希望增加其他 Mental Omega 构建的支持，请提交 Issue，并附上：
+## Report another build
 
-- Mental Omega 显示的版本和取得渠道；
-- `gamemd.exe` 与 `Ares.dll` 的 SHA-256；
-- 修改器顶部显示的完整状态；
-- 能稳定复现问题的最短步骤；
-- 是否使用过兼容补丁或替换过相关模块。
+Open an Issue and include:
 
-请不要上传游戏文件、第三方修改器、存档中的隐私内容或任何账号凭据。仅有哈希和
-版本信息并不足以加入支持；新版本仍需要针对性分析和实机验证。
+- the displayed Mental Omega version and where it was obtained;
+- SHA-256 values for `gamemd.exe` and `Ares.dll`;
+- the complete status shown at the top of MOTrainer;
+- the shortest reliable reproduction steps;
+- whether compatibility patches or replacement modules were used.
+
+Do not upload game files, third-party trainers, private save contents, account
+credentials, or tokens. Fingerprints and version labels alone are not enough to
+add support; every new target still requires focused analysis and live
+validation.

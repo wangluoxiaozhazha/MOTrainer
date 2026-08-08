@@ -1,4 +1,5 @@
 using MOTrainer.Core.Memory;
+using MOTrainer.Core.Localization;
 using MOTrainer.Core.Patching;
 using MOTrainer.Core.Processes;
 
@@ -25,7 +26,7 @@ public sealed class SelectionVeterancyEventHook
         this.memory = memory;
         remoteMemory = memory as IRemoteCodeMemory ??
             throw new InvalidOperationException(
-                "当前内存访问器不支持远程代码页");
+                CoreStrings.Get("RemoteCodePagesUnsupported"));
         this.modules = modules;
     }
 
@@ -129,8 +130,11 @@ public sealed class SelectionVeterancyEventHook
                         ? PatchRuntimeState.Enabled
                         : restored.State,
                     restored.Success
-                        ? $"{updated.Message}；旧事件策略已恢复"
-                        : $"{updated.Message}；旧事件策略恢复失败：{restored.Message}");
+                        ? CoreStrings.Format("OldEventPolicyRestored", updated.Message)
+                        : CoreStrings.Format(
+                            "OldEventPolicyRestoreFailed",
+                            updated.Message,
+                            restored.Message));
             }
 
             return updated;
@@ -155,7 +159,7 @@ public sealed class SelectionVeterancyEventHook
         {
             return new HookInspection(
                 PatchRuntimeState.ModuleUnavailable,
-                $"模块不可用：{definition.ModuleName}",
+                CoreStrings.Format("ModuleUnavailable", definition.ModuleName),
                 [],
                 0,
                 null);
@@ -171,7 +175,7 @@ public sealed class SelectionVeterancyEventHook
             {
                 return Unknown(
                     entryAddresses,
-                    "无法读取对象选择 Hook 入口");
+                    CoreStrings.Get("SelectionHookEntryReadFailed"));
             }
 
             entries[index] = entry;
@@ -182,7 +186,7 @@ public sealed class SelectionVeterancyEventHook
         {
             return new HookInspection(
                 PatchRuntimeState.Original,
-                "选中单位自动修改事件模式处于关闭状态",
+                CoreStrings.Get("SelectionEditEventDisabled"),
                 entryAddresses,
                 0,
                 null);
@@ -201,7 +205,7 @@ public sealed class SelectionVeterancyEventHook
             {
                 return Unknown(
                     entryAddresses,
-                    "对象选择入口包含未知或不一致字节，拒绝操作");
+                    CoreStrings.Get("SelectionHookUnknownBytes"));
             }
 
             remoteAddress = candidateRemoteAddress;
@@ -214,7 +218,7 @@ public sealed class SelectionVeterancyEventHook
         {
             return Unknown(
                 entryAddresses,
-                "对象选择入口跳转到未知远程代码，拒绝操作",
+                CoreStrings.Get("SelectionHookUnknownTarget"),
                 remoteAddress);
         }
 
@@ -227,13 +231,13 @@ public sealed class SelectionVeterancyEventHook
         {
             return Unknown(
                 entryAddresses,
-                "对象选择远程代码与当前策略不匹配，拒绝操作",
+                CoreStrings.Get("SelectionHookPolicyMismatch"),
                 remoteAddress);
         }
 
         return new HookInspection(
             PatchRuntimeState.Enabled,
-            "选中单位自动修改双路径事件模式已启用",
+            CoreStrings.Get("SelectionEditEventEnabled"),
             entryAddresses,
             remoteAddress,
             policy);
@@ -248,7 +252,7 @@ public sealed class SelectionVeterancyEventHook
                 RemotePageSize,
                 out uint remoteAddress))
         {
-            return Fail("无法分配对象选择远程代码页");
+            return Fail(CoreStrings.Get("SelectionHookAllocationFailed"));
         }
 
         byte[] payload = BuildRemotePage(
@@ -272,7 +276,7 @@ public sealed class SelectionVeterancyEventHook
         if (!prepared)
         {
             remoteMemory.TryFreeRemotePage(remoteAddress);
-            return Fail("对象选择远程代码页写入或权限切换失败");
+            return Fail(CoreStrings.Get("SelectionHookRemotePageFailed"));
         }
 
         for (int index = 0; index < definition.Sites.Count; index++)
@@ -282,7 +286,7 @@ public sealed class SelectionVeterancyEventHook
                     definition.Sites[index].OriginalBytes))
             {
                 remoteMemory.TryFreeRemotePage(remoteAddress);
-                return Fail("写入前对象选择入口发生变化，已取消操作");
+                return Fail(CoreStrings.Get("SelectionHookEntryChanged"));
             }
         }
 
@@ -316,14 +320,14 @@ public sealed class SelectionVeterancyEventHook
 
             return Fail(
                 restored
-                    ? "对象选择入口写入失败，已恢复已安装入口"
-                    : "对象选择入口写入失败，且部分入口恢复失败；远程页保持不动");
+                    ? CoreStrings.Get("SelectionHookEntryWriteRolledBack")
+                    : CoreStrings.Get("SelectionHookEntryWriteRollbackFailed"));
         }
 
         return new PatchTransitionResult(
             true,
             PatchRuntimeState.Enabled,
-            "选中单位自动修改双路径事件模式已启用");
+            CoreStrings.Get("SelectionEditEventEnabled"));
     }
 
     private PatchTransitionResult Disable(
@@ -343,7 +347,7 @@ public sealed class SelectionVeterancyEventHook
                     entryAddresses[index],
                     expectedEntries[index]))
             {
-                return Fail("禁用前对象选择入口发生变化，拒绝恢复");
+                return Fail(CoreStrings.Get("SelectionHookDisableEntryChanged"));
             }
         }
 
@@ -374,14 +378,14 @@ public sealed class SelectionVeterancyEventHook
                     expectedEntries[restoredIndex]));
             return Fail(
                 rolledBack
-                    ? "对象选择入口恢复失败，已回滚到启用状态"
-                    : "对象选择入口恢复失败，且启用状态回滚不完整；远程页保持不动");
+                    ? CoreStrings.Get("SelectionHookRestoreRolledBack")
+                    : CoreStrings.Get("SelectionHookRestoreRollbackFailed"));
         }
 
         bool pageFreed = remoteMemory.TryFreeRemotePage(remoteAddress);
         string message = pageFreed
-            ? "选中单位自动修改事件模式已关闭，双入口和远程页均已恢复"
-            : "对象选择双入口已恢复，但远程页释放失败；页面将在游戏退出时回收";
+            ? CoreStrings.Get("SelectionEditEventDisabledAndRestored")
+            : CoreStrings.Get("SelectionHookPageReleaseFailed");
         return new PatchTransitionResult(
             true,
             PatchRuntimeState.Original,

@@ -24,75 +24,75 @@ internal sealed record HotkeyDefinition(
 
 internal static class HotkeyDefinitions
 {
-    public static IReadOnlyList<HotkeyDefinition> All { get; } =
+    public static IReadOnlyList<HotkeyDefinition> All =>
     [
         new(
             HotkeyActionIds.AutoEdit,
-            "自动修改",
+            UiStrings.Get("ActionAutoEdit"),
             HotkeyGesture.Ctrl(Keys.A)),
         new(
             HotkeyActionIds.AddHealth,
-            "选中单位加血",
+            UiStrings.Get("ActionAddHealth"),
             HotkeyGesture.Ctrl(Keys.S)),
         new(
             HotkeyActionIds.SetOneHealth,
-            "选中单位扣血",
+            UiStrings.Get("ActionSetOneHealth"),
             HotkeyGesture.Ctrl(Keys.D)),
         new(
             HotkeyActionIds.TransferOwner,
-            "占有单位",
+            UiStrings.Get("ActionTransferOwner"),
             HotkeyGesture.Ctrl(Keys.F)),
         new(
             HotkeyActionIds.ZeroEconomy,
-            "目标阵营经济归零",
+            UiStrings.Get("ActionZeroEconomy"),
             HotkeyGesture.Ctrl(Keys.O)),
         new(
             HotkeyActionIds.DefeatOwner,
-            "目标阵营投降",
+            UiStrings.Get("ActionDefeatOwner"),
             HotkeyGesture.Ctrl(Keys.Space)),
         new(
             HotkeyActionIds.GrantSelectedSuperweapons,
-            "发放已勾选超武",
+            UiStrings.Get("ActionGrantSuperweapons"),
             HotkeyGesture.Ctrl(Keys.G)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.EconomyNoDecrease),
-            "锁定经济",
+            UiStrings.Get("FeatureLockEconomy"),
             HotkeyGesture.Ctrl(Keys.Q)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.PowerNoDecrease),
-            "锁定电量",
+            UiStrings.Get("FeatureLockPower"),
             HotkeyGesture.Ctrl(Keys.W)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.InstantUnitBuild),
-            "快速生产",
+            UiStrings.Get("FeatureInstantBuild"),
             HotkeyGesture.Ctrl(Keys.E)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.IgnoreBuildDistance),
-            "随处建造",
+            UiStrings.Get("FeatureBuildAnywhere"),
             HotkeyGesture.Ctrl(Keys.R)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.AutoRepair),
-            "自动维修",
+            UiStrings.Get("FeatureAutoRepair"),
             HotkeyGesture.Ctrl(Keys.T)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.ControlAllUnits),
-            "操纵全部",
+            UiStrings.Get("FeatureControlAll"),
             HotkeyGesture.Ctrl(Keys.I)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.PsychicDetection),
-            "心灵探测",
+            UiStrings.Get("FeaturePsychicDetection"),
             HotkeyGesture.Ctrl(Keys.Y)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.IgnoreCloak),
-            "无视隐形",
+            UiStrings.Get("FeatureIgnoreCloak"),
             HotkeyGesture.Ctrl(Keys.U)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.StableRevealMap),
-            "无视黑雾",
+            UiStrings.Get("FeatureRevealMap"),
             HotkeyGesture.Ctrl(Keys.H)),
         new(
             HotkeyActionIds.Patch(KnownPatchIds.SafeTechUnlock),
-            "科技全开",
+            UiStrings.Get("FeatureTechUnlock"),
             HotkeyGesture.Ctrl(Keys.P)),
     ];
 

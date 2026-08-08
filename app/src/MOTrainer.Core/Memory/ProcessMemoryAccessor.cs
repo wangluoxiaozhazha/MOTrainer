@@ -1,4 +1,5 @@
 using Microsoft.Win32.SafeHandles;
+using MOTrainer.Core.Localization;
 using System.ComponentModel;
 
 namespace MOTrainer.Core.Memory;
@@ -230,7 +231,7 @@ public sealed class ProcessMemoryAccessor :
                 false,
                 false,
                 0,
-                "远程线程参数无效");
+                CoreStrings.Get("RemoteThreadParametersInvalid"));
         }
 
         IntPtr thread = NativeMethods.CreateRemoteThread(
@@ -247,7 +248,9 @@ public sealed class ProcessMemoryAccessor :
                 false,
                 false,
                 0,
-                $"创建远程线程失败：{System.Runtime.InteropServices.Marshal.GetLastWin32Error()}");
+                CoreStrings.Format(
+                    "RemoteThreadCreateFailed",
+                    System.Runtime.InteropServices.Marshal.GetLastWin32Error()));
         }
 
         try
@@ -261,7 +264,7 @@ public sealed class ProcessMemoryAccessor :
                     true,
                     false,
                     0,
-                    "远程线程等待超时");
+                    CoreStrings.Get("RemoteThreadTimedOut"));
             }
             if (wait != NativeMethods.WaitObject0 ||
                 !NativeMethods.GetExitCodeThread(thread, out uint exitCode))
@@ -270,14 +273,14 @@ public sealed class ProcessMemoryAccessor :
                     true,
                     false,
                     0,
-                    "远程线程等待或退出码读取失败");
+                    CoreStrings.Get("RemoteThreadWaitFailed"));
             }
 
             return new RemoteThreadExecutionResult(
                 true,
                 true,
                 exitCode,
-                "远程线程已完成");
+                CoreStrings.Get("RemoteThreadCompleted"));
         }
         finally
         {

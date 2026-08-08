@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Compatibility and troubleshooting
+    url: https://github.com/cmdrmo/MOTrainer/blob/main/docs/COMPATIBILITY.md
+    about: Check verified fingerprints, permissions, status meanings, and reporting requirements first.

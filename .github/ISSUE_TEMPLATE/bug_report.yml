@@ -1,0 +1,108 @@
+name: Bug or compatibility report
+description: Report a reproducible MOTrainer failure or an unsupported Mental Omega build
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve MOTrainer. Please test only in an offline match.
+        Do not upload game files, third-party trainer files, saves containing private information, credentials, or tokens.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Report type
+      options:
+        - A supported build behaves incorrectly
+        - My game build is reported as unsupported
+        - The trainer cannot access or identify the game process
+        - Settings, language, hotkeys, or interface problem
+        - Other reproducible problem
+    validations:
+      required: true
+
+  - type: input
+    id: trainer_version
+    attributes:
+      label: MOTrainer version or commit
+      description: For a source build, use `git rev-parse --short HEAD`.
+      placeholder: v0.1.0-rc1 or c0b38c7
+    validations:
+      required: true
+
+  - type: input
+    id: game_version
+    attributes:
+      label: Mental Omega version and source
+      placeholder: Version shown by the launcher and where this installation came from
+    validations:
+      required: true
+
+  - type: textarea
+    id: fingerprints
+    attributes:
+      label: Module SHA-256 fingerprints
+      description: Run `Get-FileHash -Algorithm SHA256 .\gamemd.exe, .\Ares.dll` in the game directory.
+      placeholder: |
+        gamemd.exe: ...
+        Ares.dll: ...
+    validations:
+      required: true
+
+  - type: input
+    id: status
+    attributes:
+      label: Complete MOTrainer status message
+      placeholder: Copy the full message from the top status bar
+    validations:
+      required: true
+
+  - type: dropdown
+    id: privilege
+    attributes:
+      label: Game and trainer privilege levels
+      options:
+        - Both run normally
+        - Both run as administrator
+        - The game runs as administrator, but the trainer does not
+        - The trainer runs as administrator, but the game does not
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Minimal reproduction steps
+      placeholder: |
+        1. Start ...
+        2. Enter ...
+        3. Click ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+      placeholder: Explain what you expected and what happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: modifications
+    attributes:
+      label: Compatibility patches or replaced modules
+      description: List any compatibility patch or local replacement affecting gamemd.exe or Ares.dll. Write None if not applicable.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Safety checklist
+      options:
+        - label: I reproduced this in an offline match.
+          required: true
+        - label: I did not upload game files, third-party trainer files, private saves, credentials, or tokens.
+          required: true

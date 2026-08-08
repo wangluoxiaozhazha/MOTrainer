@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an offline feature or usability improvement for MOTrainer
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        MOTrainer accepts requests for offline play only. Requests involving multiplayer use or anti-cheat bypasses are out of scope.
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Offline use case
+      description: Describe the gameplay or usability problem, not only the desired control.
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Suggested behavior
+      description: Explain the target, timing, expected result, and how the user would undo or disable it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Public references or observations
+      description: Optional links, observable behavior, or version information that may help validate the request.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: This request is intended for offline play and does not require an anti-cheat bypass.
+          required: true

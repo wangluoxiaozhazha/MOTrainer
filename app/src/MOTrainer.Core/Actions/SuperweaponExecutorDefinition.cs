@@ -1,3 +1,5 @@
+using MOTrainer.Core.Localization;
+
 namespace MOTrainer.Core.Actions;
 
 public sealed record SuperweaponExecutorDefinition(
@@ -20,7 +22,7 @@ public sealed record SuperweaponExecutorDefinition(
             SafeIds.Distinct().Count() != SafeIds.Length)
         {
             throw new InvalidOperationException(
-                "超武执行器定义无效");
+                CoreStrings.Get("SuperweaponExecutorInvalid"));
         }
     }
 }

@@ -1,5 +1,15 @@
 # English Support Plan
 
+## Current status
+
+- Localization foundation and application text coverage are complete in the
+  current source branch.
+- The interface refreshes once after a language choice is saved; the process
+  does not need to be restarted manually.
+- The GitHub documentation and repository presentation are being converted to
+  English-first with preserved Simplified Chinese versions.
+- The public `v0.1.0-rc1` package predates bilingual UI support.
+
 ## Goal
 
 Make MOTrainer usable and maintainable in both Simplified Chinese and English
@@ -16,8 +26,8 @@ validated by the Chinese release.
   English elsewhere.
 - Keep configuration keys, patch IDs, hotkey action IDs, hashes, and memory
   profiles language-neutral and backward compatible.
-- Require an application restart after changing the display language in the
-  first implementation. Live language switching is not required.
+- Rebuild the main interface once after changing the display language while
+  preserving the normal shutdown restoration path.
 - Use terminology familiar to the Red Alert 2 and Mental Omega communities
   rather than translating Chinese labels word for word.
 

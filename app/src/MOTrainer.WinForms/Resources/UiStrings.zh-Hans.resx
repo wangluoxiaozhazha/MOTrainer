@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="AppTitle" xml:space="preserve"><value>MO 离线修改器</value></data>
+  <data name="CompatibilityNotice" xml:space="preserve"><value>当前仅支持已验证的 gamemd.exe / Ares.dll 哈希。</value></data>
+  <data name="DisplayLanguageTooltip" xml:space="preserve"><value>显示语言；设置保存后界面会自动刷新。</value></data>
+  <data name="DisplayLanguageLabel" xml:space="preserve"><value>语言</value></data>
+  <data name="HotkeySettings" xml:space="preserve"><value>热键设置</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>自动</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageRefreshing" xml:space="preserve"><value>显示语言已保存，正在刷新界面…</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="ActionAddHealth" xml:space="preserve"><value>选中单位加血</value></data>
+  <data name="ActionAutoEdit" xml:space="preserve"><value>自动修改</value></data>
+  <data name="AutoApplyTooltip" xml:space="preserve"><value>自动应用当前勾选的等级和生命设置。</value></data>
+  <data name="AutoModeLabel" xml:space="preserve"><value>模式：</value></data>
+  <data name="AutoModeTooltip" xml:space="preserve"><value>事件模式在形成选择时应用一次；轮询模式每 100 毫秒持续应用。</value></data>
+  <data name="ActionDefeatOwner" xml:space="preserve"><value>目标阵营投降</value></data>
+  <data name="ActionGrantSuperweapons" xml:space="preserve"><value>发放已勾选超武</value></data>
+  <data name="ActionSetOneHealth" xml:space="preserve"><value>选中单位扣血</value></data>
+  <data name="ActionTransferOwner" xml:space="preserve"><value>占有单位</value></data>
+  <data name="ActionZeroEconomy" xml:space="preserve"><value>目标阵营经济归零</value></data>
+  <data name="AutoEditDisabled" xml:space="preserve"><value>选中单位自动修改已关闭</value></data>
+  <data name="AutoEditEventEnabled" xml:space="preserve"><value>自动修改事件模式已启用；选择形成时应用当前设置</value></data>
+  <data name="AutoEditEventUpdated" xml:space="preserve"><value>自动修改事件策略已更新</value></data>
+  <data name="AutoEditNoAttributesDisabled" xml:space="preserve"><value>等级和生命均未勾选，自动修改已关闭</value></data>
+  <data name="AutoEditNotInMatch" xml:space="preserve"><value>尚未进入可用战局，无法启动自动修改</value></data>
+  <data name="AutoEditPollingEnabled" xml:space="preserve"><value>自动修改轮询模式已启用；每 100ms 持续应用当前设置</value></data>
+  <data name="BattlefieldSection" xml:space="preserve"><value>战场信息与控制</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>取消</value></data>
+  <data name="ButtonEdit" xml:space="preserve"><value>修改</value></data>
+  <data name="ButtonEditSelected" xml:space="preserve"><value>修改选中</value></data>
+  <data name="ButtonGrantSelectedSuperweapons" xml:space="preserve"><value>发放已勾选超武</value></data>
+  <data name="ButtonHeal" xml:space="preserve"><value>加血</value></data>
+  <data name="ButtonResetDefaults" xml:space="preserve"><value>恢复默认</value></data>
+  <data name="ButtonSave" xml:space="preserve"><value>保存</value></data>
+  <data name="ButtonSetHealthOne" xml:space="preserve"><value>扣血</value></data>
+  <data name="ButtonTakeOwnership" xml:space="preserve"><value>占有单位</value></data>
+  <data name="Credits" xml:space="preserve"><value>经济</value></data>
+  <data name="EconomyFactionSection" xml:space="preserve"><value>资源与阵营</value></data>
+  <data name="EconomyProductionSection" xml:space="preserve"><value>资源与生产</value></data>
+  <data name="FeatureAutoRepair" xml:space="preserve"><value>自动维修</value></data>
+  <data name="FeatureBuildAnywhere" xml:space="preserve"><value>随处建造</value></data>
+  <data name="FeatureControlAll" xml:space="preserve"><value>操纵全部</value></data>
+  <data name="FeatureIgnoreCloak" xml:space="preserve"><value>无视隐形</value></data>
+  <data name="FeatureInstantBuild" xml:space="preserve"><value>快速生产</value></data>
+  <data name="FeatureLockEconomy" xml:space="preserve"><value>锁定经济</value></data>
+  <data name="FeatureLockPower" xml:space="preserve"><value>锁定电量</value></data>
+  <data name="FeaturePsychicDetection" xml:space="preserve"><value>心灵探测</value></data>
+  <data name="FeatureRevealMap" xml:space="preserve"><value>无视黑雾</value></data>
+  <data name="FeatureTechUnlock" xml:space="preserve"><value>科技全开</value></data>
+  <data name="FactionAllies" xml:space="preserve"><value>盟军</value></data>
+  <data name="FactionEpsilon" xml:space="preserve"><value>厄普西隆</value></data>
+  <data name="FactionFoehn" xml:space="preserve"><value>焚风</value></data>
+  <data name="FactionSoviets" xml:space="preserve"><value>苏联</value></data>
+  <data name="GlobalHotkeyRegistered" xml:space="preserve"><value>全局热键已注册；操作时游戏可以保持焦点。</value></data>
+  <data name="GlobalStateGroup" xml:space="preserve"><value>全局状态</value></data>
+  <data name="Health" xml:space="preserve"><value>生命</value></data>
+  <data name="HotkeyBatchDescription" xml:space="preserve"><value>按钮一次批量发放全部已勾选项</value></data>
+  <data name="HotkeyBatchDescriptionWithGesture" xml:space="preserve"><value>{0} 与按钮一次批量发放全部已勾选项</value></data>
+  <data name="HotkeyConflict" xml:space="preserve"><value>{0} 已用于“{1}”。</value></data>
+  <data name="HotkeyInstruction" xml:space="preserve"><value>点击右侧录入框后直接按组合键。至少包含 Ctrl、Alt 或 Shift；修改只在点击“保存”后生效。</value></data>
+  <data name="HotkeyModifierRequired" xml:space="preserve"><value>热键至少需要 Ctrl、Alt 或 Shift 中的一个修饰键。</value></data>
+  <data name="HotkeyNewRegistrationFailed" xml:space="preserve"><value>新热键被其他程序占用：{0}；{1}</value></data>
+  <data name="HotkeyPressMainKey" xml:space="preserve"><value>请在按住修饰键的同时再按一个主键。</value></data>
+  <data name="HotkeyRegistrationFailed" xml:space="preserve"><value>以下热键注册失败，可能被其他程序占用：{0}</value></data>
+  <data name="HotkeyResetPending" xml:space="preserve"><value>已在当前窗口恢复默认值；点击“保存”后生效。</value></data>
+  <data name="HotkeyReserved" xml:space="preserve"><value>{0} 是系统保留组合，请使用其他热键。</value></data>
+  <data name="HotkeyRestoreFailed" xml:space="preserve"><value>旧热键恢复也失败：{0}</value></data>
+  <data name="HotkeyRestored" xml:space="preserve"><value>旧热键已恢复。</value></data>
+  <data name="HotkeyRollbackFailed" xml:space="preserve"><value>{0}；旧热键恢复失败：{1}</value></data>
+  <data name="HotkeyRollbackSucceeded" xml:space="preserve"><value>{0}；新热键未生效，旧热键已恢复。</value></data>
+  <data name="HotkeySaved" xml:space="preserve"><value>热键已保存并立即生效。</value></data>
+  <data name="HotkeySetPending" xml:space="preserve"><value>“{0}”已改为 {1}，等待保存。</value></data>
+  <data name="HotkeySettingsTitle" xml:space="preserve"><value>热键设置</value></data>
+  <data name="HotkeySystemLabel" xml:space="preserve"><value>全局热键 {0}</value></data>
+  <data name="HotkeyUnknownAction" xml:space="preserve"><value>未知功能</value></data>
+  <data name="HotkeyUnsaved" xml:space="preserve"><value>当前修改尚未保存。</value></data>
+  <data name="ModeEventRecommended" xml:space="preserve"><value>事件模式（推荐）</value></data>
+  <data name="ModeExtended" xml:space="preserve"><value>扩展模式</value></data>
+  <data name="ModeFactionRecommended" xml:space="preserve"><value>阵营模式（推荐）</value></data>
+  <data name="ModePollingCompatibility" xml:space="preserve"><value>轮询模式（兼容）</value></data>
+  <data name="OneTimeGroup" xml:space="preserve"><value>一次性功能</value></data>
+  <data name="PatchRestoreBlocked" xml:space="preserve"><value>{0}补丁字节异常，已停止退出</value></data>
+  <data name="QueueLimitOff" xml:space="preserve"><value>解锁队列上限 [Off]</value></data>
+  <data name="QueueLimitLabel" xml:space="preserve"><value>解锁队列上限</value></data>
+  <data name="Rank" xml:space="preserve"><value>等级</value></data>
+  <data name="RankElite" xml:space="preserve"><value>精英 / 三星</value></data>
+  <data name="RankRookie" xml:space="preserve"><value>新兵</value></data>
+  <data name="RankVeteran" xml:space="preserve"><value>老兵</value></data>
+  <data name="RestoreBeforeExitFailed" xml:space="preserve"><value>退出前恢复失败：{0}</value></data>
+  <data name="SelectOneSuperweapon" xml:space="preserve"><value>请至少勾选一个超级武器。</value></data>
+  <data name="SelectUnitAttribute" xml:space="preserve"><value>请至少勾选修改等级或修改生命</value></data>
+  <data name="SelectedUnitsGroup" xml:space="preserve"><value>选中单位修改</value></data>
+  <data name="SettingsNotSavedTitle" xml:space="preserve"><value>设置未保存</value></data>
+  <data name="SettingsConflictHotkey" xml:space="preserve"><value>{0} 与 {1} 冲突，已使用默认值</value></data>
+  <data name="SettingsInvalidBoolean" xml:space="preserve"><value>{0} 不是有效布尔值，已使用默认值</value></data>
+  <data name="SettingsInvalidHotkey" xml:space="preserve"><value>{0} 不是有效热键，已使用默认值</value></data>
+  <data name="SettingsInvalidOption" xml:space="preserve"><value>{0} 不是有效选项，已使用默认值</value></data>
+  <data name="SettingsInvalidUInt" xml:space="preserve"><value>{0} 不是有效无符号整数，已使用默认值</value></data>
+  <data name="SettingsMissingRoot" xml:space="preserve"><value>设置文件缺少 configuration 根节点</value></data>
+  <data name="SettingsOutOfRange" xml:space="preserve"><value>{0} 超出有效范围，已使用默认值</value></data>
+  <data name="SettingsReadFailed" xml:space="preserve"><value>设置文件读取失败，已使用默认值：{0}</value></data>
+  <data name="SettingsSaveFailed" xml:space="preserve"><value>设置保存失败：{0}</value></data>
+  <data name="SettingsUnknownHotkeyAction" xml:space="preserve"><value>{0} 对应未知功能，已忽略</value></data>
+  <data name="SettingsUnknownSuperweapon" xml:space="preserve"><value>superweapon.selectedIds 包含未知 ID，已忽略 {0}</value></data>
+  <data name="SettingsWrongRoot" xml:space="preserve"><value>设置文件根节点不是 configuration</value></data>
+  <data name="WarningSeparator" xml:space="preserve"><value>；</value></data>
+  <data name="SuperweaponBlasticade" xml:space="preserve"><value>屏障</value></data>
+  <data name="SuperweaponChronosphere" xml:space="preserve"><value>超时空</value></data>
+  <data name="SuperweaponGeneticMutator" xml:space="preserve"><value>基因</value></data>
+  <data name="SuperweaponIronCurtain" xml:space="preserve"><value>铁幕</value></data>
+  <data name="SuperweaponLightningStorm" xml:space="preserve"><value>闪电</value></data>
+  <data name="SuperweaponGreatTempest" xml:space="preserve"><value>顶点</value></data>
+  <data name="SuperweaponNuclearMissile" xml:space="preserve"><value>核弹</value></data>
+  <data name="SuperweaponPsychicDominator" xml:space="preserve"><value>心控</value></data>
+  <data name="SuperweaponsSection" xml:space="preserve"><value>超级武器</value></data>
+  <data name="TechnologySection" xml:space="preserve"><value>科技</value></data>
+  <data name="UnitUnlimitedLabel" xml:space="preserve"><value>解锁建造数量</value></data>
+  <data name="UnitUnlimitedOff" xml:space="preserve"><value>解锁建造数量 [Off]</value></data>
+</root>

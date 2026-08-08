@@ -12,7 +12,80 @@ internal enum AutoEditMode
     Polling,
 }
 
+internal enum DisplayLanguage
+{
+    Auto,
+    SimplifiedChinese,
+    English,
+}
+
+internal static class DisplayCulture
+{
+    public static DisplayLanguage ReadConfiguredLanguage(string path)
+    {
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return DisplayLanguage.Auto;
+            }
+
+            string? value = XDocument.Load(path)
+                .Root?
+                .Element("appSettings")?
+                .Elements("add")
+                .LastOrDefault(element =>
+                    string.Equals(
+                        (string?)element.Attribute("key"),
+                        "ui.language",
+                        StringComparison.Ordinal))?
+                .Attribute("value")?
+                .Value;
+            return Enum.TryParse(value, true, out DisplayLanguage language) &&
+                Enum.IsDefined(typeof(DisplayLanguage), language)
+                    ? language
+                    : DisplayLanguage.Auto;
+        }
+        catch
+        {
+            return DisplayLanguage.Auto;
+        }
+    }
+
+    public static CultureInfo Apply(
+        DisplayLanguage language,
+        CultureInfo? installedUiCulture = null)
+    {
+        CultureInfo culture = Resolve(language, installedUiCulture);
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+        return culture;
+    }
+
+    public static CultureInfo Resolve(
+        DisplayLanguage language,
+        CultureInfo? installedUiCulture = null)
+    {
+        DisplayLanguage resolved = language == DisplayLanguage.Auto
+            ? ResolveAutomatic(installedUiCulture ?? CultureInfo.InstalledUICulture)
+            : language;
+        return CultureInfo.GetCultureInfo(
+            resolved == DisplayLanguage.SimplifiedChinese
+                ? "zh-Hans"
+                : "en");
+    }
+
+    private static DisplayLanguage ResolveAutomatic(CultureInfo culture) =>
+        string.Equals(
+            culture.TwoLetterISOLanguageName,
+            "zh",
+            StringComparison.OrdinalIgnoreCase)
+            ? DisplayLanguage.SimplifiedChinese
+            : DisplayLanguage.English;
+}
+
 internal sealed record TrainerSettings(
+    DisplayLanguage DisplayLanguage,
     bool ModifyVeterancy,
     UnitVeterancyLevel Veterancy,
     bool ModifyHealth,
@@ -25,6 +98,7 @@ internal sealed record TrainerSettings(
 {
     public static TrainerSettings CreateDefaults() =>
         new(
+            DisplayLanguage: DisplayLanguage.Auto,
             ModifyVeterancy: true,
             Veterancy: UnitVeterancyLevel.Elite,
             ModifyHealth: false,
@@ -48,10 +122,12 @@ internal sealed class TrainerSettingsStore
 
     public TrainerSettingsStore(string? path = null)
     {
-        this.path = path ??
-            ((Assembly.GetEntryAssembly()?.Location ??
-                Application.ExecutablePath) + ".config");
+        this.path = path ?? DefaultPath;
     }
+
+    public static string DefaultPath =>
+        (Assembly.GetEntryAssembly()?.Location ??
+            Application.ExecutablePath) + ".config";
 
     public string Path => path;
 
@@ -73,10 +149,15 @@ internal sealed class TrainerSettingsStore
         {
             return new TrainerSettingsLoadResult(
                 defaults,
-                $"设置文件读取失败，已使用默认值：{exception.Message}");
+                UiStrings.Format("SettingsReadFailed", exception.Message));
         }
 
         List<string> warnings = [];
+        DisplayLanguage displayLanguage = ReadEnum(
+            values,
+            "ui.language",
+            defaults.DisplayLanguage,
+            warnings);
         bool modifyVeterancy = ReadBoolean(
             values,
             "unit.modifyVeterancy",
@@ -154,7 +235,7 @@ internal sealed class TrainerSettingsStore
 
             if (!HotkeyGesture.TryParse(text, out HotkeyGesture gesture))
             {
-                warnings.Add($"{key} 不是有效热键，已使用默认值");
+                warnings.Add(UiStrings.Format("SettingsInvalidHotkey", key));
                 continue;
             }
 
@@ -165,12 +246,18 @@ internal sealed class TrainerSettingsStore
             {
                 warnings.Add(
                     conflictActionId is null
-                        ? $"{key} 对应未知功能，已忽略"
-                        : $"{key} 与 {HotkeyPrefix}{conflictActionId} 冲突，已使用默认值");
+                        ? UiStrings.Format(
+                            "SettingsUnknownHotkeyAction",
+                            key)
+                        : UiStrings.Format(
+                            "SettingsConflictHotkey",
+                            key,
+                            HotkeyPrefix + conflictActionId));
             }
         }
 
         TrainerSettings settings = new(
+            displayLanguage,
             modifyVeterancy,
             veterancy,
             modifyHealth,
@@ -184,7 +271,7 @@ internal sealed class TrainerSettingsStore
             settings,
             warnings.Count == 0
                 ? null
-                : string.Join("；", warnings));
+                : string.Join(UiStrings.Get("WarningSeparator"), warnings));
     }
 
     public string? Save(TrainerSettings settings)
@@ -200,11 +287,11 @@ internal sealed class TrainerSettingsStore
                     new XElement("configuration"));
             XElement root = document.Root ??
                 throw new InvalidOperationException(
-                    "设置文件缺少 configuration 根节点");
+                    UiStrings.Get("SettingsMissingRoot"));
             if (root.Name != "configuration")
             {
                 throw new InvalidOperationException(
-                    "设置文件根节点不是 configuration");
+                    UiStrings.Get("SettingsWrongRoot"));
             }
 
             XElement appSettings =
@@ -226,6 +313,10 @@ internal sealed class TrainerSettingsStore
             }
 
             SetValue(appSettings, SettingsVersionKey, "2");
+            SetValue(
+                appSettings,
+                "ui.language",
+                settings.DisplayLanguage.ToString());
             SetValue(
                 appSettings,
                 "unit.modifyVeterancy",
@@ -324,7 +415,7 @@ internal sealed class TrainerSettingsStore
         catch (Exception exception)
         {
             TryDelete(temporaryPath);
-            return $"设置保存失败：{exception.Message}";
+            return UiStrings.Format("SettingsSaveFailed", exception.Message);
         }
     }
 
@@ -390,7 +481,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效布尔值，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidBoolean", key));
         return fallback;
     }
 
@@ -411,7 +502,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效选项，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidOption", key));
         return fallback;
     }
 
@@ -438,7 +529,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 超出有效范围，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsOutOfRange", key));
         return fallback;
     }
 
@@ -461,7 +552,7 @@ internal sealed class TrainerSettingsStore
             return value;
         }
 
-        warnings.Add($"{key} 不是有效无符号整数，已使用默认值");
+        warnings.Add(UiStrings.Format("SettingsInvalidUInt", key));
         return fallback;
     }
 
@@ -487,8 +578,9 @@ internal sealed class TrainerSettingsStore
                     out uint id) ||
                 !SuperweaponChoices.KnownIds.Contains(id))
             {
-                warnings.Add(
-                    $"superweapon.selectedIds 包含未知 ID，已忽略 {part.Trim()}");
+                warnings.Add(UiStrings.Format(
+                    "SettingsUnknownSuperweapon",
+                    part.Trim()));
                 continue;
             }
 

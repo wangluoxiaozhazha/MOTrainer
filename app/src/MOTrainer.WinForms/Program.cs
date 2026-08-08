@@ -13,6 +13,18 @@ internal static class Program
 #else
         ApplicationConfiguration.Initialize();
 #endif
-        Application.Run(new MainForm(new GameSessionProbe()));
+        bool refreshLanguage;
+        do
+        {
+            DisplayLanguage language =
+                DisplayCulture.ReadConfiguredLanguage(
+                    TrainerSettingsStore.DefaultPath);
+            DisplayCulture.Apply(language);
+
+            MainForm form = new(new GameSessionProbe());
+            Application.Run(form);
+            refreshLanguage = form.LanguageRefreshRequested;
+        }
+        while (refreshLanguage);
     }
 }

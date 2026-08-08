@@ -16,5 +16,11 @@
              Link="WinForms\TrainerSettings.cs" />
     <Compile Include="..\..\src\MOTrainer.WinForms\SuperweaponChoices.cs"
              Link="WinForms\SuperweaponChoices.cs" />
+    <Compile Include="..\..\src\MOTrainer.WinForms\Localization\UiStrings.cs"
+             Link="WinForms\Localization\UiStrings.cs" />
+    <EmbeddedResource Include="..\..\src\MOTrainer.WinForms\Resources\UiStrings.resx"
+                      Link="WinForms\Resources\UiStrings.resx">
+      <LogicalName>MOTrainer.WinForms.Resources.UiStrings.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
