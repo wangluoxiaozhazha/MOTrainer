@@ -15,7 +15,7 @@ for strictly verified game builds.
 ## Project status
 
 The latest release candidate,
-[`v0.1.0-rc2`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc2),
+[`v0.1.0-rc3`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc3),
 supports `Auto`, English, and Simplified Chinese display languages in one
 executable. It also supports the verified Classic and Steam YR 1.001 game
 profiles documented below.

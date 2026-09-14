@@ -206,4 +206,5 @@
   <data name="TechUnlockStateInconsistent" xml:space="preserve"><value>科技全开 Hook 状态不一致，拒绝操作</value></data>
   <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>科技全开入口跳转到未知远程代码，拒绝操作</value></data>
   <data name="TechUnlockWriteFailed" xml:space="preserve"><value>科技全开 Hook 写入失败，已尝试恢复原字节</value></data>
+  <data name="QueuePolicyReleased" xml:space="preserve"><value>队列策略已关闭：仍属本修改器的值已恢复；游戏替换的数值或对象保持不变。</value></data>
 </root>

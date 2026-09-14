@@ -206,4 +206,5 @@
   <data name="TechUnlockStateInconsistent" xml:space="preserve"><value>Tech-unlock hook states are inconsistent; operation refused</value></data>
   <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>A tech-unlock entry jumps to unknown remote code; operation refused</value></data>
   <data name="TechUnlockWriteFailed" xml:space="preserve"><value>Failed to write the tech-unlock hooks; attempted to restore original bytes</value></data>
+  <data name="QueuePolicyReleased" xml:space="preserve"><value>Queue policy disabled: restored our value if still present; preserved any replacement value or object.</value></data>
 </root>

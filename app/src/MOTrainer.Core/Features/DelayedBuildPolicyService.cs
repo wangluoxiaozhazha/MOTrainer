@@ -18,6 +18,7 @@ public sealed class DelayedBuildPolicyService
     private bool queueDesired;
     private int? unitOwnedProcessId;
     private QueueRestorePoint? queueRestore;
+    private QueueCandidate? queueCandidate;
 
     public DelayedBuildPolicyService(
         IGameSessionProbe sessionProbe,
@@ -46,6 +47,10 @@ public sealed class DelayedBuildPolicyService
             queueDesired = desired;
         }
 
+        if (!queueDesired)
+        {
+            queueCandidate = null;
+        }
         return Reconcile();
     }
 
@@ -155,14 +160,20 @@ public sealed class DelayedBuildPolicyService
 
         if (!queueDesired && queueRestore is not null)
         {
-            if (!TryRestoreQueue(queueRestore))
+            if (!TryRestoreQueue(queueRestore, profile))
             {
                 return Failed(false, CoreStrings.Get("QueueRestoreFailed"));
             }
 
-            uint restored = queueRestore.OriginalValue;
             queueRestore = null;
-            return Off(CoreStrings.Format("QueueLimitRestored", restored));
+            return Off(CoreStrings.Get("QueuePolicyReleased"));
+        }
+
+        // Readable memory can still contain constructor defaults during loading.
+        if (queueDesired && session.State != SessionState.MatchReady)
+        {
+            queueCandidate = null;
+            return Pending(true, CoreStrings.Get("QueuePresetWaiting"));
         }
 
         if (!TryResolveQueueAddress(
@@ -171,6 +182,7 @@ public sealed class DelayedBuildPolicyService
                 out uint address,
                 out uint current))
         {
+            queueCandidate = null;
             return queueDesired
                 ? Pending(true, CoreStrings.Get("QueuePresetWaiting"))
                 : Off(CoreStrings.Get("BuildQueueUnavailable"));
@@ -182,8 +194,12 @@ public sealed class DelayedBuildPolicyService
                 queueRestore.ProcessId != processId ||
                 queueRestore.Address != address)
             {
+                if (!QueueInitializationObserved(processId, profile, address, current))
+                {
+                    return Pending(true, CoreStrings.Get("QueuePresetWaiting"));
+                }
                 if (queueRestore is not null &&
-                    !TryRestoreQueue(queueRestore))
+                    !TryRestoreQueue(queueRestore, profile))
                 {
                     return Failed(true, CoreStrings.Get("OldQueueRestoreFailed"));
                 }
@@ -196,6 +212,7 @@ public sealed class DelayedBuildPolicyService
                 }
 
                 queueRestore = restore;
+                queueCandidate = null;
                 return Active(true, CoreStrings.Format("QueueLimitApplied", current));
             }
 
@@ -213,6 +230,26 @@ public sealed class DelayedBuildPolicyService
         }
 
         return Off(CoreStrings.Get("NotEnabled"));
+    }
+
+    private bool QueueInitializationObserved(
+        int processId, VersionProfile profile, uint address, uint value)
+    {
+        using IMemoryAccessor memory =
+            memoryFactory.Open(processId, MemoryAccessMode.ReadOnly);
+        if (!memory.TryRead(profile.CurrentFrameAddress, out int frame) || frame <= 0)
+        {
+            queueCandidate = null;
+            return false;
+        }
+
+        QueueCandidate? previous = queueCandidate;
+        queueCandidate = new(processId, address, value, frame);
+        // Require the same field/value across observations while simulation advances.
+        // Paused games remain pending until they resume.
+        return previous is not null &&
+            previous.ProcessId == processId && previous.Address == address &&
+            previous.Value == value && frame > previous.Frame;
     }
 
     private bool TryResolveQueueAddress(
@@ -244,17 +281,28 @@ public sealed class DelayedBuildPolicyService
         }
     }
 
-    private bool TryRestoreQueue(QueueRestorePoint restore)
+    private bool TryRestoreQueue(QueueRestorePoint restore, VersionProfile profile)
     {
         using IMemoryAccessor memory =
             memoryFactory.Open(
                 restore.ProcessId,
                 MemoryAccessMode.ReadWrite);
+        // The rules object may be replaced between matches or when loading a save.
+        // Never restore a captured field into an object that is no longer current.
+        if (!memory.TryRead(profile.BuildQueueRootAddress, out uint root))
+        {
+            return false;
+        }
+        if (root == 0 || (ulong)root + profile.BuildQueueLimitOffset != restore.Address)
+        {
+            return true;
+        }
         if (!memory.TryRead(restore.Address, out uint current))
         {
             return false;
         }
-        if (current == restore.OriginalValue)
+        // A different value supersedes our write; preserve it and release ownership.
+        if (current != QueueLimitValue)
         {
             return true;
         }
@@ -294,6 +342,8 @@ public sealed class DelayedBuildPolicyService
         bool desired,
         string message) =>
         new(desired, FeatureState.Failed, message);
+
+    private sealed record QueueCandidate(int ProcessId, uint Address, uint Value, int Frame);
 
     private sealed record QueueRestorePoint(
         int ProcessId,

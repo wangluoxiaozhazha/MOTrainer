@@ -38,6 +38,10 @@ public sealed class MainForm : Form
     private readonly CheckBox queueLimitControl;
     private readonly DelayedBuildPolicyService buildPolicies;
     private readonly Label resultLabel;
+    private DelayedBuildPolicySnapshot? delayedBuildSnapshot;
+    private readonly Queue<StatusNotification> notifications = new();
+    private StatusNotification? visibleNotification;
+    private DateTime notificationExpiresAt;
     private readonly ToolTip hotkeyTips;
     private readonly HotkeyBindings hotkeyBindings;
     private readonly TrainerSettingsStore settingsStore;
@@ -744,20 +748,17 @@ public sealed class MainForm : Form
     {
         if (failures.Count > 0)
         {
-            resultLabel.Text = UiStrings.Format(
+            ShowNotification(UiStrings.Format(
                 "HotkeyRegistrationFailed",
-                string.Join(", ", failures));
-            resultLabel.ForeColor = Color.DarkRed;
+                string.Join(", ", failures)), Color.DarkRed);
         }
         else if (warning is not null)
         {
-            resultLabel.Text = warning;
-            resultLabel.ForeColor = Color.DarkOrange;
+            ShowNotification(warning, Color.DarkOrange);
         }
         else
         {
-            resultLabel.Text = UiStrings.Get("GlobalHotkeyRegistered");
-            resultLabel.ForeColor = Color.DarkGreen;
+            ShowNotification(UiStrings.Get("GlobalHotkeyRegistered"), Color.DarkGreen);
         }
     }
 
@@ -793,11 +794,10 @@ public sealed class MainForm : Form
                 : UiStrings.Format(
                     "HotkeyRestoreFailed",
                     string.Join(", ", restoreFailures));
-            resultLabel.Text = UiStrings.Format(
+            ShowNotification(UiStrings.Format(
                 "HotkeyNewRegistrationFailed",
                 string.Join(", ", registrationFailures),
-                restoreSuffix);
-            resultLabel.ForeColor = Color.DarkRed;
+                restoreSuffix), Color.DarkRed);
             return;
         }
 
@@ -807,8 +807,7 @@ public sealed class MainForm : Form
         string? saveError = settingsStore.Save(CaptureSettings());
         if (saveError is null)
         {
-            resultLabel.Text = UiStrings.Get("HotkeySaved");
-            resultLabel.ForeColor = Color.DarkGreen;
+            ShowNotification(UiStrings.Get("HotkeySaved"), Color.DarkGreen);
             return;
         }
 
@@ -818,13 +817,12 @@ public sealed class MainForm : Form
             original,
             out List<string> rollbackFailures);
         RefreshHotkeyDisplays();
-        resultLabel.Text = rollbackFailures.Count == 0
+        ShowNotification(rollbackFailures.Count == 0
             ? UiStrings.Format("HotkeyRollbackSucceeded", saveError)
             : UiStrings.Format(
                 "HotkeyRollbackFailed",
                 saveError,
-                string.Join(", ", rollbackFailures));
-        resultLabel.ForeColor = Color.DarkRed;
+                string.Join(", ", rollbackFailures)), Color.DarkRed);
     }
 
     protected override void OnHandleDestroyed(EventArgs e)
@@ -862,26 +860,25 @@ public sealed class MainForm : Form
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         refreshTimer.Stop();
+        List<string> restoreFailures = [];
         ActionResult autoEditRestore = StopAutoEdit();
         if (!autoEditRestore.Success)
         {
-            CancelCloseForRestoreFailure(
-                e,
-                autoEditRestore.Message);
-            return;
+            restoreFailures.Add(autoEditRestore.Message);
         }
 
         DelayedBuildPolicySnapshot delayedRestore =
             buildPolicies.RestoreOwned();
-        if (delayedRestore.UnitUnlimited.State == FeatureState.Failed ||
-            delayedRestore.QueueLimit1000.State == FeatureState.Failed)
+        foreach (DelayedFeatureStatus status in new[]
         {
-            string message =
-                delayedRestore.UnitUnlimited.State == FeatureState.Failed
-                    ? delayedRestore.UnitUnlimited.Message
-                    : delayedRestore.QueueLimit1000.Message;
-            CancelCloseForRestoreFailure(e, message);
-            return;
+            delayedRestore.UnitUnlimited,
+            delayedRestore.QueueLimit1000,
+        })
+        {
+            if (status.State == FeatureState.Failed)
+            {
+                restoreFailures.Add(status.Message);
+            }
         }
 
         foreach (KeyValuePair<string, int> ownedPatch in
@@ -897,21 +894,24 @@ public sealed class MainForm : Form
                     actions.SetPatchEnabled(patchId, binding.DisplayName, false);
                 if (!restore.Success)
                 {
-                    CancelCloseForRestoreFailure(e, restore.Message);
-                    return;
+                    restoreFailures.Add(restore.Message);
+                    continue;
                 }
             }
             else if (inspection.State == PatchRuntimeState.Unknown)
             {
-                CancelCloseForRestoreFailure(
-                    e,
-                    UiStrings.Format(
-                        "PatchRestoreBlocked",
-                        binding.DisplayName));
-                return;
+                restoreFailures.Add(UiStrings.Format(
+                    "PatchRestoreBlocked", binding.DisplayName));
+                continue;
             }
 
             ownedPatchProcesses.Remove(patchId);
+        }
+
+        if (restoreFailures.Count > 0 &&
+            CancelCloseForRestoreFailure(e, string.Join(Environment.NewLine, restoreFailures)))
+        {
+            return;
         }
 
         string? settingsError = settingsStore.Save(CaptureSettings());
@@ -965,14 +965,12 @@ public sealed class MainForm : Form
         if (error is not null)
         {
             languageRefreshRequested = false;
-            resultLabel.Text = error;
-            resultLabel.ForeColor = Color.DarkRed;
+            ShowNotification(error, Color.DarkRed);
             return;
         }
 
         languageRefreshRequested = true;
-        resultLabel.Text = UiStrings.Get("LanguageRefreshing");
-        resultLabel.ForeColor = Color.DarkOrange;
+        ShowNotification(UiStrings.Get("LanguageRefreshing"), Color.DarkOrange);
         BeginInvoke(new Action(Close));
     }
 
@@ -1152,7 +1150,8 @@ public sealed class MainForm : Form
         SetActionControlsEnabled(matchControlsAvailable);
         if (!matchControlsAvailable && autoEditEnabled)
         {
-            StopAutoEdit();
+            ActionResult stopped = StopAutoEdit();
+            ShowNotification(stopped.Message, stopped.Success ? Color.DarkOrange : Color.DarkRed);
         }
 
         if (snapshot.ProcessId is not int currentProcessId)
@@ -1175,6 +1174,7 @@ public sealed class MainForm : Form
 
         RefreshPatchStates(snapshot);
         RefreshDelayedBuildStates(snapshot);
+        AdvanceNotificationQueue();
     }
 
     private void RunAction(Func<ActionResult> action)
@@ -1188,9 +1188,7 @@ public sealed class MainForm : Form
         try
         {
             ActionResult result = action();
-            SetTextIfChanged(resultLabel, result.Message);
-            SetForeColorIfChanged(
-                resultLabel,
+            ShowNotification(result.Message,
                 result.Success ? Color.DarkGreen : Color.DarkRed);
         }
         finally
@@ -1216,8 +1214,7 @@ public sealed class MainForm : Form
         PatchInspection before = actions.InspectPatch(binding.Id);
         if (before.State is not (PatchRuntimeState.Original or PatchRuntimeState.Enabled))
         {
-            resultLabel.Text = before.Message;
-            resultLabel.ForeColor = Color.DarkRed;
+            ShowNotification(before.Message, Color.DarkRed);
             RefreshPatchStates();
             return;
         }
@@ -1226,8 +1223,7 @@ public sealed class MainForm : Form
         ActionResult result =
             actions.SetPatchEnabled(binding.Id, binding.DisplayName, enable);
 
-        resultLabel.Text = result.Message;
-        resultLabel.ForeColor = result.Success ? Color.DarkGreen : Color.DarkRed;
+        ShowNotification(result.Message, result.Success ? Color.DarkGreen : Color.DarkRed);
 
         if (result.Success)
         {
@@ -1251,8 +1247,7 @@ public sealed class MainForm : Form
             actions.InspectTechUnlockMode(binding.Id);
         if (before.Mode is null)
         {
-            resultLabel.Text = before.Message;
-            resultLabel.ForeColor = Color.DarkRed;
+            ShowNotification(before.Message, Color.DarkRed);
             RefreshPatchStates();
             return;
         }
@@ -1265,9 +1260,8 @@ public sealed class MainForm : Form
             binding.DisplayName,
             target);
 
-        resultLabel.Text = result.Message;
-        resultLabel.ForeColor =
-            result.Success ? Color.DarkGreen : Color.DarkRed;
+        ShowNotification(result.Message,
+            result.Success ? Color.DarkGreen : Color.DarkRed);
         if (result.Success)
         {
             GameSessionSnapshot snapshot = sessionProbe.Probe();
@@ -1304,9 +1298,8 @@ public sealed class MainForm : Form
             KnownPatchIds.SafeTechUnlock,
             UiStrings.Get("FeatureTechUnlock"),
             SelectedTechUnlockMode);
-        resultLabel.Text = result.Message;
-        resultLabel.ForeColor =
-            result.Success ? Color.DarkGreen : Color.DarkRed;
+        ShowNotification(result.Message,
+            result.Success ? Color.DarkGreen : Color.DarkRed);
         RefreshPatchStates();
     }
 
@@ -1499,12 +1492,11 @@ public sealed class MainForm : Form
         if (request is null)
         {
             ActionResult stopped = StopAutoEdit();
-            resultLabel.Text = stopped.Success
+            ShowNotification(stopped.Success
                 ? UiStrings.Get("AutoEditNoAttributesDisabled")
-                : stopped.Message;
-            resultLabel.ForeColor = stopped.Success
+                : stopped.Message, stopped.Success
                 ? Color.DarkOrange
-                : Color.DarkRed;
+                : Color.DarkRed);
             return;
         }
 
@@ -1512,12 +1504,11 @@ public sealed class MainForm : Form
         {
             ActionResult updated =
                 actions.SetSelectionEditEventPolicy(request);
-            resultLabel.Text = updated.Success
+            ShowNotification(updated.Success
                 ? UiStrings.Get("AutoEditEventUpdated")
-                : updated.Message;
-            resultLabel.ForeColor = updated.Success
+                : updated.Message, updated.Success
                 ? Color.DarkGreen
-                : Color.DarkRed;
+                : Color.DarkRed);
             if (!updated.Success)
             {
                 return;
@@ -1597,24 +1588,72 @@ public sealed class MainForm : Form
     {
         DelayedBuildPolicySnapshot before =
             buildPolicies.Reconcile();
+        ApplyDelayedBuildStates(before);
         bool desired = feature == DelayedBuildFeature.UnitUnlimited
             ? !before.UnitUnlimited.Desired
             : !before.QueueLimit1000.Desired;
         DelayedBuildPolicySnapshot after =
             buildPolicies.SetDesired(feature, desired);
-        DelayedFeatureStatus status =
-            feature == DelayedBuildFeature.UnitUnlimited
-                ? after.UnitUnlimited
-                : after.QueueLimit1000;
-
-        resultLabel.Text = status.Message;
-        resultLabel.ForeColor = status.State == FeatureState.Failed
-            ? Color.DarkRed
-            : status.State == FeatureState.Pending
-                ? Color.DarkOrange
-                : Color.DarkGreen;
         ApplyDelayedBuildStates(after);
     }
+
+    private void ShowNotification(string message, Color color)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+        StatusNotification notification = new(message, color);
+        StatusNotification? last = notifications.Count > 0
+            ? notifications.Last()
+            : visibleNotification;
+        if (notification == last)
+        {
+            return;
+        }
+        notifications.Enqueue(notification);
+        AdvanceNotificationQueue();
+    }
+
+    private void AdvanceNotificationQueue()
+    {
+        DateTime now = DateTime.UtcNow;
+        if (visibleNotification is not null && now < notificationExpiresAt)
+        {
+            return;
+        }
+        if (notifications.Count == 0)
+        {
+            return;
+        }
+        visibleNotification = notifications.Dequeue();
+        notificationExpiresAt = now.AddSeconds(0.5);
+        SetTextIfChanged(resultLabel, visibleNotification.Message);
+        SetForeColorIfChanged(resultLabel, visibleNotification.Color);
+        hotkeyTips.SetToolTip(resultLabel, visibleNotification.Message);
+    }
+
+    private void NotifyDelayedBuildTransition(
+        string label, DelayedFeatureStatus? previous, DelayedFeatureStatus current)
+    {
+        if (current.State == FeatureState.Active && previous?.State != FeatureState.Active)
+        {
+            ShowNotification(UiStrings.Format("FeatureActivatedNotification", label),
+                Color.DarkGreen);
+        }
+        else if (current.State == FeatureState.Failed &&
+            (previous?.State != FeatureState.Failed || previous.Message != current.Message))
+        {
+            ShowNotification(label + ": " + current.Message, Color.DarkRed);
+        }
+        else if (current.State == FeatureState.Off && previous?.Desired == true)
+        {
+            ShowNotification(UiStrings.Format("FeatureDeactivatedNotification", label),
+                SystemColors.ControlText);
+        }
+    }
+
+    private sealed record StatusNotification(string Message, Color Color);
 
     private void RefreshDelayedBuildStates(
         GameSessionSnapshot? session = null)
@@ -1628,6 +1667,12 @@ public sealed class MainForm : Form
     private void ApplyDelayedBuildStates(
         DelayedBuildPolicySnapshot snapshot)
     {
+        DelayedBuildPolicySnapshot? previous = delayedBuildSnapshot;
+        delayedBuildSnapshot = snapshot;
+        NotifyDelayedBuildTransition(UiStrings.Get("UnitUnlimitedLabel"),
+            previous?.UnitUnlimited, snapshot.UnitUnlimited);
+        NotifyDelayedBuildTransition(UiStrings.Get("QueueLimitLabel"),
+            previous?.QueueLimit1000, snapshot.QueueLimit1000);
         ApplyDelayedBuildState(
             unitUnlimitedControl,
             UiStrings.Get("UnitUnlimitedLabel"),
@@ -1768,23 +1813,29 @@ public sealed class MainForm : Form
         }
     }
 
-    private void CancelCloseForRestoreFailure(
+    private bool CancelCloseForRestoreFailure(
         FormClosingEventArgs e,
         string message)
     {
         languageRefreshRequested = false;
-        resultLabel.Text = UiStrings.Format(
+        ShowNotification(UiStrings.Format(
             "RestoreBeforeExitFailed",
-            message);
-        resultLabel.ForeColor = Color.DarkRed;
-        MessageBox.Show(
+            message), Color.DarkRed);
+        DialogResult choice = MessageBox.Show(
             this,
-            resultLabel.Text,
+            UiStrings.Format("RestoreBeforeExitFailed", message) +
+                Environment.NewLine + Environment.NewLine +
+                UiStrings.Get("ExitWithoutRestorePrompt"),
             UiStrings.Get("AppTitle"),
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Error);
-        e.Cancel = true;
-        refreshTimer.Start();
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Warning,
+            MessageBoxDefaultButton.Button2);
+        e.Cancel = choice != DialogResult.Yes;
+        if (e.Cancel)
+        {
+            refreshTimer.Start();
+        }
+        return e.Cancel;
     }
 
     private sealed record PatchBinding(

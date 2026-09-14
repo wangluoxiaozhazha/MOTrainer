@@ -121,4 +121,7 @@
   <data name="TechnologySection" xml:space="preserve"><value>科技</value></data>
   <data name="UnitUnlimitedLabel" xml:space="preserve"><value>解锁建造数量</value></data>
   <data name="UnitUnlimitedOff" xml:space="preserve"><value>解锁建造数量 [Off]</value></data>
+  <data name="ExitWithoutRestorePrompt" xml:space="preserve"><value>仍然退出吗？部分修改可能保留到游戏退出。是：退出修改器；否：保留窗口，稍后重试。</value></data>
+  <data name="FeatureActivatedNotification" xml:space="preserve"><value>{0}已激活</value></data>
+  <data name="FeatureDeactivatedNotification" xml:space="preserve"><value>{0}已关闭</value></data>
 </root>

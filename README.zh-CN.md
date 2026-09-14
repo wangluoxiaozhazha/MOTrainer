@@ -12,7 +12,7 @@ MOTrainer 是一个面向《Mental Omega》的非官方开源离线修改器。�
 ## 项目状态
 
 最新候选版本
-[`v0.1.0-rc2`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc2)
+[`v0.1.0-rc3`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc3)
 已在同一个程序中支持自动、英文和简体中文界面，并支持下文记录的经典版与 Steam
 版 YR 1.001 已验证游戏配置。
 

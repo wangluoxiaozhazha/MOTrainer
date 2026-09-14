@@ -1773,11 +1773,34 @@ internal static class Program
             pending.QueueLimit1000.State == FeatureState.Pending,
             "Queue policy should remain pending before the root exists.");
 
+        int nextFrame = 3;
+        int NextQueueFrame() => ++nextFrame;
         const uint queueRoot = 0x084ABCB0;
         uint queueAddress = queueRoot + profile.BuildQueueLimitOffset;
         memory.SetUInt32(profile.BuildQueueRootAddress, queueRoot);
         memory.SetUInt32(queueAddress, 29);
-        DelayedBuildPolicySnapshot active = policies.Reconcile();
+        Assert(policies.Reconcile().QueueLimit1000.State == FeatureState.Pending,
+            "Readable constructor defaults during loading must not be captured.");
+        byte[] loadingValue = new byte[4];
+        Assert(memory.TryReadBytes(queueAddress, loadingValue) &&
+            BitConverter.ToUInt32(loadingValue, 0) == 29,
+            "Loading must not write the queue field.");
+        session = session with { State = SessionState.MatchReady };
+        memory.SetUInt32(queueAddress, 49);
+        memory.SetInt32(profile.CurrentFrameAddress, 0);
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Pending,
+            "A readable zero frame is not a running simulation.");
+        memory.SetInt32(profile.CurrentFrameAddress, 1);
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Pending,
+            "First running observation must remain pending.");
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Pending,
+            "A paused frame must remain pending.");
+        memory.SetUInt32(queueAddress, 29);
+        memory.SetInt32(profile.CurrentFrameAddress, 2);
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Pending,
+            "A changed initialization value requires a fresh observation.");
+        memory.SetInt32(profile.CurrentFrameAddress, 3);
+        DelayedBuildPolicySnapshot active = policies.Reconcile(session);
         Assert(
             active.QueueLimit1000.State == FeatureState.Active,
             active.QueueLimit1000.Message);
@@ -1795,6 +1818,52 @@ internal static class Program
             memory.TryReadBytes(queueAddress, current) &&
             BitConverter.ToUInt32(current, 0) == 29,
             "Queue policy must restore the captured original value.");
+
+        policies.SetDesired(DelayedBuildFeature.QueueLimit1000, true);
+        policies.Reconcile(session);
+        memory.SetInt32(profile.CurrentFrameAddress, NextQueueFrame());
+        policies.Reconcile(session);
+        memory.SetUInt32(queueAddress, 49);
+        Assert(policies.RestoreOwned().QueueLimit1000.State == FeatureState.Off,
+            "A replacement value must not trap restoration.");
+        Assert(memory.TryReadBytes(queueAddress, current) &&
+            BitConverter.ToUInt32(current, 0) == 49,
+            "Restoration must preserve the game's replacement value.");
+        policies.SetDesired(DelayedBuildFeature.QueueLimit1000, true);
+        policies.Reconcile(session);
+        memory.SetInt32(profile.CurrentFrameAddress, NextQueueFrame());
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Active,
+            "The user must be able to enable the policy again after a reset.");
+        memory.FailNextDataWriteAddress = queueAddress;
+        Assert(policies.RestoreOwned().QueueLimit1000.State == FeatureState.Failed,
+            "An actual failed restore must retain ownership for retry.");
+        Assert(policies.RestoreOwned().QueueLimit1000.State == FeatureState.Off,
+            "A failed restore must be retryable.");
+        Assert(memory.TryReadBytes(queueAddress, current) &&
+            BitConverter.ToUInt32(current, 0) == 49,
+            "Retry must restore the newly captured original value.");
+
+        policies.SetDesired(DelayedBuildFeature.QueueLimit1000, true);
+        policies.Reconcile(session);
+        memory.SetInt32(profile.CurrentFrameAddress, NextQueueFrame());
+        policies.Reconcile(session);
+        uint newRoot = queueRoot + 0x1000;
+        uint newAddress = newRoot + profile.BuildQueueLimitOffset;
+        memory.SetUInt32(profile.BuildQueueRootAddress, newRoot);
+        memory.SetUInt32(newAddress, 59);
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Pending,
+            "A replacement object must also wait for initialization.");
+        memory.SetInt32(profile.CurrentFrameAddress, NextQueueFrame());
+        Assert(policies.Reconcile(session).QueueLimit1000.State == FeatureState.Active,
+            "A new rules object must not be blocked by the old restore point.");
+        Assert(memory.TryReadBytes(queueAddress, current) &&
+            BitConverter.ToUInt32(current, 0) == 999,
+            "The retired object must not be written during migration.");
+        Assert(policies.RestoreOwned().QueueLimit1000.State == FeatureState.Off,
+            "The replacement object's policy must restore successfully.");
+        Assert(memory.TryReadBytes(newAddress, current) &&
+            BitConverter.ToUInt32(current, 0) == 59,
+            "Restore must use the replacement object's original value.");
     }
 
     private static void SuperweaponExecutorRoundTrips()

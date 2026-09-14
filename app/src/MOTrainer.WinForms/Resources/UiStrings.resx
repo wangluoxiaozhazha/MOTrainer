@@ -121,4 +121,7 @@
   <data name="TechnologySection" xml:space="preserve"><value>Technology</value></data>
   <data name="UnitUnlimitedLabel" xml:space="preserve"><value>Remove build limit</value></data>
   <data name="UnitUnlimitedOff" xml:space="preserve"><value>Remove build limit [Off]</value></data>
+  <data name="ExitWithoutRestorePrompt" xml:space="preserve"><value>Exit anyway? Some changes may remain active until the game exits. Yes: exit the trainer; No: stay open and retry later.</value></data>
+  <data name="FeatureActivatedNotification" xml:space="preserve"><value>{0} activated</value></data>
+  <data name="FeatureDeactivatedNotification" xml:space="preserve"><value>{0} disabled</value></data>
 </root>
