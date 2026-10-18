@@ -878,7 +878,21 @@ public sealed class GameActionService
         string displayName,
         TechUnlockMode mode)
     {
+        return SetTechUnlockMode(
+            patchId,
+            displayName,
+            mode,
+            sessionProbe.Probe());
+    }
+
+    public ActionResult SetTechUnlockMode(
+        string patchId,
+        string displayName,
+        TechUnlockMode mode,
+        GameSessionSnapshot session)
+    {
         if (!TryGetSession(
+                session,
                 requireMatch: false,
                 out int processId,
                 out VersionProfile profile,
@@ -929,7 +943,21 @@ public sealed class GameActionService
         string displayName,
         bool enabled)
     {
+        return SetPatchEnabled(
+            patchId,
+            displayName,
+            enabled,
+            sessionProbe.Probe());
+    }
+
+    public ActionResult SetPatchEnabled(
+        string patchId,
+        string displayName,
+        bool enabled,
+        GameSessionSnapshot session)
+    {
         if (!TryGetSession(
+                session,
                 requireMatch: false,
                 out int processId,
                 out VersionProfile profile,

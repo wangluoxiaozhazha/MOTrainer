@@ -207,4 +207,14 @@
   <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>A tech-unlock entry jumps to unknown remote code; operation refused</value></data>
   <data name="TechUnlockWriteFailed" xml:space="preserve"><value>Failed to write the tech-unlock hooks; attempted to restore original bytes</value></data>
   <data name="QueuePolicyReleased" xml:space="preserve"><value>Queue policy disabled: restored our value if still present; preserved any replacement value or object.</value></data>
+  <data name="AutoMoneyOff" xml:space="preserve"><value>Automatic credits are off</value></data>
+  <data name="AutoMoneyWaitingForMatch" xml:space="preserve"><value>Automatic credits armed; waiting to enter a match</value></data>
+  <data name="AutoMoneyActive" xml:space="preserve"><value>Credits {0} already applied in this match</value></data>
+  <data name="AutoMoneyApplied" xml:space="preserve"><value>Credits set to {0} automatically</value></data>
+  <data name="AutoSelectionOff" xml:space="preserve"><value>Automatic selected-unit editing is off</value></data>
+  <data name="AutoSelectionWaitingForModules" xml:space="preserve"><value>Automatic selected-unit editing armed; waiting for game modules</value></data>
+  <data name="AutoSelectionArmed" xml:space="preserve"><value>Automatic selected-unit editing is armed</value></data>
+  <data name="PatchPolicyOff" xml:space="preserve"><value>Feature is off</value></data>
+  <data name="PatchPolicyWaitingForGame" xml:space="preserve"><value>Feature queued; it will be applied when the verified game starts</value></data>
+  <data name="TechUnlockDisplayName" xml:space="preserve"><value>Unlock all technology</value></data>
 </root>

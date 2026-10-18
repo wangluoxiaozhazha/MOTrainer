@@ -7,6 +7,12 @@
     <RootNamespace>MOTrainer.WinForms</RootNamespace>
     <AssemblyName>MOTrainer</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <!-- Request administrator rights so the trainer matches the game's
+         integrity level; otherwise opening gamemd.exe fails with access
+         denied. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48"
                       Version="1.0.3"

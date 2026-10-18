@@ -23,6 +23,7 @@ public sealed class MainForm : Form
     private readonly CheckBox autoEditControl;
     private readonly NumericUpDown moneyInput;
     private readonly Button moneyButton;
+    private readonly CheckBox moneyAutoControl;
     private readonly Button hotkeySettingsButton;
     private readonly ComboBox languageInput;
     private readonly Button addHealthButton;
@@ -37,6 +38,8 @@ public sealed class MainForm : Form
     private readonly CheckBox unitUnlimitedControl;
     private readonly CheckBox queueLimitControl;
     private readonly DelayedBuildPolicyService buildPolicies;
+    private readonly AutoApplyPolicyService autoApply;
+    private readonly PatchPolicyService patchPolicies;
     private readonly Label resultLabel;
     private DelayedBuildPolicySnapshot? delayedBuildSnapshot;
     private readonly Queue<StatusNotification> notifications = new();
@@ -53,6 +56,8 @@ public sealed class MainForm : Form
     private readonly ManualResetEventSlim autoEditIdle = new(true);
     private readonly Dictionary<string, PatchBinding> patchBindings = [];
     private readonly Dictionary<string, int> ownedPatchProcesses = [];
+    private IReadOnlyDictionary<string, PatchPolicyStatus> patchPolicyStatuses =
+        new Dictionary<string, PatchPolicyStatus>();
     private readonly Dictionary<uint, CheckBox> superweaponControls = [];
     private readonly Dictionary<Control, HotkeyDisplayBinding>
         hotkeyDisplayBindings = [];
@@ -72,6 +77,8 @@ public sealed class MainForm : Form
         this.sessionProbe = sessionProbe;
         actions = new GameActionService(sessionProbe);
         buildPolicies = new DelayedBuildPolicyService(sessionProbe);
+        autoApply = new AutoApplyPolicyService(sessionProbe);
+        patchPolicies = new PatchPolicyService(sessionProbe);
         settingsStore = new TrainerSettingsStore();
         TrainerSettingsLoadResult settingsLoad = settingsStore.Load();
         initialSettings = settingsLoad.Settings;
@@ -207,9 +214,9 @@ public sealed class MainForm : Form
         editHealthControl.CheckedChanged += (_, _) =>
             RefreshUnitEditorInputsAndAutoEdit();
         editVeterancyInput.SelectedIndexChanged += (_, _) =>
-            RefreshAutoEditRequest();
+            RefreshAutoApplyRequest();
         editHealthInput.ValueChanged += (_, _) =>
-            RefreshAutoEditRequest();
+            RefreshAutoApplyRequest();
 
         transferButton = new Button
         {
@@ -445,7 +452,7 @@ public sealed class MainForm : Form
 
         oneTimeGroup = new GroupBox
         {
-            Enabled = false,
+            Enabled = true,
             Location = new Point(526, 196),
             Size = new Size(498, 326),
             Text = UiStrings.Get("OneTimeGroup"),
@@ -476,6 +483,25 @@ public sealed class MainForm : Form
         };
         moneyButton.Click += (_, _) => RunAction(() =>
             actions.SetMoney(decimal.ToUInt32(moneyInput.Value)));
+        moneyAutoControl = new CheckBox
+        {
+            AutoSize = true,
+            Checked = initialSettings.AutoApplyMoney,
+            Location = new Point(392, 51),
+            Text = UiStrings.Get("ActionAutoMoney"),
+        };
+        moneyAutoControl.Click += (_, _) =>
+            ApplyAutoMoney();
+        moneyInput.ValueChanged += (_, _) =>
+        {
+            if (moneyAutoControl.Checked)
+            {
+                ApplyAutoMoney();
+            }
+        };
+        hotkeyTips.SetToolTip(
+            moneyAutoControl,
+            UiStrings.Get("AutoMoneyTooltip"));
         zeroEconomyButton = new Button
         {
             Location = new Point(18, 82),
@@ -500,6 +526,7 @@ public sealed class MainForm : Form
             HotkeyActionIds.DefeatOwner);
         oneTimeGroup.Controls.Add(moneyInput);
         oneTimeGroup.Controls.Add(moneyButton);
+        oneTimeGroup.Controls.Add(moneyAutoControl);
         oneTimeGroup.Controls.Add(zeroEconomyButton);
         oneTimeGroup.Controls.Add(defeatOwnerButton);
         oneTimeGroup.Controls.Add(
@@ -614,6 +641,11 @@ public sealed class MainForm : Form
             Timeout.Infinite,
             Timeout.Infinite);
 
+        // Seed the persistent policy from the saved settings so a remembered
+        // automatic-credits choice keeps working without touching the control.
+        autoApply.SetMoney(
+            initialSettings.AutoApplyMoney,
+            decimal.ToUInt32(moneyInput.Value));
         RefreshSession();
     }
 
@@ -847,7 +879,7 @@ public sealed class MainForm : Form
         if (disposing)
         {
             refreshTimer.Dispose();
-            StopAutoEdit();
+            DisarmAutoEdit();
             autoEditTimer.Dispose();
             autoEditIdle.Dispose();
             hotkeyTips.Dispose();
@@ -861,10 +893,26 @@ public sealed class MainForm : Form
     {
         refreshTimer.Stop();
         List<string> restoreFailures = [];
-        ActionResult autoEditRestore = StopAutoEdit();
+        ActionResult autoEditRestore = DisarmAutoEdit();
         if (!autoEditRestore.Success)
         {
             restoreFailures.Add(autoEditRestore.Message);
+        }
+
+        GameSessionSnapshot closingSession = sessionProbe.Probe();
+        AutoApplySnapshot autoApplyRestore =
+            autoApply.RestoreOwned(closingSession);
+        patchPolicies.RestoreOwned(closingSession);
+        foreach (AutoApplyStatus status in new[]
+        {
+            autoApplyRestore.Money,
+            autoApplyRestore.SelectionEdit,
+        })
+        {
+            if (status.State == FeatureState.Failed)
+            {
+                restoreFailures.Add(status.Message);
+            }
         }
 
         DelayedBuildPolicySnapshot delayedRestore =
@@ -946,6 +994,7 @@ public sealed class MainForm : Form
             decimal.ToInt32(editHealthInput.Value),
             SelectedAutoEditMode,
             decimal.ToUInt32(moneyInput.Value),
+            moneyAutoControl.Checked,
             techUnlockMode,
             SuperweaponChoices.All
                 .Where(choice => superweaponControls[choice.Id].Checked)
@@ -1148,11 +1197,6 @@ public sealed class MainForm : Form
         patchControlsAvailable =
             snapshot.State is SessionState.ModulesReady or SessionState.MatchReady;
         SetActionControlsEnabled(matchControlsAvailable);
-        if (!matchControlsAvailable && autoEditEnabled)
-        {
-            ActionResult stopped = StopAutoEdit();
-            ShowNotification(stopped.Message, stopped.Success ? Color.DarkOrange : Color.DarkRed);
-        }
 
         if (snapshot.ProcessId is not int currentProcessId)
         {
@@ -1174,6 +1218,9 @@ public sealed class MainForm : Form
 
         RefreshPatchStates(snapshot);
         RefreshDelayedBuildStates(snapshot);
+        // Keep the configured money and selected-unit policy applied for the
+        // whole session; nothing is torn down until the trainer closes.
+        RefreshAutoApplyStates(autoApply.Reconcile(snapshot));
         AdvanceNotificationQueue();
     }
 
@@ -1200,83 +1247,36 @@ public sealed class MainForm : Form
 
     private void TogglePatch(PatchBinding binding)
     {
-        if (synchronizingPatchState)
-        {
-            return;
-        }
-
-        if (binding.Id == KnownPatchIds.SafeTechUnlock)
-        {
-            ToggleTechUnlock(binding);
-            return;
-        }
-
-        PatchInspection before = actions.InspectPatch(binding.Id);
-        if (before.State is not (PatchRuntimeState.Original or PatchRuntimeState.Enabled))
-        {
-            ShowNotification(before.Message, Color.DarkRed);
-            RefreshPatchStates();
-            return;
-        }
-
-        bool enable = before.State == PatchRuntimeState.Original;
-        ActionResult result =
-            actions.SetPatchEnabled(binding.Id, binding.DisplayName, enable);
-
-        ShowNotification(result.Message, result.Success ? Color.DarkGreen : Color.DarkRed);
-
-        if (result.Success)
-        {
-            GameSessionSnapshot snapshot = sessionProbe.Probe();
-            if (enable && snapshot.ProcessId is int processId)
+        bool desired = !patchPolicies.IsDesired(binding.Id);
+        patchPolicies.SetDesired(
+            binding.Id,
+            desired,
+            binding.Id == KnownPatchIds.SafeTechUnlock
+                ? SelectedTechUnlockMode
+                : null);
+        IReadOnlyDictionary<string, PatchPolicyStatus> statuses =
+            patchPolicies.Reconcile();
+        PatchPolicyStatus status =
+            statuses.TryGetValue(binding.Id, out PatchPolicyStatus? current)
+                ? current
+                : new PatchPolicyStatus(
+                    desired,
+                    FeatureState.Pending,
+                    UiStrings.Get("PatchPolicyWaitingForGame"));
+        ShowNotification(
+            status.Message,
+            status.State switch
             {
-                ownedPatchProcesses[binding.Id] = processId;
-            }
-            else if (!enable)
-            {
-                ownedPatchProcesses.Remove(binding.Id);
-            }
-        }
-
+                FeatureState.Active => Color.DarkGreen,
+                FeatureState.Failed => Color.DarkRed,
+                _ => Color.DarkOrange,
+            });
         RefreshPatchStates();
     }
 
     private void ToggleTechUnlock(PatchBinding binding)
     {
-        TechUnlockModeInspection before =
-            actions.InspectTechUnlockMode(binding.Id);
-        if (before.Mode is null)
-        {
-            ShowNotification(before.Message, Color.DarkRed);
-            RefreshPatchStates();
-            return;
-        }
-
-        TechUnlockMode target = before.Mode == TechUnlockMode.Off
-            ? SelectedTechUnlockMode
-            : TechUnlockMode.Off;
-        ActionResult result = actions.SetTechUnlockMode(
-            binding.Id,
-            binding.DisplayName,
-            target);
-
-        ShowNotification(result.Message,
-            result.Success ? Color.DarkGreen : Color.DarkRed);
-        if (result.Success)
-        {
-            GameSessionSnapshot snapshot = sessionProbe.Probe();
-            if (target != TechUnlockMode.Off &&
-                snapshot.ProcessId is int processId)
-            {
-                ownedPatchProcesses[binding.Id] = processId;
-            }
-            else
-            {
-                ownedPatchProcesses.Remove(binding.Id);
-            }
-        }
-
-        RefreshPatchStates();
+        TogglePatch(binding);
     }
 
     private void ChangeTechUnlockModeIfEnabled()
@@ -1286,20 +1286,10 @@ public sealed class MainForm : Form
             return;
         }
 
-        TechUnlockModeInspection before =
-            actions.InspectTechUnlockMode(KnownPatchIds.SafeTechUnlock);
-        if (before.Mode is not (TechUnlockMode.Faction or TechUnlockMode.Extended) ||
-            before.Mode == SelectedTechUnlockMode)
-        {
-            return;
-        }
-
-        ActionResult result = actions.SetTechUnlockMode(
+        patchPolicies.SetDesired(
             KnownPatchIds.SafeTechUnlock,
-            UiStrings.Get("FeatureTechUnlock"),
+            true,
             SelectedTechUnlockMode);
-        ShowNotification(result.Message,
-            result.Success ? Color.DarkGreen : Color.DarkRed);
         RefreshPatchStates();
     }
 
@@ -1332,19 +1322,14 @@ public sealed class MainForm : Form
     {
         if (autoEditEnabled)
         {
-            return StopAutoEdit();
+            return DisarmAutoEdit();
         }
 
-        return StartAutoEdit(SelectedAutoEditMode);
+        return ArmAutoEdit();
     }
 
-    private ActionResult StartAutoEdit(AutoEditMode mode)
+    private ActionResult ArmAutoEdit()
     {
-        if (!matchControlsAvailable)
-        {
-            return ActionResult.Fail(UiStrings.Get("AutoEditNotInMatch"));
-        }
-
         SelectedUnitEditRequest? request =
             BuildSelectedUnitEditRequest();
         if (request is null)
@@ -1352,61 +1337,32 @@ public sealed class MainForm : Form
             return ActionResult.Fail(UiStrings.Get("SelectUnitAttribute"));
         }
 
-        if (mode == AutoEditMode.Event)
+        AutoEditMode mode = SelectedAutoEditMode;
+        lock (autoEditGate)
         {
-            ActionResult enable =
-                actions.SetSelectionEditEventPolicy(request);
-            if (!enable.Success)
+            autoEditRequest = request;
+            activeAutoEditMode = mode;
+            autoEditEnabled = true;
+            if (mode == AutoEditMode.Polling)
             {
-                return enable;
-            }
-
-            GameSessionSnapshot snapshot = sessionProbe.Probe();
-            if (snapshot.ProcessId is int processId)
-            {
-                ownedPatchProcesses[
-                    KnownPatchIds.AutoPromoteSelection] = processId;
-            }
-        }
-        else
-        {
-            PatchInspection eventInspection =
-                actions.InspectPatch(
-                    KnownPatchIds.AutoPromoteSelection);
-            if (eventInspection.State == PatchRuntimeState.Enabled)
-            {
-                ActionResult disable =
-                    actions.SetSelectionEditEventPolicy(null);
-                if (!disable.Success)
-                {
-                    return disable;
-                }
-
-                ownedPatchProcesses.Remove(
-                    KnownPatchIds.AutoPromoteSelection);
-            }
-
-            lock (autoEditGate)
-            {
-                autoEditRequest = request;
                 autoEditTimer.Change(0, 100);
             }
         }
-
-        autoEditRequest = request;
-        activeAutoEditMode = mode;
-        autoEditEnabled = true;
         autoEditControl.Checked = true;
+
+        AutoApplySnapshot snapshot = mode == AutoEditMode.Event
+            ? autoApply.SetSelectionEdit(request)
+            : autoApply.SetSelectionEdit(null);
+        RefreshAutoApplyStates(snapshot);
         return new ActionResult(
-            true,
+            snapshot.SelectionEdit.State != FeatureState.Failed,
             mode == AutoEditMode.Event
-                ? UiStrings.Get("AutoEditEventEnabled")
-                : UiStrings.Get("AutoEditPollingEnabled"));
+                ? snapshot.SelectionEdit.Message
+                : UiStrings.Get("AutoEditArmed"));
     }
 
-    private ActionResult StopAutoEdit()
+    private ActionResult DisarmAutoEdit()
     {
-        AutoEditMode? mode = activeAutoEditMode;
         lock (autoEditGate)
         {
             autoEditTimer.Change(
@@ -1415,27 +1371,6 @@ public sealed class MainForm : Form
         }
 
         autoEditIdle.Wait();
-        if (mode == AutoEditMode.Event)
-        {
-            ActionResult disable =
-                actions.SetSelectionEditEventPolicy(null);
-            if (!disable.Success)
-            {
-                GameSessionSnapshot snapshot =
-                    sessionProbe.Probe();
-                if (snapshot.ProcessId is int processId &&
-                    ownedPatchProcesses.TryGetValue(
-                        KnownPatchIds.AutoPromoteSelection,
-                        out int ownedProcessId) &&
-                    processId == ownedProcessId)
-                {
-                    return disable;
-                }
-            }
-
-            ownedPatchProcesses.Remove(
-                KnownPatchIds.AutoPromoteSelection);
-        }
 
         lock (autoEditGate)
         {
@@ -1445,7 +1380,11 @@ public sealed class MainForm : Form
         }
 
         autoEditControl.Checked = false;
-        return new ActionResult(true, UiStrings.Get("AutoEditDisabled"));
+        AutoApplySnapshot snapshot = autoApply.SetSelectionEdit(null);
+        RefreshAutoApplyStates(snapshot);
+        return new ActionResult(
+            snapshot.SelectionEdit.State != FeatureState.Failed,
+            UiStrings.Get("AutoEditDisabled"));
     }
 
     private void RunAutoEditTick()
@@ -1480,7 +1419,7 @@ public sealed class MainForm : Form
         }
     }
 
-    private void RefreshAutoEditRequest()
+    private void RefreshAutoApplyRequest()
     {
         if (!autoEditEnabled)
         {
@@ -1491,28 +1430,13 @@ public sealed class MainForm : Form
             BuildSelectedUnitEditRequest();
         if (request is null)
         {
-            ActionResult stopped = StopAutoEdit();
-            ShowNotification(stopped.Success
+            ActionResult disarmed = DisarmAutoEdit();
+            ShowNotification(disarmed.Success
                 ? UiStrings.Get("AutoEditNoAttributesDisabled")
-                : stopped.Message, stopped.Success
+                : disarmed.Message, disarmed.Success
                 ? Color.DarkOrange
                 : Color.DarkRed);
             return;
-        }
-
-        if (activeAutoEditMode == AutoEditMode.Event)
-        {
-            ActionResult updated =
-                actions.SetSelectionEditEventPolicy(request);
-            ShowNotification(updated.Success
-                ? UiStrings.Get("AutoEditEventUpdated")
-                : updated.Message, updated.Success
-                ? Color.DarkGreen
-                : Color.DarkRed);
-            if (!updated.Success)
-            {
-                return;
-            }
         }
 
         lock (autoEditGate)
@@ -1521,6 +1445,18 @@ public sealed class MainForm : Form
             {
                 autoEditRequest = request;
             }
+        }
+
+        if (activeAutoEditMode != AutoEditMode.Event)
+        {
+            return;
+        }
+
+        AutoApplySnapshot snapshot = autoApply.SetSelectionEdit(request);
+        RefreshAutoApplyStates(snapshot);
+        if (snapshot.SelectionEdit.State == FeatureState.Failed)
+        {
+            ShowNotification(snapshot.SelectionEdit.Message, Color.DarkRed);
         }
     }
 
@@ -1534,11 +1470,26 @@ public sealed class MainForm : Form
 
         RunAction(() =>
         {
-            ActionResult stopped = StopAutoEdit();
-            return stopped.Success
-                ? StartAutoEdit(SelectedAutoEditMode)
-                : stopped;
+            ActionResult disarmed = DisarmAutoEdit();
+            return disarmed.Success
+                ? ArmAutoEdit()
+                : disarmed;
         });
+    }
+
+    private void ApplyAutoMoney()
+    {
+        AutoApplySnapshot snapshot = autoApply.SetMoney(
+            moneyAutoControl.Checked,
+            decimal.ToUInt32(moneyInput.Value));
+        RefreshAutoApplyStates(snapshot);
+        ShowNotification(
+            snapshot.Money.Message,
+            snapshot.Money.State == FeatureState.Failed
+                ? Color.DarkRed
+                : snapshot.Money.State == FeatureState.Active
+                    ? Color.DarkGreen
+                    : Color.DarkOrange);
     }
 
     private AutoEditMode SelectedAutoEditMode =>
@@ -1550,19 +1501,39 @@ public sealed class MainForm : Form
         GameSessionSnapshot? session = null)
     {
         GameSessionSnapshot snapshot = session ?? sessionProbe.Probe();
+        patchPolicyStatuses = patchPolicies.Reconcile(snapshot);
         synchronizingPatchState = true;
         try
         {
             foreach (PatchBinding binding in patchBindings.Values)
             {
-                if (binding.Id == KnownPatchIds.SafeTechUnlock)
+                if (patchPolicyStatuses.TryGetValue(
+                        binding.Id,
+                        out PatchPolicyStatus? status))
                 {
-                    RefreshTechUnlockState(binding, snapshot);
+                    SetCheckStateIfChanged(
+                        binding.Control,
+                        status.Desired
+                            ? CheckState.Checked
+                            : CheckState.Unchecked);
+                    SetEnabledIfChanged(binding.Control, true);
+                    SetForeColorIfChanged(
+                        binding.Control,
+                        status.State switch
+                        {
+                            FeatureState.Pending => Color.DarkOrange,
+                            FeatureState.Active => Color.DarkGreen,
+                            FeatureState.Failed => Color.DarkRed,
+                            _ => SystemColors.ControlText,
+                        });
                     continue;
                 }
 
-                PatchInspection inspection =
-                    actions.InspectPatch(binding.Id, snapshot);
+                // A patch without a saved preference is inspectable only once
+                // the verified game modules are available.
+                PatchInspection inspection = actions.InspectPatch(
+                    binding.Id,
+                    snapshot);
                 SetCheckStateIfChanged(
                     binding.Control,
                     inspection.State switch
@@ -1571,10 +1542,7 @@ public sealed class MainForm : Form
                         PatchRuntimeState.Enabled => CheckState.Checked,
                         _ => CheckState.Indeterminate,
                     });
-                SetEnabledIfChanged(
-                    binding.Control,
-                    patchControlsAvailable &&
-                    inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled);
+                SetEnabledIfChanged(binding.Control, true);
             }
         }
         finally
@@ -1702,25 +1670,80 @@ public sealed class MainForm : Form
             });
     }
 
+    private void RefreshAutoApplyStates(AutoApplySnapshot snapshot)
+    {
+        ApplyAutoApplyState(
+            moneyAutoControl,
+            UiStrings.Get("ActionAutoMoney"),
+            snapshot.Money);
+    }
+
+    private static void ApplyAutoApplyState(
+        CheckBox control,
+        string label,
+        AutoApplyStatus status)
+    {
+        SetEnabledIfChanged(control, true);
+        SetCheckedIfChanged(control, status.Desired);
+        SetTextIfChanged(control, $"{label} [{status.State}]");
+        SetForeColorIfChanged(
+            control,
+            status.State switch
+            {
+                FeatureState.Pending => Color.DarkOrange,
+                FeatureState.Active => Color.DarkGreen,
+                FeatureState.Failed => Color.DarkRed,
+                _ => SystemColors.ControlText,
+            });
+    }
+
     private void RefreshTechUnlockState(
         PatchBinding binding,
         GameSessionSnapshot session)
     {
+        TechUnlockMode desiredMode = patchPolicies.DesiredTechUnlockMode;
+        bool desired = patchPolicies.IsDesired(binding.Id);
+        if (!desired)
+        {
+            SetCheckStateIfChanged(binding.Control, CheckState.Unchecked);
+            SetEnabledIfChanged(binding.Control, true);
+            SetEnabledIfChanged(techUnlockModeInput, true);
+            SetForeColorIfChanged(binding.Control, SystemColors.ControlText);
+            return;
+        }
+
+        if (!patchPolicyStatuses.TryGetValue(
+                binding.Id,
+                out PatchPolicyStatus? status))
+        {
+            return;
+        }
+
+        if (status.State is FeatureState.Pending or FeatureState.Failed)
+        {
+            SetCheckStateIfChanged(binding.Control, CheckState.Checked);
+            SetEnabledIfChanged(binding.Control, true);
+            SetEnabledIfChanged(techUnlockModeInput, status.State != FeatureState.Failed);
+            SetForeColorIfChanged(
+                binding.Control,
+                status.State == FeatureState.Failed
+                    ? Color.DarkRed
+                    : Color.DarkOrange);
+            return;
+        }
+
         TechUnlockModeInspection inspection =
             actions.InspectTechUnlockMode(binding.Id, session);
         SetCheckStateIfChanged(
             binding.Control,
-            inspection.State switch
-            {
-                PatchRuntimeState.Original => CheckState.Unchecked,
-                PatchRuntimeState.Enabled => CheckState.Checked,
-                _ => CheckState.Indeterminate,
-            });
-        SetEnabledIfChanged(
+            CheckState.Checked);
+        SetEnabledIfChanged(binding.Control, true);
+        SetEnabledIfChanged(techUnlockModeInput, true);
+        SetForeColorIfChanged(
             binding.Control,
-            patchControlsAvailable &&
-            inspection.State is PatchRuntimeState.Original or PatchRuntimeState.Enabled);
-        SetEnabledIfChanged(techUnlockModeInput, binding.Control.Enabled);
+            inspection.Mode == desiredMode
+                ? Color.DarkGreen
+                : Color.DarkOrange);
 
         if (inspection.Mode is TechUnlockMode.Faction or TechUnlockMode.Extended)
         {
@@ -1741,34 +1764,41 @@ public sealed class MainForm : Form
 
     private void SetActionControlsEnabled(bool enabled)
     {
-        SetEnabledIfChanged(oneTimeGroup, enabled);
-        SetEnabledIfChanged(autoEditModeInput, enabled);
-        SetEnabledIfChanged(editVeterancyControl, enabled);
-        SetEnabledIfChanged(editVeterancyInput, enabled);
-        SetEnabledIfChanged(editHealthControl, enabled);
-        SetEnabledIfChanged(editHealthInput, enabled);
+        // Configuration inputs stay editable before a match so the trainer can
+        // be set up first; only the one-shot action buttons wait for a match.
+        SetEnabledIfChanged(globalStateGroup, true);
+        SetEnabledIfChanged(techUnlockModeInput, true);
+        SetEnabledIfChanged(oneTimeGroup, true);
+        SetEnabledIfChanged(autoEditModeInput, true);
+        SetEnabledIfChanged(editVeterancyControl, true);
+        SetEnabledIfChanged(editVeterancyInput, true);
+        SetEnabledIfChanged(editHealthControl, true);
+        SetEnabledIfChanged(editHealthInput, true);
+        SetEnabledIfChanged(moneyInput, true);
+        SetEnabledIfChanged(moneyAutoControl, true);
         SetEnabledIfChanged(
             applyUnitEditButton,
             enabled &&
             (editVeterancyControl.Checked || editHealthControl.Checked));
-        SetEnabledIfChanged(autoEditControl, enabled);
+        SetEnabledIfChanged(autoEditControl, true);
         SetEnabledIfChanged(moneyButton, enabled);
         SetEnabledIfChanged(addHealthButton, enabled);
         SetEnabledIfChanged(oneHealthButton, enabled);
         SetEnabledIfChanged(transferButton, enabled);
         SetEnabledIfChanged(zeroEconomyButton, enabled);
         SetEnabledIfChanged(defeatOwnerButton, enabled);
+        SetEnabledIfChanged(grantSelectedSuperweaponsButton, enabled);
     }
 
     private void RefreshUnitEditorInputsAndAutoEdit()
     {
-        SetEnabledIfChanged(editVeterancyInput, matchControlsAvailable);
-        SetEnabledIfChanged(editHealthInput, matchControlsAvailable);
+        SetEnabledIfChanged(editVeterancyInput, true);
+        SetEnabledIfChanged(editHealthInput, true);
         SetEnabledIfChanged(
             applyUnitEditButton,
             matchControlsAvailable &&
             (editVeterancyControl.Checked || editHealthControl.Checked));
-        RefreshAutoEditRequest();
+        RefreshAutoApplyRequest();
     }
 
     private static void SetEnabledIfChanged(Control control, bool enabled)

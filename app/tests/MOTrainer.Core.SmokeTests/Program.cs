@@ -63,6 +63,9 @@ internal static class Program
             ("Player-only safe tech unlock hook installs, reattaches and restores", PlayerTechUnlockHookRoundTrips),
             ("Delayed unit unlimited policy applies and restores", DelayedUnitUnlimitedRoundTrips),
             ("Delayed queue policy waits, applies and restores", DelayedQueueLimitRoundTrips),
+            ("Automatic credits reapply once per match and release on exit", AutoMoneyPolicyRoundTrips),
+            ("Automatic selection edit arms before a match and survives map changes", AutoSelectionPolicyRoundTrips),
+            ("Patch policy queues before launch and applies after module verification", PatchPolicyQueuesBeforeLaunch),
             ("Superweapon executor parameterizes, serializes and frees", SuperweaponExecutorRoundTrips),
             ("Economy patch rejects unknown bytes", EconomyPatchRejectsUnknownBytes),
             ("Patch transaction rolls back earlier sites", PatchTransactionRollsBack),
@@ -1683,6 +1686,205 @@ internal static class Program
                 recheck) &&
             recheck[0] == 1,
             "Disable must request another tech-tree rebuild.");
+    }
+
+    private static void PatchPolicyQueuesBeforeLaunch()
+    {
+        VersionProfile profile = KnownProfiles.ObservedMentalOmega;
+        PatchDefinition patch =
+            profile.Patches[KnownPatchIds.EconomyNoDecrease];
+        using FakeMemoryAccessor memory = new();
+        FakeModuleResolver modules = new();
+        const uint gameBase = 0x00400000;
+        modules.Add("gamemd.exe", gameBase);
+        foreach (PatchSite site in patch.Sites)
+        {
+            memory.SetBytes(
+                gameBase + site.Rva,
+                site.OriginalBytes);
+        }
+
+        GameSessionSnapshot notRunning = GameSessionSnapshot.NotRunning;
+        PatchPolicyService policies = new(
+            new FakeSessionProbe(notRunning),
+            new FakeMemoryAccessorFactory(memory),
+            modules);
+        policies.SetDesired(
+            KnownPatchIds.EconomyNoDecrease,
+            true);
+        IReadOnlyDictionary<string, PatchPolicyStatus> pending =
+            policies.Reconcile(notRunning);
+        Assert(
+            pending[KnownPatchIds.EconomyNoDecrease].State ==
+                FeatureState.Pending,
+            "A patch toggled before launch must wait instead of being rejected.");
+
+        GameSessionSnapshot modulesReady = new(
+            SessionState.ModulesReady,
+            memory.ProcessId,
+            "modules ready",
+            profile);
+        IReadOnlyDictionary<string, PatchPolicyStatus> active =
+            policies.Reconcile(modulesReady);
+        Assert(
+            active[KnownPatchIds.EconomyNoDecrease].State ==
+                FeatureState.Active,
+            active[KnownPatchIds.EconomyNoDecrease].Message);
+        byte[] enabled = new byte[patch.Sites[0].EnabledBytes.Length];
+        Assert(
+            memory.TryReadBytes(
+                gameBase + patch.Sites[0].Rva,
+                enabled) &&
+            enabled.SequenceEqual(patch.Sites[0].EnabledBytes),
+            "The queued patch must be written after module verification.");
+
+        policies.RestoreOwned(modulesReady);
+        byte[] restored = new byte[patch.Sites[0].OriginalBytes.Length];
+        Assert(
+            memory.TryReadBytes(
+                gameBase + patch.Sites[0].Rva,
+                restored) &&
+            restored.SequenceEqual(patch.Sites[0].OriginalBytes),
+            "Closing the trainer must restore a queued patch.");
+    }
+
+    private static void AutoMoneyPolicyRoundTrips()
+    {
+        VersionProfile profile = KnownProfiles.ObservedMentalOmega;
+        using FakeMemoryAccessor memory = new();
+        FakeModuleResolver modules = new();
+        const uint firstPlayer = 0x00200000;
+        const uint secondPlayer = 0x00300000;
+        uint firstEconomy = firstPlayer + profile.EconomyOffset;
+        uint secondEconomy = secondPlayer + profile.EconomyOffset;
+        memory.SetUInt32(profile.Selection.CurrentPlayerAddress, firstPlayer);
+        memory.SetUInt32(firstEconomy, 5000);
+
+        GameSessionSnapshot session = new(
+            SessionState.MatchReady,
+            memory.ProcessId,
+            "match ready",
+            profile);
+        AutoApplyPolicyService autoApply = new(
+            new FakeSessionProbe(session),
+            new FakeMemoryAccessorFactory(memory),
+            modules);
+
+        AutoApplySnapshot applied = autoApply.SetMoney(true, 40000);
+        Assert(
+            applied.Money.State == FeatureState.Active,
+            applied.Money.Message);
+        Assert(
+            memory.TryRead(firstEconomy, out uint firstValue) &&
+            firstValue == 40000,
+            "Automatic credits must write the configured value.");
+
+        // Spending during the match must not be undone by the polling tick.
+        memory.SetUInt32(firstEconomy, 900);
+        AutoApplySnapshot held = autoApply.Reconcile(session);
+        Assert(
+            held.Money.State == FeatureState.Active &&
+            memory.TryRead(firstEconomy, out uint spent) &&
+            spent == 900,
+            "Later ticks in the same match must not reset spent credits.");
+
+        // A new match builds a fresh economy object, so the value is reapplied.
+        memory.SetUInt32(profile.Selection.CurrentPlayerAddress, secondPlayer);
+        memory.SetUInt32(secondEconomy, 2500);
+        AutoApplySnapshot reapplied = autoApply.Reconcile(session);
+        Assert(
+            reapplied.Money.State == FeatureState.Active &&
+            memory.TryRead(secondEconomy, out uint secondValue) &&
+            secondValue == 40000,
+            "Automatic credits must be reapplied for a new match.");
+
+        AutoApplySnapshot released = autoApply.RestoreOwned();
+        Assert(
+            released.Money.State == FeatureState.Off,
+            released.Money.Message);
+    }
+
+    private static void AutoSelectionPolicyRoundTrips()
+    {
+        VersionProfile profile = KnownProfiles.ObservedMentalOmega;
+        SelectionVeterancyHookDefinition hook =
+            profile.SelectionHooks[KnownPatchIds.AutoPromoteSelection];
+        using FakeMemoryAccessor memory = new();
+        FakeModuleResolver modules = new();
+        const uint gameBase = 0x00400000;
+        modules.Add(hook.ModuleName, gameBase);
+        uint[] entryAddresses = hook.Sites
+            .Select(site => checked(gameBase + site.Rva))
+            .ToArray();
+        for (int index = 0; index < hook.Sites.Count; index++)
+        {
+            memory.SetBytes(
+                entryAddresses[index],
+                hook.Sites[index].OriginalBytes);
+        }
+
+        // Configuration is allowed before a match; only the game modules must
+        // be loaded for the code hook to install.
+        GameSessionSnapshot modulesReady = new(
+            SessionState.ModulesReady,
+            memory.ProcessId,
+            "modules ready",
+            profile);
+        AutoApplyPolicyService autoApply = new(
+            new FakeSessionProbe(modulesReady),
+            new FakeMemoryAccessorFactory(memory),
+            modules);
+
+        AutoApplySnapshot armed = autoApply.SetSelectionEdit(
+            new SelectedUnitEditRequest(
+                SelectedUnitEditScope.AllCurrentPlayer,
+                UnitVeterancyLevel.Elite,
+                50000));
+        Assert(
+            armed.SelectionEdit.State == FeatureState.Active,
+            armed.SelectionEdit.Message);
+        Assert(
+            new GameActionService(
+                    new FakeSessionProbe(modulesReady),
+                    new FakeMemoryAccessorFactory(memory),
+                    modules)
+                .InspectPatch(KnownPatchIds.AutoPromoteSelection).State ==
+                PatchRuntimeState.Enabled,
+            "Arming before a match must install the selection event hook.");
+        byte[] installed = new byte[hook.Sites[0].OriginalBytes.Length];
+        Assert(
+            memory.TryReadBytes(entryAddresses[0], installed) &&
+            installed[0] == 0xE9,
+            "The armed selection hook must jump into its wrapper.");
+
+        // Entering a match must neither tear the hook down nor rewrite it.
+        GameSessionSnapshot matchReady = modulesReady with
+        {
+            State = SessionState.MatchReady,
+        };
+        AutoApplySnapshot acrossMatch = autoApply.Reconcile(matchReady);
+        Assert(
+            acrossMatch.SelectionEdit.State == FeatureState.Active,
+            acrossMatch.SelectionEdit.Message);
+        byte[] afterMatch = new byte[hook.Sites[0].OriginalBytes.Length];
+        Assert(
+            memory.TryReadBytes(entryAddresses[0], afterMatch) &&
+            afterMatch.SequenceEqual(installed),
+            "Entering another match must keep the installed selection hook.");
+
+        AutoApplySnapshot released = autoApply.RestoreOwned();
+        Assert(
+            released.SelectionEdit.State == FeatureState.Off,
+            released.SelectionEdit.Message);
+        for (int index = 0; index < hook.Sites.Count; index++)
+        {
+            byte[] restored =
+                new byte[hook.Sites[index].OriginalBytes.Length];
+            Assert(
+                memory.TryReadBytes(entryAddresses[index], restored) &&
+                restored.SequenceEqual(hook.Sites[index].OriginalBytes),
+                $"Closing the trainer must restore selection entry {index}.");
+        }
     }
 
     private static void DelayedUnitUnlimitedRoundTrips()

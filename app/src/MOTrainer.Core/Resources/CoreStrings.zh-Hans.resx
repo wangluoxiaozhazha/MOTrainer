@@ -207,4 +207,14 @@
   <data name="TechUnlockUnknownTarget" xml:space="preserve"><value>科技全开入口跳转到未知远程代码，拒绝操作</value></data>
   <data name="TechUnlockWriteFailed" xml:space="preserve"><value>科技全开 Hook 写入失败，已尝试恢复原字节</value></data>
   <data name="QueuePolicyReleased" xml:space="preserve"><value>队列策略已关闭：仍属本修改器的值已恢复；游戏替换的数值或对象保持不变。</value></data>
+  <data name="AutoMoneyOff" xml:space="preserve"><value>自动金钱未启用</value></data>
+  <data name="AutoMoneyWaitingForMatch" xml:space="preserve"><value>自动金钱已就绪，等待进入战局</value></data>
+  <data name="AutoMoneyActive" xml:space="preserve"><value>本局金钱已设为 {0}</value></data>
+  <data name="AutoMoneyApplied" xml:space="preserve"><value>金钱已自动设为 {0}</value></data>
+  <data name="AutoSelectionOff" xml:space="preserve"><value>选中单位自动修改已关闭</value></data>
+  <data name="AutoSelectionWaitingForModules" xml:space="preserve"><value>选中单位自动修改已就绪，等待游戏模块</value></data>
+  <data name="AutoSelectionArmed" xml:space="preserve"><value>选中单位自动修改已就绪</value></data>
+  <data name="PatchPolicyOff" xml:space="preserve"><value>功能未启用</value></data>
+  <data name="PatchPolicyWaitingForGame" xml:space="preserve"><value>功能已排队，游戏启动并完成校验后自动生效</value></data>
+  <data name="TechUnlockDisplayName" xml:space="preserve"><value>科技全开</value></data>
 </root>

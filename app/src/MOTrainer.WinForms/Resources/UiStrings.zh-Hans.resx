@@ -83,7 +83,7 @@
   <data name="ModeExtended" xml:space="preserve"><value>扩展模式</value></data>
   <data name="ModeFactionRecommended" xml:space="preserve"><value>阵营模式（推荐）</value></data>
   <data name="ModePollingCompatibility" xml:space="preserve"><value>轮询模式（兼容）</value></data>
-  <data name="OneTimeGroup" xml:space="preserve"><value>一次性功能</value></data>
+  <data name="OneTimeGroup" xml:space="preserve"><value>手动操作</value></data>
   <data name="PatchRestoreBlocked" xml:space="preserve"><value>{0}补丁字节异常，已停止退出</value></data>
   <data name="QueueLimitOff" xml:space="preserve"><value>解锁队列上限 [Off]</value></data>
   <data name="QueueLimitLabel" xml:space="preserve"><value>解锁队列上限</value></data>
@@ -124,4 +124,8 @@
   <data name="ExitWithoutRestorePrompt" xml:space="preserve"><value>仍然退出吗？部分修改可能保留到游戏退出。是：退出修改器；否：保留窗口，稍后重试。</value></data>
   <data name="FeatureActivatedNotification" xml:space="preserve"><value>{0}已激活</value></data>
   <data name="FeatureDeactivatedNotification" xml:space="preserve"><value>{0}已关闭</value></data>
+  <data name="ActionAutoMoney" xml:space="preserve"><value>自动</value></data>
+  <data name="AutoMoneyTooltip" xml:space="preserve"><value>每局自动应用该金钱值，直到关闭修改器。</value></data>
+  <data name="AutoEditArmed" xml:space="preserve"><value>选中单位自动修改已就绪，每局自动生效，直到关闭修改器</value></data>
+  <data name="PatchPolicyWaitingForGame" xml:space="preserve"><value>已排队，游戏启动并完成校验后自动生效</value></data>
 </root>

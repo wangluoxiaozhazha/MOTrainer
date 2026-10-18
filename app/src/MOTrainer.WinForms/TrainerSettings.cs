@@ -92,6 +92,7 @@ internal sealed record TrainerSettings(
     int Health,
     AutoEditMode AutoEditMode,
     uint Money,
+    bool AutoApplyMoney,
     TechUnlockMode TechUnlockMode,
     IReadOnlyList<uint> SelectedSuperweaponIds,
     HotkeyBindings Hotkeys)
@@ -105,6 +106,7 @@ internal sealed record TrainerSettings(
             Health: 10_000_000,
             AutoEditMode: AutoEditMode.Event,
             Money: 123_456,
+            AutoApplyMoney: false,
             TechUnlockMode: TechUnlockMode.Faction,
             SelectedSuperweaponIds: Array.Empty<uint>(),
             Hotkeys: HotkeyBindings.CreateDefaults());
@@ -190,6 +192,11 @@ internal sealed class TrainerSettingsStore
             "faction.money",
             defaults.Money,
             warnings);
+        bool autoApplyMoney = ReadBoolean(
+            values,
+            "faction.autoApplyMoney",
+            defaults.AutoApplyMoney,
+            warnings);
         TechUnlockMode techUnlockMode = ReadEnum(
             values,
             "techUnlock.mode",
@@ -264,6 +271,7 @@ internal sealed class TrainerSettingsStore
             health,
             autoEditMode,
             money,
+            autoApplyMoney,
             techUnlockMode,
             selectedSuperweaponIds,
             hotkeys);
@@ -341,6 +349,10 @@ internal sealed class TrainerSettingsStore
                 appSettings,
                 "faction.money",
                 settings.Money.ToString(CultureInfo.InvariantCulture));
+            SetValue(
+                appSettings,
+                "faction.autoApplyMoney",
+                settings.AutoApplyMoney.ToString());
             SetValue(
                 appSettings,
                 "techUnlock.mode",

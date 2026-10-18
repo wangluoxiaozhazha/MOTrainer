@@ -83,7 +83,7 @@
   <data name="ModeExtended" xml:space="preserve"><value>Extended mode</value></data>
   <data name="ModeFactionRecommended" xml:space="preserve"><value>Faction mode (recommended)</value></data>
   <data name="ModePollingCompatibility" xml:space="preserve"><value>Continuous (compatibility)</value></data>
-  <data name="OneTimeGroup" xml:space="preserve"><value>One-time actions</value></data>
+  <data name="OneTimeGroup" xml:space="preserve"><value>Manual actions</value></data>
   <data name="PatchRestoreBlocked" xml:space="preserve"><value>{0} patch bytes are unexpected; exit cancelled</value></data>
   <data name="QueueLimitOff" xml:space="preserve"><value>Remove queue limit [Off]</value></data>
   <data name="QueueLimitLabel" xml:space="preserve"><value>Remove queue limit</value></data>
@@ -124,4 +124,8 @@
   <data name="ExitWithoutRestorePrompt" xml:space="preserve"><value>Exit anyway? Some changes may remain active until the game exits. Yes: exit the trainer; No: stay open and retry later.</value></data>
   <data name="FeatureActivatedNotification" xml:space="preserve"><value>{0} activated</value></data>
   <data name="FeatureDeactivatedNotification" xml:space="preserve"><value>{0} disabled</value></data>
+  <data name="ActionAutoMoney" xml:space="preserve"><value>Auto</value></data>
+  <data name="AutoMoneyTooltip" xml:space="preserve"><value>Keeps applying this credit value in every match until the trainer is closed.</value></data>
+  <data name="AutoEditArmed" xml:space="preserve"><value>Automatic selected-unit editing armed; it applies in every match until the trainer is closed</value></data>
+  <data name="PatchPolicyWaitingForGame" xml:space="preserve"><value>Queued; it will apply when the verified game starts</value></data>
 </root>
