@@ -7,18 +7,32 @@ MOTrainer 是一个面向《Mental Omega》的非官方开源离线修改器。�
 
 > 本项目仅供离线游戏使用，不提供反作弊绕过，也不建议在任何联机环境中运行。
 
+## 本仓库的增强版
+
+本仓库基于原开源项目
+[cmdrmo/MOTrainer](https://github.com/cmdrmo/MOTrainer)
+进行增强，原作者与原项目仍是上游来源。
+
+本版本新增或改进的功能：
+
+- 修改器打开后即可配置金钱、选中单位属性和全部功能开关，不必先启动游戏或进入地图。
+- 游戏未启动时可以先把功能排入队列；检测到经过校验的游戏模块后自动应用。
+- 金钱按配置值在每一局开始时自动应用一次，不持续覆盖局内的正常花费。
+- 选中单位修改和功能策略在换地图、返回主菜单、重新开局后继续生效。
+- 所有状态保持到关闭修改器为止；退出时自动还原修改器拥有的补丁和策略。
+- EXE 内置管理员权限清单，可直接访问与游戏相同权限级别的进程。
+- 新增启动前排队、逐局重新应用和退出还原的自动化测试。
+
 ![MOTrainer 英文界面](docs/images/motrainer-english.png)
 
 ## 项目状态
 
-最新候选版本
-[`v0.1.0-rc3`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc3)
-已在同一个程序中支持自动、英文和简体中文界面，并支持下文记录的经典版与 Steam
-版 YR 1.001 已验证游戏配置。
+本增强版在同一个程序中支持自动、英文和简体中文界面，并支持下文记录的经典版与
+Steam 版 YR 1.001 已验证游戏配置。
 
-- [查看全部 Releases](https://github.com/cmdrmo/MOTrainer/releases)
+- [原项目地址](https://github.com/cmdrmo/MOTrainer)
 - [兼容性与故障排查](docs/COMPATIBILITY.zh-CN.md)
-- [提交 Issue](https://github.com/cmdrmo/MOTrainer/issues)
+- [提交增强版 Issue](https://github.com/wangluoxiaozhazha/MOTrainer/issues)
 
 ## 主要功能
 
@@ -39,8 +53,14 @@ MOTrainer 是一个面向《Mental Omega》的非官方开源离线修改器。�
 - 操纵全部、心灵探测、无视隐形、无视黑雾。
 - 科技全开：阵营模式与扩展模式。
 
-`解锁建造数量` 和 `解锁队列上限` 可以在进入战局前预设；程序会在对应结构
-就绪后应用。
+全部功能开关都可以在修改器打开后预先配置。游戏未启动时显示等待状态；检测到
+经过校验的游戏模块后自动应用，并在换地图后继续保持，直到关闭修改器。
+
+### 自动保持
+
+- 金钱可在进图前设置，每局开始时自动应用一次。
+- 选中单位等级和生命可在进图前启用自动修改。
+- 自动策略会保持到关闭修改器，并在退出时释放。
 
 ### 一次性功能
 
@@ -71,7 +91,7 @@ MOTrainer 是一个面向《Mental Omega》的非官方开源离线修改器。�
 ## 下载与使用
 
 请从本项目的
-[GitHub Releases](https://github.com/cmdrmo/MOTrainer/releases)
+[GitHub Releases](https://github.com/wangluoxiaozhazha/MOTrainer/releases)
 下载发布包，不要使用不明来源重新打包的版本。Release 提供 `.sha256` 文件时，
 建议在解压前核对 ZIP。
 
@@ -86,10 +106,12 @@ MOTrainer.exe.config
 双语构建还包含一个 `zh-Hans` 目录，其中有两个卫星资源 DLL。该目录必须与
 `MOTrainer.exe` 一起保留；删除后简体中文资源将不可用。
 
-1. 启动 Mental Omega。
-2. 使用与游戏相同的权限级别启动 `MOTrainer.exe`。
-3. 等待顶部状态栏确认游戏版本。
-4. 进入离线战局后使用对应功能。
+1. 启动 `MOTrainer.exe`，在 Windows UAC 提示中选择“是”。
+2. 先配置金钱、单位属性和需要启用的功能开关。
+3. 启动 Mental Omega；游戏版本校验完成后，排队功能会自动应用。
+4. 进入离线战局，使用已配置的功能。
+
+增强版 EXE 已内置管理员权限清单，不再需要单独的 VBS 启动器。
 
 `MOTrainer.exe.config` 保存界面语言、编辑数值、超级武器选择、功能模式和自定义
 热键。更新前建议备份该文件；如果旧配置被新版本判定为无效，请恢复新发布包附带的
@@ -120,8 +142,9 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-当前自动化测试包含 38 项烟雾测试，覆盖核心状态转换、安全拒绝、回滚路径、本地化
-资源和设置兼容性，但不代替特定 Mental Omega 版本中的实机验证。
+当前自动化测试包含 41 项烟雾测试，覆盖核心状态转换、安全拒绝、回滚路径、启动前
+排队、跨战局策略重新应用、本地化资源和设置兼容性，但不代替特定 Mental Omega
+版本中的实机验证。
 
 默认的紧凑型 .NET Framework 4.8 发布命令：
 
@@ -150,9 +173,10 @@ docs/                                兼容性与维护说明
 
 ## 项目关系与致谢
 
-MOTrainer 不是 Mental Omega、Electronic Arts 或任何既有修改器的官方项目，
-也不与这些项目存在隶属关系。设计和兼容性研究参考了社区公开资料、既有工具的
-可观察行为和长期游戏经验，具体说明见
+本增强版基于原开源项目
+[cmdrmo/MOTrainer](https://github.com/cmdrmo/MOTrainer)，
+并保留上游的 GPL-3.0-only 授权。MOTrainer 不是 Mental Omega、Electronic
+Arts 或任何既有修改器的官方项目，也不与这些项目存在隶属关系。具体说明见
 [致谢与项目边界](ACKNOWLEDGEMENTS.zh-CN.md)。
 
 本仓库不包含或分发游戏本体、Mental Omega 文件、第三方修改器文件或它们的资源。

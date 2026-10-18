@@ -10,19 +10,39 @@ for strictly verified game builds.
 > Offline use only. MOTrainer does not provide anti-cheat bypasses and should
 > not be used in multiplayer environments.
 
+## Enhanced build in this repository
+
+This repository is an enhanced build based on the original open-source
+[cmdrmo/MOTrainer](https://github.com/cmdrmo/MOTrainer) project. The original
+author and project remain the upstream source.
+
+Enhancements in this build:
+
+- Configure credits, selected-unit attributes, and every feature toggle before
+  the game or match starts.
+- Queue feature toggles while the game is closed and apply them automatically
+  after the verified game modules load.
+- Automatically apply the configured credit value once per match without
+  overwriting normal in-match spending.
+- Keep selected-unit editing and feature policies active across map changes,
+  menu returns, and new matches until the trainer is closed.
+- Restore patches and policies that this trainer owns when it exits.
+- Run the executable with the administrator privileges required to access a
+  game process running at the same privilege level.
+- Add smoke-test coverage for pre-launch queues, per-match reapplication, and
+  shutdown restoration.
+
 ![MOTrainer English interface](docs/images/motrainer-english.png)
 
 ## Project status
 
-The latest release candidate,
-[`v0.1.0-rc3`](https://github.com/cmdrmo/MOTrainer/releases/tag/v0.1.0-rc3),
-supports `Auto`, English, and Simplified Chinese display languages in one
-executable. It also supports the verified Classic and Steam YR 1.001 game
-profiles documented below.
+This enhanced branch supports `Auto`, English, and Simplified Chinese display
+languages in one executable. It also supports the verified Classic and Steam
+YR 1.001 game profiles documented below.
 
-- [Releases](https://github.com/cmdrmo/MOTrainer/releases)
+- [Original upstream project](https://github.com/cmdrmo/MOTrainer)
 - [Compatibility and troubleshooting](docs/COMPATIBILITY.md)
-- [Report an issue](https://github.com/cmdrmo/MOTrainer/issues)
+- [Report an issue for this enhanced build](https://github.com/wangluoxiaozhazha/MOTrainer/issues)
 
 ## Features
 
@@ -44,8 +64,16 @@ profiles documented below.
   the map.
 - Safe technology unlock with faction and extended modes.
 
-Build-count and queue-limit options may be preset before entering a match. They
-remain pending and apply only after the required game structures are available.
+All feature toggles may be configured before the game starts. Toggles remain
+pending until the verified game modules are available, then apply automatically.
+Policies remain active across matches until the trainer is closed.
+
+### Automatic values
+
+- Credits can be configured before a match and are reapplied once when each
+  new match starts.
+- Selected-unit rank and health editing can be armed before a match.
+- Automatic values are released when the trainer closes.
 
 ### One-time actions
 
@@ -80,9 +108,9 @@ requirements.
 ## Download and use
 
 Download packages only from this repository's
-[GitHub Releases](https://github.com/cmdrmo/MOTrainer/releases). Avoid
-third-party repacks. When a `.sha256` file is provided, verify the ZIP before
-extracting it.
+[GitHub Releases](https://github.com/wangluoxiaozhazha/MOTrainer/releases).
+Avoid third-party repacks. When a `.sha256` file is provided, verify the ZIP
+before extracting it.
 
 The release package contains three files that must remain in the same
 directory:
@@ -97,10 +125,13 @@ Bilingual builds also contain a `zh-Hans` directory with two satellite resource
 DLLs. Keep that directory beside `MOTrainer.exe`; removing it disables the
 Simplified Chinese resources.
 
-1. Start Mental Omega.
-2. Start `MOTrainer.exe` at the same privilege level as the game.
-3. Wait for the top status bar to confirm the game build.
-4. Enter an offline match and use the required controls.
+1. Start `MOTrainer.exe` and approve the Windows UAC prompt.
+2. Configure credits, selected-unit attributes, and feature toggles first.
+3. Start Mental Omega. Queued features apply after the game build is verified.
+4. Enter an offline match and use the configured controls.
+
+The enhanced executable includes an administrator manifest and does not require
+a separate script launcher.
 
 `MOTrainer.exe.config` stores the language, editor values, selected
 superweapons, feature modes, and custom hotkeys. Back it up before replacing a
@@ -139,10 +170,10 @@ dotnet run --project .\app\tests\MOTrainer.Core.SmokeTests `
   --configuration Release
 ```
 
-The current suite contains 38 smoke tests covering core state transitions,
-safety refusals, rollback paths, localization resources, and settings
-compatibility. These tests do not replace validation against the exact supported
-Mental Omega build.
+The current suite contains 41 smoke tests covering core state transitions,
+safety refusals, rollback paths, pre-launch queues, cross-match policy
+reapplication, localization resources, and settings compatibility. These tests
+do not replace validation against the exact supported Mental Omega build.
 
 Publish the compact x86 .NET Framework build with:
 
@@ -173,10 +204,11 @@ shutdown restoration. The current internal plan is available in
 
 ## Independence and acknowledgements
 
-MOTrainer is not affiliated with or endorsed by Mental Omega, Electronic Arts,
-or any existing trainer project. It is independently implemented from public
-documentation, observable behavior, community research, and validation against
-the supported build. See [Acknowledgements and project boundaries](ACKNOWLEDGEMENTS.md).
+This enhanced build is based on the original
+[cmdrmo/MOTrainer](https://github.com/cmdrmo/MOTrainer) project and preserves
+the upstream GPL-3.0-only license. It is not affiliated with or endorsed by
+Mental Omega, Electronic Arts, or any existing trainer project. See
+[Acknowledgements and project boundaries](ACKNOWLEDGEMENTS.md).
 
 This repository does not contain or distribute the game, Mental Omega files,
 third-party trainer files, or their assets.
